@@ -197,15 +197,6 @@
             font-size: 12px;
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .code-icon {
             text-align: center;
             font-size: 30px;
@@ -314,14 +305,7 @@
     }
 
     // ===== ПЕРЕХОД НА MAIN.HTML =====
-    function goToMain(telegramId, nickname, siteNick, siteId) {
-        localStorage.setItem('userData', JSON.stringify({
-            telegramId: telegramId,
-            nickname: nickname,
-            siteNick: siteNick,
-            siteId: siteId,
-            regDate: new Date().toISOString()
-        }));
+    function goToMain() {
         window.location.href = 'main.html';
     }
 
@@ -399,9 +383,6 @@
     verifyBtn.addEventListener('click', async () => {
         const code = codeInput.value.trim();
         const telegramId = telegramIdInput.value.trim();
-        const nickname = nicknameInput.value.trim();
-        const siteNick = siteNickInput.value.trim();
-        const siteId = siteIdInput.value.trim();
 
         if (!code || code.length !== 5) {
             codeStatus.textContent = '❌ Введите 5-значный код!';
@@ -427,7 +408,7 @@
             if (data.verified) {
                 codeStatus.textContent = '✅ Аккаунт уже подтверждён!';
                 codeStatus.style.color = '#34d399';
-                goToMain(telegramId, nickname, siteNick, siteId);
+                goToMain();
                 return;
             }
 
@@ -439,7 +420,7 @@
 
                 codeStatus.textContent = '✅ Аккаунт успешно зарегистрирован!';
                 codeStatus.style.color = '#34d399';
-                goToMain(telegramId, nickname, siteNick, siteId);
+                goToMain();
             } else {
                 codeStatus.textContent = '❌ Неверный код! Попробуйте снова.';
                 codeStatus.style.color = '#f87171';
