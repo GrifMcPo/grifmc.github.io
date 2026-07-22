@@ -1,0 +1,409 @@
+/* ========================================
+   main.css — СТИЛИ ГЛАВНОЙ СТРАНИЦЫ
+   ======================================== */
+
+/* ===== НАВБАР ===== */
+.navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    height: 72px;
+    background: rgba(10,10,20,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,255,255,0.08);
+    box-shadow: 0 4px 40px rgba(0,0,0,0.5);
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.logo-icon { font-size: 1.5em; animation: pulseLogo 2s ease-in-out infinite; }
+@keyframes pulseLogo {
+    0%,100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0,255,255,0.3)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 30px rgba(0,255,255,0.6)); }
+}
+
+.logo-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3em;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+}
+
+.nav-links {
+    display: flex;
+    gap: 4px;
+}
+
+.nav-links a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    letter-spacing: 0.08em;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.nav-links a:hover {
+    color: #fff;
+    background: rgba(0,255,255,0.08);
+}
+
+.nav-links a.active {
+    color: var(--primary);
+    background: rgba(0,255,255,0.12);
+}
+
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 14px 4px 4px;
+    border-radius: 30px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.3s ease;
+}
+
+.user-profile:hover {
+    border-color: rgba(0,255,255,0.2);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,255,255,0.2);
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #fff;
+}
+
+.user-rank {
+    font-size: 0.7em;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: rgba(0,255,255,0.1);
+    color: var(--primary);
+    border: 1px solid rgba(0,255,255,0.1);
+}
+
+.logout-btn {
+    padding: 6px 16px !important;
+    font-size: 0.75em !important;
+}
+
+/* ===== ГЛАВНЫЙ ЭКРАН ===== */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 20px 60px;
+    position: relative;
+    z-index: 10;
+}
+
+.hero-content {
+    max-width: 1100px;
+    width: 100%;
+    text-align: center;
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 6px 24px;
+    border-radius: 30px;
+    background: rgba(0,255,255,0.06);
+    border: 1px solid rgba(0,255,255,0.1);
+    color: var(--primary);
+    font-size: 0.75em;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.pulse-badge {
+    animation: pulseBadge 2s ease-in-out infinite;
+}
+
+@keyframes pulseBadge {
+    0%,100% { box-shadow: 0 0 0 rgba(0,255,255,0); }
+    50% { box-shadow: 0 0 30px rgba(0,255,255,0.08); }
+}
+
+.hero-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 5em;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 16px;
+}
+
+.hero-sub {
+    color: rgba(255,255,255,0.35);
+    font-size: 1.1em;
+    letter-spacing: 0.05em;
+    margin-bottom: 40px;
+}
+
+/* ===== СТАТИСТИКА ===== */
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    padding: 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: rgba(0,255,255,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.stat-icon { font-size: 1.5em; margin-bottom: 6px; }
+.stat-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5em;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+.stat-number.online { color: var(--accent); }
+.stat-number.danger { color: var(--danger); }
+.stat-number.gold { color: var(--gold); }
+.stat-label {
+    color: rgba(255,255,255,0.25);
+    font-size: 0.7em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* ===== IP-АДРЕС ===== */
+.hero-ip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 14px 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.ip-label {
+    color: rgba(255,255,255,0.2);
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.ip-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2em;
+    color: var(--primary);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 20px rgba(0,255,255,0.2);
+}
+
+.ip-value:hover {
+    text-shadow: 0 0 40px rgba(0,255,255,0.5);
+}
+
+.ip-value.copied {
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(57,255,20,0.5);
+}
+
+.copy-btn {
+    padding: 6px 16px !important;
+    font-size: 0.75em !important;
+}
+
+/* ===== ПЛИТКИ ===== */
+.hero-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tile::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(0,255,255,0.05), rgba(123,47,255,0.05));
+    z-index: -1;
+}
+
+.tile:hover { transform: translateY(-4px) scale(1.02); }
+
+.tile-shop:hover { border-color: var(--gold); }
+.tile-profile:hover { border-color: var(--primary); }
+.tile-rules:hover { border-color: var(--accent); }
+
+.tile-icon { font-size: 2em; margin-bottom: 8px; }
+.tile-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.tile-desc {
+    color: rgba(255,255,255,0.3);
+    font-size: 0.75em;
+    margin-top: 4px;
+}
+
+/* ===== СЕКЦИИ ===== */
+.section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8em;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: #fff;
+}
+
+.section-line {
+    width: 80px;
+    height: 2px;
+    margin: 12px auto 0;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+}
+
+/* ===== НОВОСТИ ===== */
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.news-card {
+    padding: 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+}
+
+.news-card:hover {
+    border-color: rgba(0,255,255,0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+}
+
+.news-card.important {
+    border-color: var(--danger);
+    background: rgba(255,0,128,0.04);
+}
+
+.news-badge {
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 12px;
+    font-size: 0.65em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+}
+
+.news-badge.update { background: rgba(0,255,255,0.1); color: var(--primary); }
+.news-badge.event { background: rgba(251,191,36,0.1); color: var(--gold); }
+.news-badge.important { background: rgba(255,0,128,0.1); color: var(--danger); }
+
+.news-title {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.news-text {
+    color: rgba(255,255,255,0.4);
+    font-size: 0.9em;
+    line-height: 1.6;
+}
+
+.news-date {
+    color: rgba(255,255,255,0.15);
+    font-size: 0.7em;
+    margin-top: 12px;
+}
+
+/* ===== КАРУСЕЛЬ ===== */
+.carousel-container {
+    overflow: hidden;
+    position: relative;
+    padding: 10px 0;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 20px;
+    animation: carouselScroll 30s linear infinite;
+    width: max-content;
+}
