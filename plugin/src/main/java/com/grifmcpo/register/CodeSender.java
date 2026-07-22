@@ -28,7 +28,10 @@ public class CodeSender extends BukkitRunnable {
                             if (player != null) {
                                 player.sendMessage("§6🔐 Код подтверждения: §c" + code);
                                 player.sendMessage("§7Введите этот код на сайте для завершения регистрации!");
-                                child.getRef().child("code_sent").setValue(true);
+                                
+                                // ИСПРАВЛЕНО: используем setValueAsync() или setValue() с null listener
+                                child.getRef().child("code_sent").setValueAsync(true);
+                                
                                 RegisterPlugin.getInstance().getLogger().info("📨 Код отправлен игроку " + nickname);
                             }
                         }
