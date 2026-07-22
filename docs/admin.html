@@ -3,376 +3,490 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔧 Админ-панель</title>
+    <title>🔧 Панель администратора</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0e27;
-            color: #fff;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: #12163a;
-            border-bottom: 2px solid #ef4444;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo { font-size: 20px; font-weight: 700; color: #ef4444; }
-        .back-link { color: #94a3b8; text-decoration: none; }
-        .back-link:hover { color: #fff; }
-        .content { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        h1 { color: #ef4444; margin-bottom: 16px; }
-        h2 { color: #a78bfa; margin: 16px 0 8px; font-size: 18px; }
-        .btn {
-            background: #7c3aed;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
-        }
-        .btn:hover { background: #6d28d9; }
-        .btn-danger { background: #ef4444; }
-        .btn-danger:hover { background: #dc2626; }
-        .btn-success { background: #10b981; }
-        .btn-success:hover { background: #059669; }
-        .btn-sm { padding: 6px 14px; font-size: 13px; }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin: 16px 0;
-        }
-        .stat-card {
-            background: #1e2447;
-            padding: 16px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid #334155;
-        }
-        .stat-card .num { font-size: 28px; font-weight: 700; }
-        .stat-card .label { color: #94a3b8; font-size: 12px; text-transform: uppercase; }
-        .players-list {
-            background: #1e2447;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 12px;
-        }
-        .player-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 20px;
-            border-bottom: 1px solid #0a0e27;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .player-row:last-child { border-bottom: none; }
-        .player-row .info { flex: 1; }
-        .player-row .name { font-weight: 700; }
-        .player-row .details { color: #94a3b8; font-size: 13px; margin-top: 2px; }
-        .player-row .actions { display: flex; gap: 6px; flex-wrap: wrap; }
-        .badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-ok { background: rgba(16,185,129,0.2); color: #10b981; }
-        .badge-ban { background: rgba(239,68,68,0.2); color: #ef4444; }
-        .badge-warn { background: rgba(251,191,36,0.2); color: #fbbf24; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; color: #94a3b8; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            background: #1e2447;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #7c3aed;
-        }
-        .form-group textarea { resize: vertical; min-height: 60px; }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .admin-card {
-            background: #12163a;
-            border: 1px solid #ef4444;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-        .footer {
-            margin-top: 30px;
-            padding-top: 16px;
-            border-top: 1px solid #1e2447;
-            text-align: center;
-            color: #475569;
-            font-size: 14px;
-        }
-        .loading { text-align: center; padding: 20px; color: #475569; }
-    </style>
 </head>
-<body>
+<body class="admin-body">
 
-<div class="navbar">
-    <div class="logo">🔧 Админ-панель</div>
-    <div>
-        <a href="main.html" class="back-link">← На главную</a>
-        <span style="color:#94a3b8;margin-left:16px;">👑 Admin</span>
+<div class="particles" id="particles"></div>
+<div class="screen-border"></div>
+
+<!-- ЛОГИН -->
+<div id="admin-login-screen" class="admin-login-screen">
+    <div class="admin-login-card">
+        <div class="admin-login-icon">🔧</div>
+        <h1 class="rgb-text" style="font-family:'Orbitron',monospace;font-size:1.6em;">Панель администратора</h1>
+        <p style="color:rgba(255,255,255,0.4);margin-bottom:28px;">Введите пароль для доступа</p>
+        <input type="password" id="admin-password-input" placeholder="Пароль администратора" style="text-align:center;margin-bottom:16px;">
+        <button class="btn-primary" onclick="checkAdminPassword()"><span class="btn-text">🚀 Войти</span><span class="btn-shimmer"></span></button>
+        <p id="login-error" style="color:#ff0080;text-align:center;margin-top:12px;min-height:20px;"></p>
+        <div style="margin-top:20px;"><a href="main.html" style="color:rgba(255,255,255,0.3);text-decoration:none;">← Назад на сайт</a></div>
     </div>
 </div>
 
-<div class="content">
+<!-- ПАНЕЛЬ -->
+<div id="admin-panel" style="display:none;">
 
-    <h1>Управление сервером</h1>
-
-    <div class="stats-grid">
-        <div class="stat-card"><div class="num" id="admin-stat-users" style="color:#a78bfa;">—</div><div class="label">👥 Игроков</div></div>
-        <div class="stat-card"><div class="num" id="admin-stat-bans" style="color:#ef4444;">—</div><div class="label">🚫 Активных банов</div></div>
-        <div class="stat-card"><div class="num" id="admin-stat-warns" style="color:#fbbf24;">—</div><div class="label">⚠️ Предупреждений</div></div>
-        <div class="stat-card"><div class="num" id="admin-stat-online" style="color:#10b981;">—</div><div class="label">🟢 Онлайн</div></div>
-    </div>
-
-    <div class="admin-card">
-        <h2>⚡ Быстрые действия</h2>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
-            <button class="btn btn-danger" onclick="alert('Форма бана ниже')">🚫 Выдать бан</button>
-            <button class="btn btn-success" onclick="alert('Форма разбана ниже')">🔓 Снять бан</button>
-            <button class="btn" style="background:#fbbf24;color:#000;" onclick="alert('Форма варна ниже')">⚠️ Выдать варн</button>
-            <button class="btn" onclick="loadPlayers()">🔄 Обновить</button>
+    <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="sidebar-logo"><span class="sidebar-icon">⚡</span><span class="rgb-text" style="font-family:'Orbitron',monospace;font-weight:900;">Admin Panel</span></div>
+        <nav class="sidebar-nav">
+            <div class="nav-group"><div class="nav-group-title">📊 Мониторинг</div>
+                <a class="s-link active" onclick="showSection('dashboard')">🏠 Dashboard</a>
+                <a class="s-link" onclick="showSection('realtime')">⚡ Реальное время</a>
+                <a class="s-link" onclick="showSection('logs')">📋 Логи</a>
+                <a class="s-link" onclick="showSection('analytics')">📈 Аналитика</a>
+            </div>
+            <div class="nav-group"><div class="nav-group-title">👥 Пользователи</div>
+                <a class="s-link" onclick="showSection('users')">👤 Все игроки</a>
+                <a class="s-link" onclick="showSection('search-users')">🔍 Поиск игрока</a>
+                <a class="s-link" onclick="showSection('roles')">🎖️ Роли</a>
+                <a class="s-link" onclick="showSection('messages')">✉️ Сообщения</a>
+            </div>
+            <div class="nav-group"><div class="nav-group-title">🚫 Система банов</div>
+                <a class="s-link" onclick="showSection('bans')">🚫 Все баны</a>
+                <a class="s-link" onclick="showSection('ban-account')">👤 Бан аккаунта</a>
+                <a class="s-link" onclick="showSection('ban-ip')">🌐 IP-бан</a>
+                <a class="s-link" onclick="showSection('ban-telegram')">📱 Бан Telegram</a>
+                <a class="s-link" onclick="showSection('ban-siteid')">🆔 Бан Site ID</a>
+                <a class="s-link" onclick="showSection('mass-ban')">💥 Массовый бан</a>
+                <a class="s-link" onclick="showSection('appeals')">📨 Апелляции</a>
+                <a class="s-link" onclick="showSection('warns')">⚠️ Предупреждения</a>
+                <a class="s-link" onclick="showSection('ip-whitelist')">✅ IP Whitelist</a>
+            </div>
+            <div class="nav-group"><div class="nav-group-title">📢 Контент</div>
+                <a class="s-link" onclick="showSection('announcements')">📢 Объявления</a>
+                <a class="s-link" onclick="showSection('news-admin')">📰 Новости</a>
+                <a class="s-link" onclick="showSection('rules-admin')">📜 Правила</a>
+                <a class="s-link" onclick="showSection('motd')">💬 MOTD</a>
+                <a class="s-link" onclick="showSection('blacklist-nicks')">🔇 Чёрный список</a>
+            </div>
+            <div class="nav-group"><div class="nav-group-title">🛡️ Безопасность</div>
+                <a class="s-link" onclick="showSection('security')">🛡️ Безопасность</a>
+                <a class="s-link" onclick="showSection('suspicious')">🔍 Подозрительные</a>
+                <a class="s-link" onclick="showSection('admin-log')">📖 Лог админа</a>
+                <a class="s-link" onclick="showSection('lockdown')">🔒 Локдаун</a>
+                <a class="s-link" onclick="showSection('rate-limits')">⏱️ Rate Limits</a>
+            </div>
+            <div class="nav-group"><div class="nav-group-title">⚙️ Настройки</div>
+                <a class="s-link" onclick="showSection('settings')">⚙️ Настройки</a>
+                <a class="s-link" onclick="showSection('server-settings')">🖥️ Сервер</a>
+                <a class="s-link" onclick="showSection('notifications-settings')">🔔 Уведомления</a>
+                <a class="s-link" onclick="showSection('webhook')">🔗 Webhook</a>
+                <a class="s-link" onclick="showSection('backup')">💾 Бэкап</a>
+                <a class="s-link" onclick="showSection('export')">📤 Экспорт</a>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="adminLogout()">🚪 Выход</button>
+            <a href="main.html" class="back-link">← На сайт</a>
         </div>
-    </div>
+    </aside>
 
-    <div class="admin-card">
-        <h2>🚫 Выдать бан</h2>
-        <div class="grid-2">
-            <div class="form-group">
-                <label>Telegram ID или Site ID</label>
-                <input type="text" id="ban-target" placeholder="Например: 8889631346">
+    <main class="admin-main">
+        <div class="admin-topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+                <span class="topbar-title" id="section-title">Dashboard</span>
             </div>
-            <div class="form-group">
-                <label>Причина</label>
-                <input type="text" id="ban-reason" placeholder="Например: Читы, Спам...">
-            </div>
-            <div class="form-group">
-                <label>Срок</label>
-                <select id="ban-duration">
-                    <option value="permanent">♾️ Навсегда</option>
-                    <option value="1d">📅 1 день</option>
-                    <option value="3d">📅 3 дня</option>
-                    <option value="7d">📅 7 дней</option>
-                    <option value="14d">📅 14 дней</option>
-                    <option value="30d">📅 30 дней</option>
-                </select>
-            </div>
-            <div style="display:flex;align-items:flex-end;">
-                <button class="btn btn-danger" onclick="banPlayer()" style="width:100%;">🚫 Забанить</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="admin-card">
-        <h2>🔓 Снять бан</h2>
-        <div class="grid-2">
-            <div class="form-group">
-                <label>Telegram ID или Site ID</label>
-                <input type="text" id="unban-target" placeholder="Например: 8889631346">
-            </div>
-            <div style="display:flex;align-items:flex-end;">
-                <button class="btn btn-success" onclick="unbanPlayer()" style="width:100%;">🔓 Снять бан</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="admin-card">
-        <h2>⚠️ Выдать предупреждение</h2>
-        <div class="grid-2">
-            <div class="form-group">
-                <label>Telegram ID или Site ID</label>
-                <input type="text" id="warn-target" placeholder="Например: 8889631346">
-            </div>
-            <div class="form-group">
-                <label>Причина</label>
-                <input type="text" id="warn-reason" placeholder="Например: Нарушение правил">
-            </div>
-            <div style="display:flex;align-items:flex-end;">
-                <button class="btn" style="background:#fbbf24;color:#000;" onclick="warnPlayer()" style="width:100%;">⚠️ Выдать варн</button>
+            <div class="topbar-right">
+                <div class="realtime-badge"><span class="rt-dot"></span> Реальное время</div>
+                <div class="admin-info"><span class="admin-avatar">👑</span> Администратор</div>
             </div>
         </div>
-    </div>
 
-    <div class="admin-card">
-        <h2>👥 Игроки</h2>
-        <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;">
-            <input type="text" id="search-players" placeholder="Поиск по нику..." style="flex:1;padding:8px 14px;background:#1e2447;border:1px solid #334155;border-radius:8px;color:#fff;min-width:150px;">
-            <button class="btn btn-sm" onclick="searchPlayers()">🔍 Найти</button>
-            <button class="btn btn-sm" onclick="loadPlayers()">🔄 Обновить</button>
-        </div>
-        <div class="players-list" id="players-list-admin">
-            <div class="loading">Загрузка...</div>
-        </div>
-    </div>
+        <div id="admin-notifications" class="admin-notifications"></div>
 
-    <div class="footer">
-        🔧 Админ-панель v2.0 | <a href="main.html" style="color:#a78bfa;text-decoration:none;">← На сайт</a>
-    </div>
+        <!-- DASHBOARD -->
+        <section class="a-section active" id="sec-dashboard">
+            <div class="a-grid-4">
+                <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num rgb-text" id="dash-users">0</div><div class="stat-label">Всего игроков</div></div>
+                <div class="stat-card"><div class="stat-icon">🚫</div><div class="stat-num" id="dash-bans" style="color:#ff0080;">0</div><div class="stat-label">Активных банов</div></div>
+                <div class="stat-card"><div class="stat-icon">🌐</div><div class="stat-num" id="dash-ipbans" style="color:#ff6600;">0</div><div class="stat-label">IP-банов</div></div>
+                <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-num" id="dash-warns" style="color:#f1c40f;">0</div><div class="stat-label">Предупреждений</div></div>
+            </div>
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">⚡ Последние регистрации</div><div id="recent-registrations" class="feed-list"></div></div>
+                <div class="a-card"><div class="a-card-header">🚫 Последние баны</div><div id="recent-bans-feed" class="feed-list"></div></div>
+            </div>
+        </section>
+
+        <!-- REALTIME -->
+        <section class="a-section" id="sec-realtime">
+            <div class="a-card"><div class="a-card-header">⚡ Лента событий</div><div id="realtime-feed" class="realtime-feed"></div></div>
+        </section>
+
+        <!-- LOGS -->
+        <section class="a-section" id="sec-logs">
+            <div class="a-card">
+                <div class="a-card-header">📋 Все логи<div class="card-actions"><input type="text" placeholder="Поиск..." id="log-search" oninput="filterLogs()" style="width:180px;padding:6px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#fff;"><button class="btn-sm" onclick="clearLogs()">🗑️</button></div></div>
+                <div id="all-logs" class="log-list"></div>
+            </div>
+        </section>
+
+        <!-- ANALYTICS -->
+        <section class="a-section" id="sec-analytics">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">📈 Регистрации</div><div id="chart-regs" class="chart-area"></div></div>
+                <div class="a-card"><div class="a-card-header">🚫 Баны по типу</div><div id="chart-bans" class="chart-area"></div></div>
+            </div>
+        </section>
+
+        <!-- USERS -->
+        <section class="a-section" id="sec-users">
+            <div class="a-card">
+                <div class="a-card-header">👤 Все игроки<div class="card-actions"><input type="text" placeholder="Фильтр..." id="users-filter" oninput="filterUsers()" style="width:160px;padding:6px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#fff;"><button class="btn-sm" onclick="exportUsers()">📤 CSV</button></div></div>
+                <div class="table-wrapper">
+                    <table class="a-table"><thead><tr><th>Ник сайта</th><th>Ник MC</th><th>Site ID</th><th>TG ID</th><th>Статус</th><th>Действия</th></tr></thead><tbody id="users-tbody"></tbody></table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEARCH USERS -->
+        <section class="a-section" id="sec-search-users">
+            <div class="a-card">
+                <div class="a-card-header">🔍 Поиск игрока</div>
+                <div class="search-box">
+                    <input type="text" id="user-search-input" placeholder="Telegram ID / Ник / Site ID...">
+                    <button class="btn-primary" style="width:auto;padding:10px 24px;" onclick="searchUser()">Найти</button>
+                </div>
+                <div id="user-search-result" class="user-search-result"></div>
+            </div>
+        </section>
+
+        <!-- BANS -->
+        <section class="a-section" id="sec-bans">
+            <div class="a-card">
+                <div class="a-card-header">🚫 Активные баны<div class="card-actions"><select id="bans-type-filter" onchange="filterBans()" style="padding:6px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#fff;"><option value="">Все</option><option value="account">Аккаунт</option><option value="ip">IP</option><option value="telegram">Telegram</option><option value="siteid">Site ID</option></select><button class="btn-sm danger" onclick="massUnban()">🔓 Снять все</button></div></div>
+                <div class="table-wrapper">
+                    <table class="a-table"><thead><tr><th>Тип</th><th>Цель</th><th>Причина</th><th>Срок</th><th>Статус</th><th>Действия</th></tr></thead><tbody id="bans-tbody"></tbody></table>
+                </div>
+            </div>
+        </section>
+
+        <!-- BAN ACCOUNT -->
+        <section class="a-section" id="sec-ban-account">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">🚫 Бан аккаунта</div>
+                    <div class="form-col">
+                        <label>Telegram ID или Site ID</label>
+                        <input type="text" id="ban-acc-target" placeholder="Идентификатор">
+                        <label>Причина</label>
+                        <select id="ban-acc-reason-preset" onchange="setPresetReason('ban-acc-reason',this.value)" style="padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;">
+                            <option value="">-- Выберите --</option>
+                            <option value="Читы">🎯 Читы</option>
+                            <option value="Оскорбления">💬 Оскорбления</option>
+                            <option value="Спам">📢 Спам</option>
+                            <option value="Griefing">🔨 Griefing</option>
+                            <option value="Мультиаккаунт">👥 Мультиаккаунт</option>
+                            <option value="Нарушение правил">📜 Нарушение</option>
+                        </select>
+                        <input type="text" id="ban-acc-reason" placeholder="Или введите вручную">
+                        <label>Срок</label>
+                        <select id="ban-acc-duration" style="padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;">
+                            <option value="permanent">♾️ Навсегда</option>
+                            <option value="1h">1 час</option>
+                            <option value="6h">6 часов</option>
+                            <option value="1d">1 день</option>
+                            <option value="3d">3 дня</option>
+                            <option value="7d">7 дней</option>
+                            <option value="14d">14 дней</option>
+                            <option value="30d">30 дней</option>
+                        </select>
+                        <button class="btn-primary danger-btn" onclick="banAccount()">🚫 Выдать бан</button>
+                    </div>
+                </div>
+                <div class="a-card"><div class="a-card-header">🔓 Снять бан</div>
+                    <div class="form-col">
+                        <label>Telegram ID или Site ID</label>
+                        <input type="text" id="unban-acc-target" placeholder="Идентификатор">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#00ff88,#00d4ff);" onclick="unbanAccount()">🔓 Снять бан</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BAN IP -->
+        <section class="a-section" id="sec-ban-ip">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">🌐 IP-бан</div>
+                    <div class="form-col">
+                        <label>IP-адрес</label>
+                        <input type="text" id="ban-ip-target" placeholder="192.168.1.1">
+                        <label>Причина</label>
+                        <input type="text" id="ban-ip-reason" placeholder="Причина">
+                        <label>Срок</label>
+                        <select id="ban-ip-duration" style="padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;">
+                            <option value="permanent">♾️ Навсегда</option>
+                            <option value="1d">1 день</option>
+                            <option value="7d">7 дней</option>
+                            <option value="30d">30 дней</option>
+                        </select>
+                        <button class="btn-primary danger-btn" onclick="banIP()">🌐 Заблокировать</button>
+                    </div>
+                </div>
+                <div class="a-card"><div class="a-card-header">✅ Снять IP-бан</div>
+                    <div class="form-col">
+                        <label>IP-адрес</label>
+                        <input type="text" id="unban-ip-target" placeholder="IP-адрес">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#00ff88,#00d4ff);" onclick="unbanIP()">✅ Снять</button>
+                    </div>
+                    <div style="margin-top:12px;"><div class="a-card-header">📋 Забаненные IP</div><div id="ip-bans-list" class="feed-list"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BAN TELEGRAM -->
+        <section class="a-section" id="sec-ban-telegram">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">📱 Бан Telegram</div>
+                    <div class="form-col">
+                        <label>Telegram ID</label>
+                        <input type="text" id="ban-tg-target" placeholder="123456789">
+                        <label>Причина</label>
+                        <input type="text" id="ban-tg-reason" placeholder="Причина">
+                        <label>Срок</label>
+                        <select id="ban-tg-duration" style="padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;">
+                            <option value="permanent">♾️ Навсегда</option>
+                            <option value="1d">1 день</option>
+                            <option value="7d">7 дней</option>
+                            <option value="30d">30 дней</option>
+                        </select>
+                        <button class="btn-primary danger-btn" onclick="banTelegram()">📱 Заблокировать</button>
+                    </div>
+                </div>
+                <div class="a-card"><div class="a-card-header">🔓 Снять бан</div>
+                    <div class="form-col">
+                        <label>Telegram ID</label>
+                        <input type="text" id="unban-tg-target" placeholder="123456789">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#00ff88,#00d4ff);" onclick="unbanTelegram()">🔓 Снять</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BAN SITE ID -->
+        <section class="a-section" id="sec-ban-siteid">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">🆔 Бан Site ID</div>
+                    <div class="form-col">
+                        <label>Site ID</label>
+                        <input type="text" id="ban-sid-target" placeholder="Site ID">
+                        <label>Причина</label>
+                        <input type="text" id="ban-sid-reason" placeholder="Причина">
+                        <label>Срок</label>
+                        <select id="ban-sid-duration" style="padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;">
+                            <option value="permanent">♾️ Навсегда</option>
+                            <option value="1d">1 день</option>
+                            <option value="7d">7 дней</option>
+                            <option value="30d">30 дней</option>
+                        </select>
+                        <button class="btn-primary danger-btn" onclick="banSiteId()">🆔 Заблокировать</button>
+                    </div>
+                </div>
+                <div class="a-card"><div class="a-card-header">🔓 Снять бан</div>
+                    <div class="form-col">
+                        <label>Site ID</label>
+                        <input type="text" id="unban-sid-target" placeholder="Site ID">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#00ff88,#00d4ff);" onclick="unbanSiteId()">🔓 Снять</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MASS BAN -->
+        <section class="a-section" id="sec-mass-ban">
+            <div class="a-card">
+                <div class="a-card-header">💥 Массовый бан</div>
+                <div class="form-col">
+                    <label>Список целей (по одной на строку)</label>
+                    <textarea id="mass-ban-targets" rows="5" placeholder="123456789&#10;player1"></textarea>
+                    <label>Тип</label>
+                    <select id="mass-ban-type" style="padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;">
+                        <option value="account">Аккаунт</option>
+                        <option value="telegram">Telegram</option>
+                        <option value="siteid">Site ID</option>
+                    </select>
+                    <label>Причина</label>
+                    <input type="text" id="mass-ban-reason" placeholder="Общая причина">
+                    <button class="btn-primary danger-btn" onclick="massBan()">💥 Выдать массовый бан</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- WARNS -->
+        <section class="a-section" id="sec-warns">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">⚠️ Выдать предупреждение</div>
+                    <div class="form-col">
+                        <label>Site ID или TG ID</label>
+                        <input type="text" id="warn-target" placeholder="Идентификатор">
+                        <label>Причина</label>
+                        <input type="text" id="warn-reason" placeholder="Причина">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#f1c40f,#e67e22);" onclick="warnUser()">⚠️ Выдать</button>
+                    </div>
+                </div>
+                <div class="a-card"><div class="a-card-header">📋 Активные предупреждения</div><div id="warns-list" class="feed-list"></div></div>
+            </div>
+        </section>
+
+        <!-- APPEALS -->
+        <section class="a-section" id="sec-appeals">
+            <div class="a-card"><div class="a-card-header">📨 Апелляции</div><div id="appeals-list" class="feed-list"></div></div>
+        </section>
+
+        <!-- ANNOUNCEMENTS -->
+        <section class="a-section" id="sec-announcements">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">📢 Создать объявление</div>
+                    <div class="form-col">
+                        <input type="text" id="ann-title" placeholder="Заголовок">
+                        <select id="ann-type" style="padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;">
+                            <option value="info">ℹ️ Информация</option>
+                            <option value="update">🆕 Обновление</option>
+                            <option value="event">⚡ Ивент</option>
+                            <option value="warning">⚠️ Предупреждение</option>
+                        </select>
+                        <textarea id="ann-body" rows="4" placeholder="Текст..."></textarea>
+                        <label><input type="checkbox" id="ann-pinned"> 📌 Закрепить</label>
+                        <button class="btn-primary" onclick="createAnnouncement()">📢 Опубликовать</button>
+                    </div>
+                </div>
+                <div class="a-card"><div class="a-card-header">📋 Все объявления</div><div id="announcements-list" class="feed-list"></div></div>
+            </div>
+        </section>
+
+        <!-- NEWS -->
+        <section class="a-section" id="sec-news-admin">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">📰 Создать новость</div>
+                    <div class="form-col">
+                        <input type="text" id="news-title" placeholder="Заголовок">
+                        <input type="text" id="news-badge-txt" placeholder="Бейдж">
+                        <textarea id="news-body" rows="4" placeholder="Текст..."></textarea>
+                        <button class="btn-primary" onclick="createNews()">📰 Опубликовать</button>
+                    </div>
+                </div>
+                <div class="a-card"><div class="a-card-header">📋 Новости</div><div id="news-admin-list" class="feed-list"></div></div>
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="a-section" id="sec-settings">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">⚙️ Настройки сайта</div>
+                    <div class="form-col">
+                        <input type="text" id="set-server-name" placeholder="Название сервера" value="GameServer">
+                        <textarea id="set-server-desc" rows="2" placeholder="Описание..."></textarea>
+                        <input type="text" id="set-server-ip" placeholder="IP сервера">
+                        <input type="text" id="set-discord" placeholder="Discord ссылка">
+                        <input type="text" id="set-telegram" placeholder="Telegram ссылка">
+                        <button class="btn-primary" onclick="saveSettings()">💾 Сохранить</button>
+                    </div>
+                </div>
+                <div class="a-card"><div class="a-card-header">🎨 Тема</div>
+                    <div class="form-col">
+                        <select id="theme-select" style="padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;">
+                            <option value="purple">💜 Фиолетовая</option>
+                            <option value="red">❤️ Красная</option>
+                            <option value="green">💚 Зелёная</option>
+                            <option value="gold">💛 Золотая</option>
+                            <option value="cyan">💙 Голубая</option>
+                        </select>
+                        <button class="btn-primary" onclick="saveTheme()">🎨 Применить</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECURITY -->
+        <section class="a-section" id="sec-security">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">🛡️ Безопасность</div>
+                    <div class="form-col">
+                        <label class="toggle-label"><input type="checkbox" id="sec-maintenance" onchange="toggleMaintenance()"> 🔧 Тех. работы</label>
+                        <label class="toggle-label"><input type="checkbox" id="sec-registration" onchange="toggleRegistration()" checked> ✅ Регистрация открыта</label>
+                        <label class="toggle-label"><input type="checkbox" id="sec-vpn-detect"> 🔀 Блок VPN</label>
+                        <button class="btn-primary" onclick="saveSecuritySettings()">💾 Сохранить</button>
+                    </div>
+                </div>
+                <div class="a-card"><div class="a-card-header">🔒 Сменить пароль</div>
+                    <div class="form-col">
+                        <input type="password" id="new-admin-pass" placeholder="Новый пароль">
+                        <input type="password" id="confirm-admin-pass" placeholder="Подтвердить">
+                        <button class="btn-primary" onclick="changeAdminPassword()">🔒 Сменить</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOCKDOWN -->
+        <section class="a-section" id="sec-lockdown">
+            <div class="a-card">
+                <div class="a-card-header">🔒 Экстренный локдаун</div>
+                <div style="text-align:center;padding:40px;">
+                    <div style="font-size:4em;margin-bottom:20px;">🔒</div>
+                    <p style="color:rgba(255,255,255,0.5);margin-bottom:30px;">Полная блокировка всех входов</p>
+                    <button class="btn-primary danger-btn" style="width:auto;padding:16px 40px;font-size:1.1em;" onclick="triggerLockdown()">⚠️ АКТИВИРОВАТЬ</button>
+                    <button class="btn-primary" style="width:auto;padding:16px 40px;font-size:1.1em;background:linear-gradient(135deg,#00ff88,#00d4ff);" onclick="deactivateLockdown()">✅ Снять</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN LOG -->
+        <section class="a-section" id="sec-admin-log">
+            <div class="a-card"><div class="a-card-header">📖 Лог администратора</div><div id="admin-action-log" class="log-list"></div></div>
+        </section>
+
+        <!-- BACKUP -->
+        <section class="a-section" id="sec-backup">
+            <div class="a-card">
+                <div class="a-card-header">💾 Бэкап</div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;padding:20px;">
+                    <button class="btn-primary" style="width:auto;" onclick="backupUsers()">👥 Игроки</button>
+                    <button class="btn-primary" style="width:auto;" onclick="backupBans()">🚫 Баны</button>
+                    <button class="btn-primary" style="width:auto;" onclick="backupLogs()">📋 Логи</button>
+                    <button class="btn-primary" style="width:auto;" onclick="fullBackup()">💾 Полный</button>
+                </div>
+                <div id="backup-status" style="padding:0 20px 20px;"></div>
+            </div>
+        </section>
+
+        <!-- EXPORT -->
+        <section class="a-section" id="sec-export">
+            <div class="a-card">
+                <div class="a-card-header">📤 Экспорт</div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;padding:20px;">
+                    <button class="btn-primary" style="width:auto;" onclick="exportUsers()">👥 CSV</button>
+                    <button class="btn-primary" style="width:auto;" onclick="exportBansCSV()">🚫 CSV</button>
+                    <button class="btn-primary" style="width:auto;" onclick="exportLogsCSV()">📋 CSV</button>
+                    <button class="btn-primary" style="width:auto;" onclick="exportAllJSON()">📦 JSON</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
 </div>
 
+<script src="admin.js"></script>
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyD7m_FKQQZbbP4nN3RyNMdW9pY7FQJ7ZN8",
-        authDomain: "ggggg-e8d09.firebaseapp.com",
-        projectId: "ggggg-e8d09",
-        storageBucket: "ggggg-e8d09.firebasestorage.app",
-        messagingSenderId: "171437590788",
-        appId: "1:171437590788:web:ce51f41e34b4a34cd3e851",
-        measurementId: "G-8NE7FXP8RW"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    function loadPlayers() {
-        const list = document.getElementById('players-list-admin');
-        list.innerHTML = '<div class="loading">Загрузка...</div>';
-        db.collection('users').get().then(snap => {
-            if (snap.empty) { list.innerHTML = '<div class="loading">Нет игроков</div>'; return; }
-            let html = '';
-            snap.forEach(doc => {
-                const d = doc.data();
-                const status = d.verified ? '✅ Подтверждён' : '⏳ Не подтверждён';
-                const statusClass = d.verified ? 'badge-ok' : 'badge-warn';
-                html += `<div class="player-row">
-                    <div class="info">
-                        <div class="name">${d.siteNick || d.nickname || 'Без имени'}</div>
-                        <div class="details">⛏️ ${d.nickname || '—'} | 📱 ${d.telegram_id || '—'} | 🆔 ${d.site_id || '—'}</div>
-                    </div>
-                    <span class="badge ${statusClass}">${status}</span>
-                    <div class="actions">
-                        <button class="btn btn-danger btn-sm" onclick="quickBan('${d.site_id || d.telegram_id}')">🚫</button>
-                        <button class="btn btn-success btn-sm" onclick="quickUnban('${d.site_id || d.telegram_id}')">🔓</button>
-                    </div>
-                </div>`;
-            });
-            list.innerHTML = html;
-            document.getElementById('admin-stat-users').textContent = snap.size;
-        }).catch(() => list.innerHTML = '<div class="loading" style="color:#ef4444;">❌ Ошибка</div>');
-    }
-
-    db.collection('bans').where('active','==',true).onSnapshot(s => document.getElementById('admin-stat-bans').textContent = s.size);
-    db.collection('warns').where('active','==',true).onSnapshot(s => document.getElementById('admin-stat-warns').textContent = s.size);
-    document.getElementById('admin-stat-online').textContent = Math.floor(Math.random() * 15 + 5);
-
-    function banPlayer() {
-        const target = document.getElementById('ban-target').value.trim();
-        const reason = document.getElementById('ban-reason').value.trim() || 'Нарушение правил';
-        const duration = document.getElementById('ban-duration').value;
-        if (!target) return alert('Введите ID игрока');
-        db.collection('bans').add({
-            type: 'account', target, reason, duration,
-            expiresStr: duration === 'permanent' ? 'Навсегда' : duration,
-            active: true,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-            alert('✅ Бан выдан для ' + target);
-            document.getElementById('ban-target').value = '';
-            document.getElementById('ban-reason').value = '';
-            loadPlayers();
-        }).catch(e => alert('❌ Ошибка: ' + e.message));
-    }
-
-    function unbanPlayer() {
-        const target = document.getElementById('unban-target').value.trim();
-        if (!target) return alert('Введите ID игрока');
-        db.collection('bans').where('target','==',target).where('active','==',true).get().then(snap => {
-            if (snap.empty) return alert('Активный бан не найден');
-            const batch = db.batch();
-            snap.forEach(doc => batch.update(doc.ref, { active: false }));
-            batch.commit().then(() => {
-                alert('✅ Бан снят для ' + target);
-                document.getElementById('unban-target').value = '';
-                loadPlayers();
-            });
-        }).catch(e => alert('❌ Ошибка: ' + e.message));
-    }
-
-    function warnPlayer() {
-        const target = document.getElementById('warn-target').value.trim();
-        const reason = document.getElementById('warn-reason').value.trim() || 'Нарушение';
-        if (!target) return alert('Введите ID игрока');
-        db.collection('warns').add({ target, reason, active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
-            .then(() => { alert('⚠️ Предупреждение выдано для ' + target);
-                document.getElementById('warn-target').value = '';
-                document.getElementById('warn-reason').value = '';
-                loadPlayers();
-            }).catch(e => alert('❌ Ошибка: ' + e.message));
-    }
-
-    function quickBan(target) {
-        if (!target || !confirm('Забанить ' + target + '?')) return;
-        db.collection('bans').add({ type: 'account', target, reason: 'Быстрый бан', duration: 'permanent', expiresStr: 'Навсегда', active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
-            .then(() => { alert('✅ Бан выдан'); loadPlayers(); });
-    }
-
-    function quickUnban(target) {
-        if (!target) return;
-        db.collection('bans').where('target','==',target).where('active','==',true).get().then(snap => {
-            if (snap.empty) return alert('Бан не найден');
-            const batch = db.batch();
-            snap.forEach(doc => batch.update(doc.ref, { active: false }));
-            batch.commit().then(() => { alert('✅ Бан снят'); loadPlayers(); });
+    (function() {
+        const c = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDelay = Math.random() * 8 + 's';
+            p.style.animationDuration = (6 + Math.random() * 8) + 's';
+            p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+            c.appendChild(p);
+        }
+        document.getElementById('admin-password-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') checkAdminPassword();
         });
-    }
-
-    function searchPlayers() {
-        const q = document.getElementById('search-players').value.trim().toLowerCase();
-        if (!q) return loadPlayers();
-        const list = document.getElementById('players-list-admin');
-        list.innerHTML = '<div class="loading">Поиск...</div>';
-        db.collection('users').get().then(snap => {
-            let html = '';
-            let found = 0;
-            snap.forEach(doc => {
-                const d = doc.data();
-                const searchable = (d.siteNick || '').toLowerCase() + (d.nickname || '').toLowerCase() + (d.telegram_id || '') + (d.site_id || '');
-                if (searchable.includes(q)) {
-                    found++;
-                    const status = d.verified ? '✅ Подтверждён' : '⏳ Не подтверждён';
-                    const statusClass = d.verified ? 'badge-ok' : 'badge-warn';
-                    html += `<div class="player-row">
-                        <div class="info">
-                            <div class="name">${d.siteNick || d.nickname || 'Без имени'}</div>
-                            <div class="details">⛏️ ${d.nickname || '—'} | 📱 ${d.telegram_id || '—'} | 🆔 ${d.site_id || '—'}</div>
-                        </div>
-                        <span class="badge ${statusClass}">${status}</span>
-                        <div class="actions">
-                            <button class="btn btn-danger btn-sm" onclick="quickBan('${d.site_id || d.telegram_id}')">🚫</button>
-                            <button class="btn btn-success btn-sm" onclick="quickUnban('${d.site_id || d.telegram_id}')">🔓</button>
-                        </div>
-                    </div>`;
-                }
-            });
-            list.innerHTML = found ? html : '<div class="loading">Ничего не найдено</div>';
-        });
-    }
-
-    loadPlayers();
+    })();
 </script>
-
 </body>
 </html>
