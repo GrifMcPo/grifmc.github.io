@@ -1,0 +1,233 @@
+/* ========================================
+   style.css — КОСМИЧЕСКИЙ ДИЗАЙН
+   GRIFMC • ANARCHY SURVIVAL
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap');
+
+/* ===== ПЕРЕМЕННЫЕ ===== */
+:root {
+    --primary: #00ffff;
+    --secondary: #7b2fff;
+    --accent: #39ff14;
+    --danger: #ff0080;
+    --gold: #fbbf24;
+    --dark: #0a0a14;
+    --dark-card: #12122a;
+    --glass: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.06);
+    --shadow: 0 8px 40px rgba(0,0,0,0.5);
+    --glow-primary: 0 0 30px rgba(0,255,255,0.15);
+    --glow-danger: 0 0 30px rgba(255,0,128,0.15);
+}
+
+/* ===== ГЛОБАЛЬНЫЕ ===== */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Rajdhani', 'Inter', sans-serif;
+    background: var(--dark);
+    color: #e0e0e0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ===== ФОН С ЧАСТИЦАМИ ===== */
+.particles-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    bottom: -10px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    animation: floatParticle linear infinite;
+    opacity: 0.3;
+}
+
+.particle:nth-child(3n) {
+    background: var(--primary);
+    box-shadow: 0 0 15px var(--primary);
+}
+.particle:nth-child(3n+1) {
+    background: var(--secondary);
+    box-shadow: 0 0 15px var(--secondary);
+}
+.particle:nth-child(3n+2) {
+    background: var(--accent);
+    box-shadow: 0 0 15px var(--accent);
+}
+
+@keyframes floatParticle {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== КОСМИЧЕСКИЙ ГРАДИЕНТ ===== */
+.cosmic-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(ellipse 60% 50% at 20% 20%, rgba(123,47,255,0.20) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 80% 80%, rgba(0,255,255,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 40% at 50% 50%, rgba(255,0,128,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #0a0a14 0%, #0f0a2a 40%, #08081a 100%);
+    animation: cosmicShift 20s ease-in-out infinite alternate;
+}
+
+@keyframes cosmicShift {
+    0% { filter: hue-rotate(0deg) brightness(1); }
+    50% { filter: hue-rotate(20deg) brightness(1.1); }
+    100% { filter: hue-rotate(-10deg) brightness(0.95); }
+}
+
+/* ===== НЕОНОВАЯ РАМКА ===== */
+.neon-border {
+    position: fixed;
+    inset: 0;
+    border: 1px solid transparent;
+    background: linear-gradient(var(--dark), var(--dark)) padding-box,
+                linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--danger), var(--primary)) border-box;
+    background-size: 400% 100%;
+    animation: borderFlow 8s linear infinite;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.25;
+}
+
+@keyframes borderFlow {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 400% 0%; }
+}
+
+/* ===== СТЕКЛЯННАЯ КАРТОЧКА ===== */
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.glass-card:hover {
+    border-color: rgba(0,255,255,0.15);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow), var(--glow-primary);
+}
+
+/* ===== ЗАГОЛОВКИ ===== */
+h1, h2, h3, .title {
+    font-family: 'Orbitron', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.neon-text {
+    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textFlow 6s linear infinite;
+}
+
+@keyframes textFlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+/* ===== КНОПКИ ===== */
+.btn-neon {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: #fff;
+    padding: 12px 32px;
+    border-radius: 10px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 30px rgba(0,255,255,0.15);
+}
+
+.btn-neon:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 0 50px rgba(0,255,255,0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger), #cc0055);
+    box-shadow: 0 0 30px rgba(255,0,128,0.15);
+}
+
+.btn-danger:hover {
+    box-shadow: 0 0 50px rgba(255,0,128,0.3);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--accent), #059669);
+    box-shadow: 0 0 30px rgba(57,255,20,0.15);
+}
+
+.btn-success:hover {
+    box-shadow: 0 0 50px rgba(57,255,20,0.3);
+}
+
+.btn-glass {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-glass:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: var(--primary);
+}
+
+/* ===== СКРОЛЛБАР ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--primary), var(--secondary));
+    border-radius: 3px;
+}
+
+/* ===== АНИМАЦИЯ ПОЯВЛЕНИЯ ===== */
+.fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== АДАПТИВ ===== */
+@media (max-width: 768px) {
+    .glass-card { padding: 16px; }
+    .btn-neon { padding: 10px 20px; font-size: 0.75em; }
+}
