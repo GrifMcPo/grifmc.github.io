@@ -1257,4 +1257,47 @@ loadPage = function(page) {
     
     const titles = {
         dashboard: '📊 ТЕРМИНАЛ УПРАВЛЕНИЯ',
-        content: '🏗️ КОНСТРУКТ
+        content: '🏗️ КОНСТРУКТОР ГЛАВНОЙ СТРАНИЦЫ',
+        analytics: '📈 ГЛУБОКАЯ АНАЛИТИКА',
+        staff: '👥 УПРАВЛЕНИЕ ПЕРСОНАЛОМ',
+        finance: '💰 ФИНАНСЫ',
+        profile: '👤 ДОСЬЕ БЕЗОПАСНОСТИ',
+        calendar: '📅 ПЛАНИРОВЩИК ЖИЗНИ СЕРВЕРА',
+        integrations: '🔗 ИНТЕГРАЦИИ',
+        tech: '🖥️ ΤΕΧΗИЧЕСКИЙ ХАБ',
+        bans: '⚖️ СИСТЕМА НАКАЗАНИЙ',
+        reports: '📋 ЖАЛОБЫ ИГРОКОВ',
+        announcements: '📢 ГЛОБАЛЬНЫЕ АНОНСЫ',
+        performance: '📊 МОНИТОРИНГ ПРОИЗВОДИТЕЛЬНОСТИ',
+        knowledge: '📚 БАЗА ЗНАНИЙ',
+        hwid: '🛡️ БЛОКИРОВКА HWID',
+        security: '⚙️ НАСТРОЙКИ БЕЗОПАСНОСТИ'
+    };
+    document.getElementById('page-title').textContent = titles[page] || 'АДМИН-ПАНЕЛЬ';
+    
+    container.innerHTML = '<div class="loading-terminal">ЗАГРУЗКА ТЕРМИНАЛА</div>';
+    
+    setTimeout(() => {
+        switch(page) {
+            case 'dashboard': renderDashboard(container); break;
+            case 'hwid': renderHWID(container); break;
+            case 'bans': renderBans(container); break;
+            case 'staff': renderStaff(container); break;
+            case 'finance': renderFinance(container); break;
+            case 'reports': renderReports(container); break;
+            case 'content': renderContent(container); break;
+            case 'analytics': renderAnalytics(container); break;
+            case 'profile': renderProfile(container); break;
+            case 'calendar': renderCalendar(container); break;
+            case 'integrations': renderIntegrations(container); break;
+            case 'tech': renderTech(container); break;
+            case 'announcements': renderAnnouncements(container); break;
+            case 'performance': renderPerformance(container); break;
+            case 'knowledge': renderKnowledge(container); break;
+            case 'security': renderSecurity(container); break;
+            default: renderDefault(container, page);
+        }
+    }, 500);
+};
+
+console.log('✅ Админ-панель загружена (все страницы)');
