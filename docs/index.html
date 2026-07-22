@@ -4,812 +4,218 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRIFMC • ANARCHY SURVIVAL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="main.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <style>
-        /* ===== ОСНОВНЫЕ СТИЛИ ===== */
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: #0a0a0f;
-            color: #e0e0e0;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* ===== ФОН С ЧАСТИЦАМИ ===== */
-        .bg-particles {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-        .particle {
-            position: absolute;
-            bottom: -10px;
-            width: 4px;
-            height: 4px;
-            background: #00ffff;
-            border-radius: 50%;
-            animation: floatUp linear infinite;
-            opacity: 0.4;
-            box-shadow: 0 0 15px #00ffff, 0 0 30px rgba(0,255,255,0.2);
-        }
-        .particle:nth-child(3n) { background: #39ff14; box-shadow: 0 0 15px #39ff14; }
-        .particle:nth-child(3n+1) { background: #ff0080; box-shadow: 0 0 15px #ff0080; }
-        .particle:nth-child(3n+2) { background: #7b2fff; box-shadow: 0 0 15px #7b2fff; }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.6; }
-            90% { opacity: 0.4; }
-            100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
-        }
-
-        /* ===== НЕОНОВАЯ РАМКА ===== */
-        .neon-border {
-            position: fixed;
-            inset: 0;
-            border: 1px solid transparent;
-            background: linear-gradient(#0a0a0f, #0a0a0f) padding-box,
-                        linear-gradient(90deg, #00ffff, #39ff14, #ff0080, #7b2fff, #00ffff) border-box;
-            background-size: 300% 100%;
-            animation: borderMove 6s linear infinite;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.3;
-        }
-        @keyframes borderMove {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 300% 0%; }
-        }
-
-        /* ===== НАВБАР ===== */
-        .navbar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            height: 70px;
-            background: rgba(10,10,15,0.92);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0,255,255,0.15);
-            box-shadow: 0 4px 40px rgba(0,0,0,0.5);
-        }
-        .nav-logo {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.3em;
-            font-weight: 900;
-            color: #00ffff;
-            text-shadow: 0 0 20px rgba(0,255,255,0.3);
-            letter-spacing: 0.1em;
-            cursor: pointer;
-        }
-        .nav-links { display: flex; gap: 4px; }
-        .nav-links a {
-            color: rgba(255,255,255,0.5);
-            text-decoration: none;
-            font-weight: 600;
-            padding: 8px 18px;
-            border-radius: 8px;
-            font-size: 0.85em;
-            transition: all 0.3s;
-            letter-spacing: 0.05em;
-        }
-        .nav-links a:hover { color: #fff; background: rgba(0,255,255,0.1); }
-        .nav-links a.active { color: #00ffff; background: rgba(0,255,255,0.12); }
-        .nav-user {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .nav-user span { color: rgba(255,255,255,0.6); font-weight: 600; font-size: 0.9em; }
-        .nav-user .admin-btn {
-            background: linear-gradient(135deg, #ff0080, #7b2fff);
-            border: none;
-            color: #fff;
-            padding: 8px 20px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.8em;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 0.05em;
-            box-shadow: 0 0 20px rgba(255,0,128,0.3);
-        }
-        .nav-user .admin-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 40px rgba(255,0,128,0.5);
-        }
-
-        /* ===== ГЛАВНЫЙ ЭКРАН ===== */
-        .hero {
-            position: relative;
-            z-index: 10;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 100px 20px 60px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .hero-badge {
-            display: inline-block;
-            background: rgba(0,255,255,0.08);
-            border: 1px solid rgba(0,255,255,0.2);
-            color: #00ffff;
-            padding: 6px 20px;
-            border-radius: 30px;
-            font-size: 0.75em;
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            animation: pulseBadge 2s ease-in-out infinite;
-        }
-        @keyframes pulseBadge {
-            0%,100% { box-shadow: 0 0 0 rgba(0,255,255,0); }
-            50% { box-shadow: 0 0 30px rgba(0,255,255,0.15); }
-        }
-        .hero-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 4.5em;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 16px;
-            background: linear-gradient(90deg, #00ffff, #39ff14, #ff0080, #7b2fff, #00ffff);
-            background-size: 300% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rgbFlow 6s linear infinite;
-        }
-        @keyframes rgbFlow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 300% 50%; }
-        }
-        .hero-sub {
-            color: rgba(255,255,255,0.5);
-            font-size: 1.2em;
-            margin-bottom: 32px;
-            letter-spacing: 0.05em;
-        }
-        .hero-ip-box {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(0,255,255,0.15);
-            border-radius: 16px;
-            padding: 14px 24px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .hero-ip-box:hover { border-color: #00ffff; box-shadow: 0 0 40px rgba(0,255,255,0.1); }
-        .hero-ip-box .label { color: rgba(255,255,255,0.3); font-size: 0.85em; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
-        .hero-ip-box .ip {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.2em;
-            color: #00ffff;
-            font-weight: 700;
-            text-shadow: 0 0 20px rgba(0,255,255,0.3);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .hero-ip-box .ip:hover { text-shadow: 0 0 40px rgba(0,255,255,0.6); }
-        .hero-ip-box .copy-btn {
-            background: rgba(0,255,255,0.1);
-            border: 1px solid rgba(0,255,255,0.2);
-            color: #00ffff;
-            padding: 6px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.8em;
-            transition: all 0.3s;
-            font-family: 'Orbitron', monospace;
-        }
-        .hero-ip-box .copy-btn:hover { background: rgba(0,255,255,0.2); box-shadow: 0 0 20px rgba(0,255,255,0.2); }
-
-        /* ===== СТАТИСТИКА ===== */
-        .stats {
-            display: flex;
-            gap: 60px;
-            margin: 40px 0;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .stat {
-            text-align: center;
-        }
-        .stat-num {
-            font-family: 'Orbitron', monospace;
-            font-size: 3.5em;
-            font-weight: 900;
-            color: #00ffff;
-            text-shadow: 0 0 40px rgba(0,255,255,0.3);
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-        .stat-num.online { color: #39ff14; text-shadow: 0 0 40px rgba(57,255,20,0.3); }
-        .stat-num.bans { color: #ff0080; text-shadow: 0 0 40px rgba(255,0,128,0.3); }
-        .stat-label {
-            color: rgba(255,255,255,0.3);
-            font-size: 0.75em;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            font-weight: 700;
-        }
-
-        /* ===== ПРОФИЛЬ ===== */
-        .profile-section {
-            width: 100%;
-            margin: 40px 0;
-        }
-        .profile-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            display: flex;
-            gap: 30px;
-            align-items: flex-start;
-            flex-wrap: wrap;
-        }
-        .profile-avatar {
-            flex-shrink: 0;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00ffff, #7b2fff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            box-shadow: 0 0 40px rgba(0,255,255,0.2);
-        }
-        .profile-info { flex: 1; min-width: 200px; }
-        .profile-name {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 12px;
-        }
-        .profile-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-        }
-        .profile-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 10px 14px;
-        }
-        .profile-item .label { color: rgba(255,255,255,0.3); font-size: 0.65em; text-transform: uppercase; letter-spacing: 0.08em; display: block; }
-        .profile-item .value { color: #fff; font-weight: 700; font-size: 1em; }
-
-        /* ===== НОВОСТИ ===== */
-        .news-section { width: 100%; margin: 40px 0; }
-        .section-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.5em;
-            font-weight: 900;
-            color: #fff;
-            margin-bottom: 20px;
-            letter-spacing: 0.05em;
-        }
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-        }
-        .news-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 16px;
-            padding: 20px;
-            transition: all 0.3s;
-        }
-        .news-card:hover {
-            border-color: rgba(0,255,255,0.2);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-        }
-        .news-card .icon { font-size: 1.5em; margin-bottom: 10px; display: block; }
-        .news-card .badge {
-            display: inline-block;
-            background: rgba(0,255,255,0.08);
-            border: 1px solid rgba(0,255,255,0.15);
-            color: #00ffff;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 0.65em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-        .news-card h3 { color: #fff; font-size: 1.05em; margin: 8px 0 6px; }
-        .news-card p { color: rgba(255,255,255,0.4); font-size: 0.9em; line-height: 1.5; }
-
-        /* ===== ТОП ИГРОКОВ ===== */
-        .top-section { width: 100%; margin: 40px 0; }
-        .top-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-        }
-        .top-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        .top-card:hover { border-color: rgba(0,255,255,0.15); transform: translateY(-3px); }
-        .top-card .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00ffff, #7b2fff);
-            margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em;
-            box-shadow: 0 0 30px rgba(0,255,255,0.1);
-        }
-        .top-card .rank { color: #fbbf24; font-weight: 700; font-size: 0.75em; }
-        .top-card .name { color: #fff; font-weight: 700; font-size: 0.95em; margin-top: 4px; }
-
-        /* ===== ФУТЕР ===== */
-        .footer {
-            width: 100%;
-            padding: 24px 0;
-            border-top: 1px solid rgba(255,255,255,0.04);
-            text-align: center;
-            color: rgba(255,255,255,0.15);
-            font-size: 0.8em;
-            letter-spacing: 0.08em;
-            margin-top: 20px;
-        }
-        .footer a { color: #00ffff; text-decoration: none; transition: all 0.3s; }
-        .footer a:hover { text-shadow: 0 0 20px rgba(0,255,255,0.3); }
-
-        /* ===== АДАПТИВ ===== */
-        @media (max-width: 768px) {
-            .hero-title { font-size: 2.5em; }
-            .hero-ip-box { flex-direction: column; gap: 10px; }
-            .stats { gap: 30px; }
-            .stat-num { font-size: 2.5em; }
-            .navbar { padding: 0 16px; }
-            .nav-links { display: none; }
-            .profile-card { flex-direction: column; align-items: center; text-align: center; }
-            .profile-grid { grid-template-columns: 1fr; }
-        }
-
-        /* ===== РЕГИСТРАЦИЯ ===== */
-        .register-box {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(0,255,255,0.1);
-            border-radius: 20px;
-            padding: 40px 35px;
-            max-width: 460px;
-            width: 100%;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 60px rgba(0,255,255,0.05);
-            margin: 20px 0;
-        }
-        .register-box h2 {
-            font-family: 'Orbitron', monospace;
-            color: #00ffff;
-            text-align: center;
-            font-size: 1.3em;
-            margin-bottom: 6px;
-            text-shadow: 0 0 20px rgba(0,255,255,0.2);
-        }
-        .register-box .sub {
-            color: rgba(255,255,255,0.3);
-            text-align: center;
-            font-size: 0.85em;
-            margin-bottom: 20px;
-        }
-        .register-box label {
-            display: block;
-            color: rgba(255,255,255,0.6);
-            font-weight: 600;
-            font-size: 0.8em;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 4px;
-        }
-        .register-box input {
-            width: 100%;
-            padding: 12px 16px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 14px;
-            margin-bottom: 14px;
-            transition: all 0.3s;
-        }
-        .register-box input:focus {
-            outline: none;
-            border-color: #00ffff;
-            box-shadow: 0 0 30px rgba(0,255,255,0.05);
-        }
-        .register-box input::placeholder { color: rgba(255,255,255,0.2); }
-        .register-box .hint {
-            color: rgba(255,255,255,0.2);
-            font-size: 0.75em;
-            margin-top: -10px;
-            display: block;
-            margin-bottom: 12px;
-        }
-        .register-box .hint strong { color: #00ffff; }
-        .register-box .btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #00ffff, #7b2fff);
-            border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1em;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 0.05em;
-            box-shadow: 0 0 30px rgba(0,255,255,0.2);
-        }
-        .register-box .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 50px rgba(0,255,255,0.3);
-        }
-        .register-box .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        #message { margin-top: 16px; padding: 12px; border-radius: 10px; text-align: center; display: none; font-weight: 600; }
-        #message.success { display: block; background: rgba(57,255,20,0.08); border: 1px solid #39ff14; color: #39ff14; }
-        #message.error { display: block; background: rgba(255,0,128,0.08); border: 1px solid #ff0080; color: #ff6eb4; }
-        #code-section { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
-        #code-section h3 { text-align: center; color: #fbbf24; font-family: 'Orbitron', monospace; margin-bottom: 12px; }
-        #code-status { text-align: center; margin-top: 10px; color: rgba(255,255,255,0.3); font-size: 0.9em; }
-    </style>
 </head>
 <body>
 
-<div class="bg-particles" id="particles"></div>
+<div class="cosmic-bg"></div>
 <div class="neon-border"></div>
+<div class="particles-container" id="particles"></div>
 
-<!-- НАВБАР -->
-<nav class="navbar">
-    <div class="nav-logo">⚡ GRIFMC</div>
+<!-- ===== НАВБАР ===== -->
+<nav class="navbar" id="navbar">
+    <div class="nav-logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text neon-text">GRIFMC</span>
+    </div>
     <div class="nav-links">
-        <a href="#" class="active">Главная</a>
+        <a href="#home" class="active">Главная</a>
         <a href="#news">Новости</a>
-        <a href="#top">Игроки</a>
+        <a href="#top">Топ</a>
+        <a href="#events">События</a>
         <a href="#rules">Правила</a>
     </div>
     <div class="nav-user">
-        <span id="nav-username">👤 Игрок</span>
-        <button class="admin-btn" onclick="window.location.href='admin.html'">🔧 Админка</button>
+        <div class="user-profile" id="user-profile">
+            <img src="https://minotar.net/avatar/pley1657/32" alt="Avatar" class="user-avatar" id="user-avatar">
+            <span class="user-name" id="user-name">Гость</span>
+            <span class="user-rank" id="user-rank"></span>
+        </div>
+        <button class="btn-glass" onclick="window.location.href='admin.html'">🔧 Админка</button>
+        <button class="btn-glass logout-btn" id="logout-btn" style="display:none;" onclick="logout()">🚪 Выход</button>
     </div>
 </nav>
 
-<!-- ГЛАВНЫЙ ЭКРАН -->
+<!-- ===== ГЛАВНЫЙ ЭКРАН ===== -->
 <section class="hero" id="home">
-    <div class="hero-badge">▸ СЕЙЧАС В БОЮ</div>
-    <h1 class="hero-title">GRIFMC • ANARCHY</h1>
-    <p class="hero-sub">Территория абсолютной свободы. Выживание без правил и вайпов.</p>
+    <div class="hero-content">
+        <div class="hero-badge pulse-badge">▸ СЕЙЧАС В БОЮ</div>
+        <h1 class="hero-title neon-text">GRIFMC • ANARCHY</h1>
+        <p class="hero-sub">Территория абсолютной свободы. Выживание без правил и вайпов.</p>
 
-    <div class="stats">
-        <div class="stat"><div class="stat-num online" id="stat-online">—</div><div class="stat-label">В БОЮ</div></div>
-        <div class="stat"><div class="stat-num" id="stat-total">—</div><div class="stat-label">ИГРОКОВ</div></div>
-        <div class="stat"><div class="stat-num bans" id="stat-bans">—</div><div class="stat-label">БАНОВ</div></div>
-    </div>
-
-    <div class="hero-ip-box">
-        <span class="label">▶ Адрес для входа</span>
-        <span class="ip" id="server-ip" onclick="copyIP()">grifmc.fun</span>
-        <button class="copy-btn" onclick="copyIP()">📋 Копировать</button>
-    </div>
-</section>
-
-<!-- РЕГИСТРАЦИЯ -->
-<div style="width:100%;display:flex;justify-content:center;z-index:10;position:relative;">
-    <div class="register-box" id="app">
-        <h2>⚡ РЕГИСТРАЦИЯ</h2>
-        <p class="sub">Заполни форму для доступа на сервер</p>
-
-        <form id="register-form">
-            <label>📱 Telegram ID</label>
-            <input type="text" id="telegram-id" placeholder="Например: 123456789">
-            <span class="hint">Напиши боту <strong>!id</strong> в Telegram</span>
-
-            <label>⛏️ Ник на сервере</label>
-            <input type="text" id="nickname" placeholder="Ваш Minecraft ник">
-
-            <label>👤 Ник на сайте</label>
-            <input type="text" id="site-nick" placeholder="Как вас называть">
-
-            <label>🆔 ID на сайте</label>
-            <input type="text" id="site-id" placeholder="Уникальный ID">
-            <span class="hint">Придумай уникальный идентификатор</span>
-
-            <button type="submit" id="register-btn" class="btn">🚀 ЗАРЕГИСТРИРОВАТЬСЯ</button>
-        </form>
-
-        <div id="code-section">
-            <h3>🔐 Введите код</h3>
-            <p style="text-align:center;color:rgba(255,255,255,0.3);font-size:14px;margin-bottom:12px;">Код отправлен в чат сервера</p>
-            <input type="text" id="code-input" placeholder="Код из 5 цифр" maxlength="5" style="text-align:center;font-size:20px;letter-spacing:4px;">
-            <button id="verify-btn" class="btn" style="background:linear-gradient(135deg,#39ff14,#10b981);">✅ ПОДТВЕРДИТЬ</button>
-            <p id="code-status"></p>
-        </div>
-
-        <div id="message"></div>
-    </div>
-</div>
-
-<!-- НОВОСТИ -->
-<section class="news-section" id="news">
-    <h2 class="section-title">📰 НОВОСТИ</h2>
-    <div class="news-grid" id="news-grid">
-        <div class="news-card">
-            <span class="icon">🆕</span>
-            <span class="badge">Обновление</span>
-            <h3>Мы открылись! Забери стартовый набор брони командой /kit start</h3>
-            <p>Добро пожаловать на наш сервер. Регистрируйся и играй!</p>
-        </div>
-        <div class="news-card">
-            <span class="icon">⚡</span>
-            <span class="badge">Ивент</span>
-            <h3>Арена чемпионов. Каждое воскресенье в 20:00 мы разыгрываем баланс магазина</h3>
-            <p>Участвуй и выигрывай призы. Регистрация через бота.</p>
-        </div>
-        <div class="news-card">
-            <span class="icon">🛡️</span>
-            <span class="badge">Безопасность</span>
-            <h3>Умный античит. Читер вылетает с сервера быстрее, чем успевает нажать F3 + N</h3>
-            <p>Внедрена автоматическая система обнаружения читеров.</p>
-        </div>
-    </div>
-</section>
-
-<!-- ТОП ИГРОКОВ -->
-<section class="top-section" id="top">
-    <h2 class="section-title">🏆 ТОП ИГРОКОВ</h2>
-    <div class="top-grid" id="top-grid">
-        <div style="text-align:center;color:rgba(255,255,255,0.2);padding:20px;width:100%;">Загрузка...</div>
-    </div>
-</section>
-
-<!-- ФУТЕР -->
-<div class="footer">
-    ⚡ GRIFMC • ANARCHY SURVIVAL &nbsp;|&nbsp; <a href="admin.html">🔧 Админ-панель</a> &nbsp;|&nbsp; v2.0
-</div>
-
-<script>
-    // ===== ЧАСТИЦЫ =====
-    (function() {
-        const container = document.getElementById('particles');
-        for (let i = 0; i < 50; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.animationDelay = Math.random() * 12 + 's';
-            p.style.animationDuration = (6 + Math.random() * 12) + 's';
-            p.style.width = (2 + Math.random() * 5) + 'px';
-            p.style.height = p.style.width;
-            container.appendChild(p);
-        }
-    })();
-
-    // ===== КОПИРОВАНИЕ IP =====
-    function copyIP() {
-        const ip = document.getElementById('server-ip').textContent;
-        navigator.clipboard.writeText(ip).then(() => {
-            const el = document.getElementById('server-ip');
-            el.textContent = '✅ Скопировано!';
-            setTimeout(() => el.textContent = ip, 2000);
-        });
-    }
-
-    // ===== ДАННЫЕ ПОЛЬЗОВАТЕЛЯ =====
-    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    if (userData.siteNick) {
-        document.getElementById('nav-username').textContent = '👤 ' + userData.siteNick;
-    }
-
-    // ===== СТАТИСТИКА В РЕАЛЬНОМ ВРЕМЕНИ =====
-    db.collection('users').onSnapshot(snap => {
-        document.getElementById('stat-total').textContent = snap.size;
-        const users = [];
-        snap.forEach(d => users.push(d.data()));
-        users.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
-        const grid = document.getElementById('top-grid');
-        if (users.length === 0) {
-            grid.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.2);padding:20px;width:100%;">Пока нет игроков</div>';
-            return;
-        }
-        const top5 = users.slice(0,5);
-        const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
-        grid.innerHTML = top5.map((u, i) => `
-            <div class="top-card">
-                <div class="avatar">⛏️</div>
-                <div class="rank">${medals[i]}</div>
-                <div class="name">${u.siteNick || u.nickname || '—'}</div>
+        <div class="hero-stats">
+            <div class="stat-card glass-card">
+                <div class="stat-icon">⚔️</div>
+                <div class="stat-number online" id="stat-online">—</div>
+                <div class="stat-label">В БОЮ</div>
             </div>
-        `).join('');
-    });
+            <div class="stat-card glass-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" id="stat-total">—</div>
+                <div class="stat-label">ИГРОКОВ</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-icon">🚫</div>
+                <div class="stat-number danger" id="stat-bans">—</div>
+                <div class="stat-label">БАНОВ</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-number gold" id="stat-event-timer">—</div>
+                <div class="stat-label">ДО ИВЕНТА</div>
+            </div>
+        </div>
 
-    db.collection('bans').where('active','==',true).onSnapshot(snap => {
-        document.getElementById('stat-bans').textContent = snap.size;
-    });
+        <div class="hero-ip">
+            <span class="ip-label">▶ Адрес для входа</span>
+            <span class="ip-value" id="server-ip" onclick="copyIP()">grifmc.fun</span>
+            <button class="btn-glass copy-btn" onclick="copyIP()">📋 Копировать</button>
+        </div>
 
-    document.getElementById('stat-online').textContent = Math.floor(Math.random() * 25 + 8);
+        <!-- Плитки-ссылки -->
+        <div class="hero-tiles">
+            <a href="shop.html" class="tile glass-card tile-shop">
+                <span class="tile-icon">🛒</span>
+                <span class="tile-title">МАГАЗИН</span>
+                <span class="tile-desc">Привилегии и донат</span>
+            </a>
+            <a href="profile.html" class="tile glass-card tile-profile">
+                <span class="tile-icon">👤</span>
+                <span class="tile-title">ЛИЧНЫЙ КАБИНЕТ</span>
+                <span class="tile-desc">Твоя статистика</span>
+            </a>
+            <a href="rules.html" class="tile glass-card tile-rules">
+                <span class="tile-icon">📜</span>
+                <span class="tile-title">ПРАВИЛА</span>
+                <span class="tile-desc">Кодекс сервера</span>
+            </a>
+        </div>
+    </div>
+</section>
 
-    // ===== РЕГИСТРАЦИЯ =====
-    const form = document.getElementById('register-form');
-    const tg = document.getElementById('telegram-id');
-    const nick = document.getElementById('nickname');
-    const siteNick = document.getElementById('site-nick');
-    const siteId = document.getElementById('site-id');
-    const msg = document.getElementById('message');
-    const codeSection = document.getElementById('code-section');
-    const codeInput = document.getElementById('code-input');
-    const verifyBtn = document.getElementById('verify-btn');
-    const codeStatus = document.getElementById('code-status');
-    const registerBtn = document.getElementById('register-btn');
+<!-- ===== НОВОСТИ ===== -->
+<section class="section" id="news">
+    <div class="section-header">
+        <h2 class="section-title">📰 НОВОСТИ</h2>
+        <div class="section-line"></div>
+    </div>
+    <div class="news-grid" id="news-grid">
+        <!-- Новости загружаются из Firebase -->
+        <div class="loading-spinner">Загрузка...</div>
+    </div>
+</section>
 
-    function showMessage(text, type) {
-        msg.textContent = text;
-        msg.className = type;
-        msg.style.display = 'block';
-    }
-    function hideMessage() { msg.style.display = 'none'; }
-    function generateCode() { return Math.floor(10000 + Math.random() * 90000).toString(); }
-    function goToMain() { window.location.href = 'main.html'; }
+<!-- ===== ТОП ИГРОКОВ (3D-КАРУСЕЛЬ) ===== -->
+<section class="section" id="top">
+    <div class="section-header">
+        <h2 class="section-title">🏆 ТОП ИГРОКОВ</h2>
+        <div class="section-line"></div>
+    </div>
+    <div class="carousel-container" id="carousel-container">
+        <div class="carousel-track" id="carousel-track">
+            <!-- Загружается из Firebase -->
+        </div>
+    </div>
+</section>
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        hideMessage();
+<!-- ===== КАЛЕНДАРЬ СОБЫТИЙ ===== -->
+<section class="section" id="events">
+    <div class="section-header">
+        <h2 class="section-title">📅 КАЛЕНДАРЬ СОБЫТИЙ</h2>
+        <div class="section-line"></div>
+    </div>
+    <div class="events-grid" id="events-grid">
+        <div class="event-card glass-card">
+            <div class="event-date">15.07</div>
+            <div class="event-info">
+                <div class="event-title">🎯 Турнир чемпионов</div>
+                <div class="event-desc">Еженедельный PvP-турнир с призовым фондом</div>
+            </div>
+            <div class="event-status">⏳ Скоро</div>
+        </div>
+        <div class="event-card glass-card">
+            <div class="event-date">22.07</div>
+            <div class="event-info">
+                <div class="event-title">🔄 Вайп мира</div>
+                <div class="event-desc">Полный сброс карты и экономики</div>
+            </div>
+            <div class="event-status danger">⚠️ ВАЖНО</div>
+        </div>
+        <div class="event-card glass-card">
+            <div class="event-date">01.08</div>
+            <div class="event-info">
+                <div class="event-title">🎉 День рождения сервера</div>
+                <div class="event-desc">Праздничные ивенты и двойной опыт</div>
+            </div>
+            <div class="event-status gold">🎊 Праздник</div>
+        </div>
+    </div>
+</section>
 
-        const telegramId = tg.value.trim();
-        const nickname = nick.value.trim();
-        const siteNickVal = siteNick.value.trim();
-        const siteIdVal = siteId.value.trim();
+<!-- ===== ЛЕНТА DISCORD ===== -->
+<section class="section" id="discord">
+    <div class="section-header">
+        <h2 class="section-title">💬 DISCORD • ПОСЛЕДНИЕ СООБЩЕНИЯ</h2>
+        <div class="section-line"></div>
+    </div>
+    <div class="discord-feed" id="discord-feed">
+        <div class="discord-message glass-card">
+            <div class="msg-avatar">👤</div>
+            <div class="msg-content">
+                <div class="msg-author">Grif_Mo</div>
+                <div class="msg-text">Запускаем турнир через 30 минут!</div>
+                <div class="msg-time">15:30</div>
+            </div>
+        </div>
+        <div class="discord-message glass-card">
+            <div class="msg-avatar">👤</div>
+            <div class="msg-content">
+                <div class="msg-author">pley1657</div>
+                <div class="msg-text">Кто хочет в пати на фарм?</div>
+                <div class="msg-time">15:15</div>
+            </div>
+        </div>
+        <div class="discord-message glass-card">
+            <div class="msg-avatar">👤</div>
+            <div class="msg-content">
+                <div class="msg-author">Admin</div>
+                <div class="msg-text">Обновление античита выкачено ✅</div>
+                <div class="msg-time">14:45</div>
+            </div>
+        </div>
+    </div>
+</section>
 
-        if (!telegramId || !nickname || !siteNickVal || !siteIdVal) {
-            showMessage('❌ Заполните все поля!', 'error');
-            return;
-        }
-        if (!/^\d+$/.test(telegramId)) {
-            showMessage('❌ Telegram ID должен содержать только цифры!', 'error');
-            return;
-        }
+<!-- ===== ДРОП ДНЯ ===== -->
+<section class="section" id="drop">
+    <div class="drop-card glass-card">
+        <div class="drop-icon">💎</div>
+        <div class="drop-info">
+            <div class="drop-title">ДРОП ДНЯ</div>
+            <div class="drop-item">⭐ Алмазный меч с Sharpness V</div>
+            <div class="drop-chance">⬆️ Шанс выпадения увеличен на 300%</div>
+        </div>
+        <div class="drop-timer">⏳ Активно</div>
+    </div>
+</section>
 
-        try {
-            registerBtn.disabled = true;
-            registerBtn.textContent = '⏳ Отправка...';
+<!-- ===== ФУТЕР ===== -->
+<footer class="footer">
+    <div class="footer-content">
+        <span class="footer-logo neon-text">⚡ GRIFMC</span>
+        <span class="footer-sep">|</span>
+        <span class="footer-text">ANARCHY SURVIVAL • v3.0</span>
+        <span class="footer-sep">|</span>
+        <a href="admin.html" class="footer-link">🔧 Админ-панель</a>
+        <span class="footer-sep">|</span>
+        <span class="footer-copy">© 2026 All rights reserved</span>
+    </div>
+</footer>
 
-            const snap = await db.collection('users').where('nickname', '==', nickname).get();
-            if (!snap.empty) {
-                showMessage('❌ Этот ник уже зарегистрирован!', 'error');
-                registerBtn.disabled = false;
-                registerBtn.textContent = '🚀 ЗАРЕГИСТРИРОВАТЬСЯ';
-                return;
-            }
-
-            const tgSnap = await db.collection('users').where('telegram_id', '==', telegramId).get();
-            if (!tgSnap.empty) {
-                showMessage('❌ Этот Telegram ID уже зарегистрирован!', 'error');
-                registerBtn.disabled = false;
-                registerBtn.textContent = '🚀 ЗАРЕГИСТРИРОВАТЬСЯ';
-                return;
-            }
-
-            const code = generateCode();
-
-            await db.collection('users').doc(telegramId).set({
-                telegram_id: telegramId,
-                nickname: nickname,
-                site_nick: siteNickVal,
-                site_id: siteIdVal,
-                code: code,
-                verified: false,
-                code_sent: false,
-                registered_at: new Date().toLocaleString()
-            });
-
-            codeSection.style.display = 'block';
-            codeInput.value = '';
-            codeStatus.textContent = '📨 Код отправлен в чат сервера!';
-            codeStatus.style.color = '#39ff14';
-            form.style.display = 'none';
-
-            showMessage('✅ Запрос отправлен! Введите код из чата сервера.', 'success');
-
-        } catch (error) {
-            console.error('Ошибка:', error);
-            showMessage('❌ Ошибка: ' + error.message, 'error');
-        } finally {
-            registerBtn.disabled = false;
-            registerBtn.textContent = '🚀 ЗАРЕГИСТРИРОВАТЬСЯ';
-        }
-    });
-
-    verifyBtn.addEventListener('click', async () => {
-        const code = codeInput.value.trim();
-        const telegramId = tg.value.trim();
-
-        if (!code || code.length !== 5) {
-            codeStatus.textContent = '❌ Введите 5-значный код!';
-            codeStatus.style.color = '#ff6eb4';
-            return;
-        }
-
-        try {
-            verifyBtn.disabled = true;
-            verifyBtn.textContent = '⏳ Проверка...';
-
-            const docRef = db.collection('users').doc(telegramId);
-            const docSnap = await docRef.get();
-
-            if (!docSnap.exists) {
-                codeStatus.textContent = '❌ Пользователь не найден!';
-                codeStatus.style.color = '#ff6eb4';
-                return;
-            }
-
-            const data = docSnap.data();
-
-            if (data.verified) {
-                codeStatus.textContent = '✅ Аккаунт уже подтверждён!';
-                codeStatus.style.color = '#39ff14';
-                goToMain();
-                return;
-            }
-
-            if (data.code === code) {
-                await docRef.update({
-                    verified: true,
-                    verified_at: new Date().toLocaleString()
-                });
-
-                codeStatus.textContent = '✅ Аккаунт успешно зарегистрирован!';
-                codeStatus.style.color = '#39ff14';
-                goToMain();
-            } else {
-                codeStatus.textContent = '❌ Неверный код! Попробуйте снова.';
-                codeStatus.style.color = '#ff6eb4';
-            }
-
-        } catch (error) {
-            console.error('Ошибка проверки кода:', error);
-            codeStatus.textContent = '❌ Ошибка: ' + error.message;
-            codeStatus.style.color = '#ff6eb4';
-        } finally {
-            verifyBtn.disabled = false;
-            verifyBtn.textContent = '✅ ПОДТВЕРДИТЬ';
-        }
-    });
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
