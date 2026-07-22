@@ -1,0 +1,6 @@
+name: RegisterPlugin
+version: 1.0.0
+main: com.grifmcpo.register.RegisterPlugin
+api-version: 1.21
+description: Регистрация через сайт с Firebase
+author: Grif_Mo
