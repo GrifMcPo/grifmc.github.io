@@ -20,22 +20,30 @@ public class RegisterPlugin extends JavaPlugin {
 
         // Подключаем Firebase
         try {
+            // Пробуем загрузить serviceAccountKey.json из папки плагина
             InputStream serviceAccount = getResource("serviceAccountKey.json");
             if (serviceAccount == null) {
-                getLogger().severe("❌ Файл serviceAccountKey.json не найден в ресурсах!");
+                getLogger().severe("❌ Файл serviceAccountKey.json не найден!");
                 getLogger().severe("❌ Положите его в plugins/RegisterPlugin/");
-                return;
+                getLogger().severe("❌ Или в resources плагина");
+            } else {
+                getLogger().info("✅ serviceAccountKey.json найден!");
             }
+
+            // Инициализируем Firebase
             firebaseDatabase = FirebaseDatabase.getInstance();
             databaseReference = firebaseDatabase.getReference();
             getLogger().info("✅ Firebase подключена!");
         } catch (Exception e) {
             getLogger().severe("❌ Ошибка подключения Firebase: " + e.getMessage());
+            e.printStackTrace();
         }
 
         // Регистрируем слушатели
         Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
-        new CodeSender().runTaskTimer(this, 20L, 100L); // каждые 5 секунд
+
+        // Запускаем задачу отправки кодов (каждые 5 секунд)
+        new CodeSender().runTaskTimer(this, 20L, 100L);
 
         getLogger().info("✅ RegisterPlugin готов!");
     }
