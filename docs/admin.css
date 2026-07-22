@@ -1,74 +1,73 @@
 /* ========================================
    admin.css — СТИЛИ АДМИН-ПАНЕЛИ
-   СТИЛЬ: СТРОГИЙ, ТЁМНЫЙ, ТЕХНОЛОГИЧНЫЙ
+   ТЁМНЫЙ, СТРОГИЙ, ТЕХНОЛОГИЧНЫЙ
    ======================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
 
-/* ===== ПЕРЕМЕННЫЕ ===== */
 :root {
-    --admin-bg: #0a0a0f;
-    --admin-card: #111118;
+    --admin-bg: #08080d;
+    --admin-card: #0d0d18;
     --admin-border: #1a1a2a;
-    --admin-text: #a0a0a8;
-    --admin-text-light: #c8c8d0;
+    --admin-text: #8888a0;
+    --admin-text-light: #b8b8c8;
     --admin-gold: #b8860b;
-    --admin-glow: rgba(184, 134, 11, 0.15);
-    --admin-danger: #8b0000;
-    --admin-success: #1a4a1a;
-    --admin-accent: #2a2a3a;
+    --admin-glow: rgba(184,134,11,0.08);
+    --admin-danger: #6b0000;
+    --admin-success: #0a3a0a;
+    --admin-accent: #1a1a2a;
 }
 
-/* ===== ОБЩИЕ ===== */
+* { margin:0; padding:0; box-sizing:border-box; }
+
 .admin-body {
-    font-family: 'Rajdhani', 'Inter', sans-serif;
+    font-family: 'Rajdhani', 'Segoe UI', sans-serif;
     background: var(--admin-bg);
     color: var(--admin-text);
     min-height: 100vh;
     display: flex;
 }
 
-/* ===== ШЕСТЕРЁНКА (ВХОД В АДМИНКУ) ===== */
+/* ===== ШЕСТЕРЁНКА ===== */
 .admin-gear {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 16px;
+    right: 16px;
     z-index: 9999;
-    font-size: 1.8em;
-    color: rgba(255,255,255,0.05);
+    font-size: 1.6em;
+    color: rgba(255,255,255,0.04);
     cursor: pointer;
-    transition: all 0.4s ease;
+    transition: all 0.5s ease;
     background: none;
     border: none;
-    padding: 10px;
+    padding: 12px;
+    font-family: 'Segoe UI', sans-serif;
 }
 
 .admin-gear:hover {
-    color: rgba(255,255,255,0.2);
-    transform: rotate(180deg);
+    color: rgba(255,255,255,0.15);
+    transform: rotate(180deg) scale(1.1);
 }
 
-/* ===== ОВЕРЛЕЙ ВХОДА ===== */
+/* ===== ЛОГИН ===== */
 .admin-login-overlay {
     position: fixed;
     inset: 0;
     z-index: 10000;
-    background: rgba(10,10,15,0.98);
+    background: rgba(8,8,13,0.98);
     display: none;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(20px);
 }
 
-.admin-login-overlay.active {
-    display: flex;
-}
+.admin-login-overlay.active { display: flex; }
 
 .admin-login-box {
     background: var(--admin-card);
     border: 1px solid var(--admin-border);
     padding: 48px 40px;
-    max-width: 400px;
+    max-width: 380px;
     width: 92%;
     text-align: center;
 }
@@ -76,17 +75,16 @@
 .admin-login-box .icon {
     font-size: 3em;
     margin-bottom: 12px;
-    opacity: 0.3;
+    opacity: 0.2;
 }
 
 .admin-login-box h2 {
     font-family: 'Orbitron', monospace;
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 700;
     letter-spacing: 0.15em;
     color: var(--admin-text-light);
     text-transform: uppercase;
-    margin-bottom: 4px;
 }
 
 .admin-login-box .sub {
@@ -101,7 +99,7 @@
     padding: 14px 18px;
     background: rgba(255,255,255,0.02);
     border: 1px solid var(--admin-border);
-    border-radius: 4px;
+    border-radius: 0;
     color: var(--admin-text-light);
     font-size: 1em;
     font-family: 'Rajdhani', sans-serif;
@@ -121,7 +119,7 @@
     border: 1px solid var(--admin-gold);
     color: var(--admin-gold);
     font-family: 'Orbitron', monospace;
-    font-size: 0.85em;
+    font-size: 0.8em;
     font-weight: 700;
     letter-spacing: 0.1em;
     cursor: pointer;
@@ -130,8 +128,8 @@
 }
 
 .admin-login-box .login-btn:hover {
-    background: rgba(184,134,11,0.05);
-    box-shadow: 0 0 30px rgba(184,134,11,0.05);
+    background: rgba(184,134,11,0.04);
+    box-shadow: 0 0 40px rgba(184,134,11,0.03);
 }
 
 .admin-login-box .error {
@@ -141,19 +139,23 @@
     min-height: 20px;
 }
 
-/* ===== САЙДБАР АДМИНКИ ===== */
+/* ===== САЙДБАР ===== */
 .admin-sidebar {
     position: fixed;
     left: 0; top: 0; bottom: 0;
     width: 220px;
     background: var(--admin-card);
     border-right: 1px solid var(--admin-border);
-    display: flex;
+    display: none;
     flex-direction: column;
     padding: 20px 0;
     z-index: 100;
     overflow-y: auto;
 }
+
+.admin-sidebar::-webkit-scrollbar { width: 3px; }
+.admin-sidebar::-webkit-scrollbar-track { background: transparent; }
+.admin-sidebar::-webkit-scrollbar-thumb { background: var(--admin-border); }
 
 .admin-sidebar .logo {
     font-family: 'Orbitron', monospace;
@@ -167,9 +169,7 @@
     text-transform: uppercase;
 }
 
-.admin-sidebar .logo span {
-    color: var(--admin-gold);
-}
+.admin-sidebar .logo span { color: var(--admin-gold); }
 
 .admin-sidebar .nav-item {
     display: flex;
@@ -178,16 +178,18 @@
     padding: 10px 20px;
     color: var(--admin-text);
     text-decoration: none;
-    font-size: 0.85em;
+    font-size: 0.82em;
     font-weight: 600;
     transition: all 0.3s;
     border-left: 2px solid transparent;
     cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .admin-sidebar .nav-item:hover {
     color: var(--admin-text-light);
-    background: rgba(255,255,255,0.02);
+    background: rgba(255,255,255,0.01);
 }
 
 .admin-sidebar .nav-item.active {
@@ -196,19 +198,14 @@
     background: rgba(184,134,11,0.03);
 }
 
-.admin-sidebar .nav-item .icon {
-    font-size: 1.1em;
-    width: 24px;
-    text-align: center;
-}
-
+.admin-sidebar .nav-item .icon { font-size: 1em; width: 24px; text-align: center; }
 .admin-sidebar .nav-item .badge {
     margin-left: auto;
-    background: rgba(184,134,11,0.1);
+    background: rgba(184,134,11,0.08);
     color: var(--admin-gold);
-    font-size: 0.65em;
+    font-size: 0.6em;
     padding: 2px 8px;
-    border-radius: 2px;
+    border-radius: 0;
 }
 
 /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
@@ -217,6 +214,7 @@
     flex: 1;
     padding: 24px 32px;
     min-height: 100vh;
+    display: none;
 }
 
 .admin-main .topbar {
@@ -230,7 +228,7 @@
 
 .admin-main .topbar .title {
     font-family: 'Orbitron', monospace;
-    font-size: 1.1em;
+    font-size: 1em;
     font-weight: 700;
     letter-spacing: 0.08em;
     color: var(--admin-text-light);
@@ -242,33 +240,66 @@
     color: var(--admin-text);
 }
 
-.admin-main .topbar .user-info .gold {
-    color: var(--admin-gold);
+.admin-main .topbar .user-info .gold { color: var(--admin-gold); }
+
+/* ===== ЭКСТРЕННАЯ СТРОКА ===== */
+.emergency-bar {
+    background: linear-gradient(90deg, #1a0000, #6b0000, #1a0000);
+    padding: 12px 24px;
+    text-align: center;
+    color: #ff3333;
+    font-family: 'Orbitron', monospace;
+    font-size: 1em;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: -24px -32px 24px;
+    border-bottom: 1px solid #6b0000;
+    position: relative;
+    animation: emergencyPulse 1.5s ease-in-out infinite;
 }
 
-/* ===== КАРТОЧКИ АДМИНКИ ===== */
+@keyframes emergencyPulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.emergency-close {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #ff3333;
+    font-size: 1.2em;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+/* ===== КАРТОЧКИ ===== */
 .admin-card {
     background: var(--admin-card);
     border: 1px solid var(--admin-border);
-    border-radius: 0;
     padding: 20px 24px;
     margin-bottom: 20px;
 }
 
 .admin-card .card-title {
     font-family: 'Orbitron', monospace;
-    font-size: 0.75em;
+    font-size: 0.7em;
     font-weight: 700;
     letter-spacing: 0.1em;
     color: var(--admin-text);
     text-transform: uppercase;
     margin-bottom: 16px;
+    opacity: 0.5;
 }
 
-/* ===== СТАТИСТИКА (ГЛОБАЛЬНЫЙ РАДАР) ===== */
+/* ===== ГРИД СТАТИСТИКИ ===== */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 16px;
     margin-bottom: 24px;
 }
@@ -280,11 +311,11 @@
 }
 
 .stat-block .label {
-    font-size: 0.7em;
+    font-size: 0.65em;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--admin-text);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 .stat-block .value {
@@ -303,7 +334,7 @@
 .admin-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.85em;
+    font-size: 0.82em;
 }
 
 .admin-table th {
@@ -313,8 +344,9 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    font-size: 0.7em;
+    font-size: 0.65em;
     border-bottom: 1px solid var(--admin-border);
+    opacity: 0.5;
 }
 
 .admin-table td {
@@ -323,32 +355,21 @@
     color: var(--admin-text-light);
 }
 
-.admin-table tr:hover td {
-    background: rgba(255,255,255,0.01);
-}
+.admin-table tr:hover td { background: rgba(255,255,255,0.01); }
 
-.admin-table .status-success {
-    color: #1a6a1a;
-}
-.admin-table .status-pending {
-    color: var(--admin-gold);
-}
-.admin-table .status-failed {
-    color: #8b0000;
-}
-
-/* ===== КНОПКИ АДМИНКИ ===== */
+/* ===== КНОПКИ ===== */
 .admin-btn {
     padding: 8px 18px;
     background: transparent;
     border: 1px solid var(--admin-border);
     color: var(--admin-text);
     font-family: 'Rajdhani', sans-serif;
-    font-size: 0.8em;
+    font-size: 0.75em;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
     letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .admin-btn:hover {
@@ -356,36 +377,23 @@
     color: var(--admin-gold);
 }
 
-.admin-btn.gold {
-    border-color: var(--admin-gold);
-    color: var(--admin-gold);
-}
+.admin-btn.gold { border-color: var(--admin-gold); color: var(--admin-gold); }
+.admin-btn.gold:hover { background: rgba(184,134,11,0.04); }
 
-.admin-btn.gold:hover {
-    background: rgba(184,134,11,0.05);
-}
+.admin-btn.danger { border-color: #6b0000; color: #6b0000; }
+.admin-btn.danger:hover { background: rgba(107,0,0,0.05); }
 
-.admin-btn.danger {
-    border-color: #8b0000;
-    color: #8b0000;
-}
+.admin-btn.success { border-color: #1a6a1a; color: #1a6a1a; }
+.admin-btn.success:hover { background: rgba(26,106,26,0.05); }
 
-.admin-btn.danger:hover {
-    background: rgba(139,0,0,0.05);
-}
+.admin-btn-sm { padding: 4px 12px; font-size: 0.7em; }
 
-.admin-btn.success {
-    border-color: #1a6a1a;
-    color: #1a6a1a;
-}
-
-/* ===== ФОРМЫ АДМИНКИ ===== */
+/* ===== ФОРМЫ ===== */
 .admin-input {
     width: 100%;
     padding: 10px 14px;
-    background: rgba(255,255,255,0.02);
+    background: rgba(255,255,255,0.01);
     border: 1px solid var(--admin-border);
-    border-radius: 0;
     color: var(--admin-text-light);
     font-family: 'Rajdhani', sans-serif;
     font-size: 0.9em;
@@ -400,9 +408,8 @@
 .admin-textarea {
     width: 100%;
     padding: 10px 14px;
-    background: rgba(255,255,255,0.02);
+    background: rgba(255,255,255,0.01);
     border: 1px solid var(--admin-border);
-    border-radius: 0;
     color: var(--admin-text-light);
     font-family: 'Rajdhani', sans-serif;
     font-size: 0.9em;
@@ -418,9 +425,8 @@
 
 .admin-select {
     padding: 10px 14px;
-    background: rgba(255,255,255,0.02);
+    background: rgba(255,255,255,0.01);
     border: 1px solid var(--admin-border);
-    border-radius: 0;
     color: var(--admin-text-light);
     font-family: 'Rajdhani', sans-serif;
     font-size: 0.9em;
@@ -433,95 +439,179 @@
     border-color: var(--admin-gold);
 }
 
-/* ===== ТОГГЛЫ ===== */
-.admin-toggle {
-    position: relative;
-    width: 40px;
-    height: 22px;
-    background: var(--admin-border);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: inline-block;
-}
-
-.admin-toggle.active {
-    background: var(--admin-gold);
-}
-
-.admin-toggle .knob {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 18px;
-    height: 18px;
-    background: var(--admin-text-light);
-    border-radius: 50%;
-    transition: all 0.3s;
-}
-
-.admin-toggle.active .knob {
-    left: 20px;
-    background: #fff;
-}
-
 /* ===== ГРАФИКИ ===== */
 .chart-container {
-    height: 200px;
+    height: 180px;
     display: flex;
     align-items: flex-end;
     gap: 4px;
-    padding: 20px 0;
+    padding: 16px 0;
 }
 
 .chart-bar {
     flex: 1;
     min-height: 8px;
     background: var(--admin-border);
-    border-radius: 2px 2px 0 0;
-    transition: height 0.6s ease;
+    transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
 }
 
-.chart-bar.active {
-    background: var(--admin-gold);
-}
+.chart-bar.active { background: var(--admin-gold); }
+.chart-bar.danger { background: #6b0000; }
 
 .chart-bar .label {
     position: absolute;
     bottom: -20px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.55em;
+    font-size: 0.5em;
     color: var(--admin-text);
     opacity: 0.3;
     white-space: nowrap;
 }
 
-/* ===== СТРОКА ЭКСТРЕННОГО ОПОВЕЩЕНИЯ ===== */
-.emergency-bar {
-    display: none;
-    background: linear-gradient(90deg, #1a0000, #8b0000, #1a0000);
-    padding: 12px 24px;
+/* ===== ТОГГЛЫ ===== */
+.admin-toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: var(--admin-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+}
+
+.admin-toggle.active { background: var(--admin-gold); }
+
+.admin-toggle .knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--admin-text);
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.admin-toggle.active .knob {
+    left: 18px;
+    background: #fff;
+}
+
+/* ===== ЗАГРУЗКА ===== */
+.loading-terminal {
     text-align: center;
-    color: #ff4444;
+    padding: 60px 20px;
+    color: var(--admin-text);
     font-family: 'Orbitron', monospace;
-    font-size: 1.1em;
-    font-weight: 700;
+    font-size: 0.9em;
     letter-spacing: 0.15em;
+    opacity: 0.3;
+}
+
+.loading-terminal::after {
+    content: '...';
+    animation: dots 1.5s steps(4) infinite;
+}
+
+@keyframes dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+}
+
+/* ===== HWID-БАН ===== */
+.hwid-section {
+    background: var(--admin-card);
+    border: 1px solid var(--admin-border);
+    padding: 24px;
+}
+
+.hwid-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.hwid-header .hwid-icon { font-size: 2em; }
+.hwid-header h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--admin-text-light);
     text-transform: uppercase;
-    margin: -24px -32px 24px;
-    border-bottom: 1px solid #8b0000;
 }
 
-.emergency-bar.active {
-    display: block;
-    animation: emergencyPulse 1.5s ease-in-out infinite;
+.hwid-header .hwid-sub {
+    margin-left: auto;
+    color: var(--admin-text);
+    font-size: 0.7em;
+    opacity: 0.4;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
-@keyframes emergencyPulse {
-    0%,100% { opacity: 1; }
-    50% { opacity: 0.6; }
+.hwid-profile {
+    background: rgba(255,255,255,0.01);
+    border: 1px solid var(--admin-border);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.hwid-profile .avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 0;
+    background: var(--admin-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+}
+
+.hwid-profile .info .name {
+    font-weight: 700;
+    color: var(--admin-text-light);
+    font-size: 1em;
+}
+
+.hwid-profile .info .uuid {
+    font-size: 0.7em;
+    color: var(--admin-text);
+    opacity: 0.4;
+    font-family: 'Orbitron', monospace;
+}
+
+.hwid-profile .info .hwid {
+    font-size: 0.7em;
+    color: var(--admin-gold);
+    font-family: 'Orbitron', monospace;
+    margin-top: 2px;
+}
+
+.hwid-warning {
+    background: rgba(107,0,0,0.05);
+    border: 1px solid #6b0000;
+    padding: 12px 16px;
+    color: #8b0000;
+    font-size: 0.8em;
+    margin: 16px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hwid-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
 }
 
 /* ===== АДАПТИВ ===== */
@@ -531,14 +621,8 @@
         transition: transform 0.3s ease;
         width: 260px;
     }
-    .admin-sidebar.open {
-        transform: translateX(0);
-    }
-    .admin-main {
-        margin-left: 0;
-        padding: 16px;
-    }
-    .stats-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+    .admin-sidebar.open { transform: translateX(0); }
+    .admin-main { margin-left: 0; padding: 16px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .emergency-bar { margin: -16px -16px 16px; padding: 10px 16px; font-size: 0.8em; }
 }
