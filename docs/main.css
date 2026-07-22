@@ -1,22 +1,8 @@
 /* ============================
-   MAIN.CSS — Главная страница
-   ЯРКАЯ И ВИДНАЯ ВЕРСИЯ
+   main.css — ГЛАВНАЯ СТРАНИЦА
    ============================ */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #0a0e27;
-    color: #ffffff;
-    min-height: 100vh;
-}
-
-/* ── НАВБАР ──────────────────────────────── */
+/* ── НАВБАР ────────────────────────────────── */
 .navbar {
     position: fixed;
     top: 0;
@@ -39,12 +25,7 @@ body {
     gap: 10px;
 }
 
-.nav-icon {
-    font-size: 1.5em;
-}
-
 .nav-title {
-    font-family: 'Segoe UI', sans-serif;
     font-size: 1.2em;
     font-weight: 700;
     color: #a78bfa;
@@ -111,44 +92,44 @@ body {
     transform: translateY(-2px);
 }
 
-/* ── ОСНОВНОЙ КОНТЕНТ ────────────────────── */
+/* ── ОСНОВНОЙ КОНТЕНТ ──────────────────────── */
 .main-content {
     padding-top: 90px;
-    padding-bottom: 80px;
+    padding-bottom: 60px;
     max-width: 1100px;
     margin: 0 auto;
     padding-left: 20px;
     padding-right: 20px;
+    position: relative;
+    z-index: 10;
 }
 
 /* ── ЗАГОЛОВКИ ────────────────────────────── */
 .section-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .section-title {
-    font-family: 'Segoe UI', sans-serif;
     font-size: 2em;
     font-weight: 900;
     color: #a78bfa;
     text-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
 }
 
-/* ── ГЕРОЙ ──────────────────────────────────── */
+/* ── ГЕРОЙ ────────────────────────────────── */
 .hero {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 40px 0;
-    gap: 40px;
-    flex-wrap: wrap;
     background: #12163a;
     border-radius: 20px;
     border: 1px solid #7c3aed;
     padding: 40px;
     margin-bottom: 40px;
     box-shadow: 0 0 60px rgba(124, 58, 237, 0.15);
+    flex-wrap: wrap;
+    gap: 30px;
 }
 
 .hero-content {
@@ -169,18 +150,10 @@ body {
 }
 
 .hero-title {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 3em;
+    font-size: 2.8em;
     font-weight: 900;
     line-height: 1.1;
     margin-bottom: 16px;
-}
-
-.hero-title .rgb-text {
-    background: linear-gradient(90deg, #a78bfa, #7c3aed, #06b6d4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
 .hero-sub {
@@ -197,12 +170,9 @@ body {
     flex-wrap: wrap;
 }
 
-.hstat {
-    text-align: center;
-}
+.hstat { text-align: center; }
 
 .hstat-num {
-    font-family: 'Segoe UI', sans-serif;
     font-size: 2em;
     font-weight: 900;
     color: #ffffff;
@@ -241,7 +211,6 @@ body {
 }
 
 .ip-value {
-    font-family: 'Segoe UI', monospace;
     font-size: 0.95em;
     color: #06b6d4;
     font-weight: 700;
@@ -263,9 +232,9 @@ body {
     background: rgba(124, 58, 237, 0.4);
 }
 
-/* ── КУБ (ВИЗУАЛ) ──────────────────────────── */
+/* ── КУБ ──────────────────────────────────── */
 .hero-visual {
-    flex: 0 0 180px;
+    flex: 0 0 160px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -303,10 +272,8 @@ body {
 .cube-face.top    { transform: rotateX(90deg)  translateZ(60px); }
 .cube-face.bottom { transform: rotateX(-90deg) translateZ(60px); }
 
-/* ── ПРОФИЛЬ ────────────────────────────────── */
-.profile-section {
-    margin: 40px 0;
-}
+/* ── ПРОФИЛЬ ──────────────────────────────── */
+.profile-section { margin: 40px 0; }
 
 .profile-card {
     background: #12163a;
@@ -333,13 +300,9 @@ body {
     flex-shrink: 0;
 }
 
-.profile-info {
-    flex: 1;
-    min-width: 240px;
-}
+.profile-info { flex: 1; min-width: 240px; }
 
 .profile-name {
-    font-family: 'Segoe UI', sans-serif;
     font-size: 1.5em;
     font-weight: 700;
     margin-bottom: 16px;
@@ -377,10 +340,8 @@ body {
 .status-ok { color: #34d399; }
 .status-ban { color: #f87171; }
 
-/* ── НОВОСТИ ────────────────────────────────── */
-.news-section {
-    margin: 40px 0;
-}
+/* ── НОВОСТИ ──────────────────────────────── */
+.news-section { margin: 40px 0; }
 
 .news-grid {
     display: grid;
@@ -431,10 +392,8 @@ body {
     margin-top: 12px;
 }
 
-/* ── ИГРОКИ ────────────────────────────────── */
-.players-section {
-    margin: 40px 0;
-}
+/* ── ИГРОКИ ──────────────────────────────── */
+.players-section { margin: 40px 0; }
 
 .players-list {
     background: #12163a;
@@ -455,31 +414,11 @@ body {
 .player-row:last-child { border-bottom: none; }
 .player-row:hover { background: #1e2447; }
 
-.player-rank {
-    font-size: 1.2em;
-    min-width: 32px;
-    text-align: center;
-}
-
+.player-rank { font-size: 1.2em; min-width: 32px; text-align: center; }
 .player-info { flex: 1; }
-
-.player-name {
-    font-weight: 700;
-    font-size: 0.95em;
-    color: #ffffff;
-}
-
-.player-id {
-    color: #94a3b8;
-    font-size: 0.78em;
-    margin-top: 2px;
-}
-
-.player-tag {
-    color: #64748b;
-    font-size: 0.82em;
-    font-family: monospace;
-}
+.player-name { font-weight: 700; font-size: 0.95em; color: #ffffff; }
+.player-id { color: #94a3b8; font-size: 0.78em; margin-top: 2px; }
+.player-tag { color: #64748b; font-size: 0.82em; }
 
 .loading-text {
     text-align: center;
@@ -487,10 +426,8 @@ body {
     color: #475569;
 }
 
-/* ── ПРАВИЛА ────────────────────────────────── */
-.rules-section {
-    margin: 40px 0;
-}
+/* ── ПРАВИЛА ──────────────────────────────── */
+.rules-section { margin: 40px 0; }
 
 .rules-grid {
     display: grid;
@@ -512,7 +449,6 @@ body {
 }
 
 .rule-num {
-    font-family: 'Segoe UI', sans-serif;
     font-size: 2em;
     font-weight: 900;
     color: #334155;
@@ -531,7 +467,7 @@ body {
     line-height: 1.6;
 }
 
-/* ── ФУТЕР ──────────────────────────────────── */
+/* ── ФУТЕР ────────────────────────────────── */
 .main-footer {
     margin-top: 40px;
     padding: 20px;
@@ -554,8 +490,14 @@ body {
     font-weight: 700;
 }
 
-.footer-admin-link:hover {
-    color: #ffffff;
+.footer-admin-link:hover { color: #ffffff; }
+
+/* ── ВСПОМОГАТЕЛЬНЫЕ ──────────────────────── */
+.rgb-text {
+    background: linear-gradient(90deg, #a78bfa, #7c3aed, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* ── АДАПТИВ ────────────────────────────────── */
@@ -566,15 +508,7 @@ body {
     .hero-stats { justify-content: center; }
     .nav-links { display: none; }
     .navbar { padding: 0 16px; }
-    .main-content { padding: 80px 16px 60px; }
+    .main-content { padding: 80px 16px 40px; }
     .profile-card { flex-direction: column; align-items: center; text-align: center; }
     .profile-fields { grid-template-columns: 1fr; }
-}
-
-/* ── ВСПОМОГАТЕЛЬНЫЕ ────────────────────────── */
-.rgb-text {
-    background: linear-gradient(90deg, #a78bfa, #7c3aed, #06b6d4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
