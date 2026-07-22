@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Регистрация</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .box {
+            background: #12163a;
+            padding: 40px 35px;
+            border-radius: 20px;
+            border: 2px solid #7c3aed;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 0 0 60px rgba(124,58,237,0.3);
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(20px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+        .icon { text-align:center; font-size:40px; margin-bottom:6px; }
+        h1 { text-align:center; color:#a78bfa; font-size:26px; }
+        .sub { text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px; }
+        .badges { display:flex; gap:10px; justify-content:center; margin-bottom:20px; }
+        .badge { background:#1e2447; border:1px solid #334155; padding:4px 14px; border-radius:20px; font-size:12px; color:#94a3b8; }
+        label { display:block; color:#e2e8f0; font-weight:600; margin-bottom:5px; font-size:14px; }
+        input {
+            width:100%; padding:12px 16px; background:#1e2447; border:1px solid #334155;
+            border-radius:10px; color:#fff; font-size:15px; margin-bottom:16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus { outline:none; border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,0.2); }
+        input::placeholder { color:#64748b; }
+        .hint { color:#64748b; font-size:12px; margin-top:-12px; display:block; margin-bottom:12px; }
+        .hint strong { color:#7c3aed; }
+        .btn {
+            width:100%; padding:14px; background:linear-gradient(135deg,#7c3aed,#6d28d9);
+            color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:700;
+            cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(124,58,237,0.4); }
+        .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+        .btn-success { background:linear-gradient(135deg,#10b981,#059669); }
+        #message { margin-top:16px; padding:12px; border-radius:10px; text-align:center; display:none; font-weight:600; }
+        #message.success { display:block; background:#064e3b; border:1px solid #10b981; color:#34d399; }
+        #message.error { display:block; background:#4c0519; border:1px solid #ef4444; color:#f87171; }
+        #code-section { margin-top:20px; padding-top:20px; border-top:1px solid #334155; display:none; }
+        #code-section h3 { text-align:center; color:#fbbf24; margin-bottom:12px; }
+        #code-status { text-align:center; margin-top:10px; color:#94a3b8; }
+        .ver { text-align:center; margin-top:20px; color:#475569; font-size:12px; }
+        .link { color:#a78bfa; text-decoration:none; }
+        .link:hover { text-decoration:underline; }
+    </style>
+</head>
+<body>
+
+<div class="box" id="app">
+    <div class="icon">⚡</div>
+    <h1>Регистрация</h1>
+    <p class="sub">Заполните форму для доступа на сервер</p>
+    <div class="badges">
+        <span class="badge">🎮 Minecraft</span>
+        <span class="badge">🔐 Защищено</span>
+    </div>
+
+    <form id="register-form">
+        <label>📱 Telegram ID</label>
+        <input type="text" id="telegram-id" placeholder="Например: 123456789">
+        <span class="hint">Напишите боту <strong>!id</strong> в Telegram</span>
+
+        <label>⛏️ Ник на сервере</label>
+        <input type="text" id="nickname" placeholder="Ваш Minecraft ник">
+
+        <label>👤 Ник на сайте</label>
+        <input type="text" id="site-nick" placeholder="Как вас называть">
+
+        <label>🆔 ID на сайте</label>
+        <input type="text" id="site-id" placeholder="Уникальный ID для друзей">
+        <span class="hint">Придумайте уникальный идентификатор</span>
+
+        <button type="submit" id="register-btn" class="btn">🚀 Зарегистрироваться</button>
+    </form>
+
+    <div id="code-section">
+        <h3>🔐 Введите код</h3>
+        <p style="text-align:center;color:#64748b;font-size:14px;margin-bottom:12px;">Код отправлен в чат сервера</p>
+        <input type="text" id="code-input" placeholder="Код из 5 цифр" maxlength="5" style="text-align:center;font-size:20px;letter-spacing:4px;">
+        <button id="verify-btn" class="btn btn-success" style="margin-top:0;">✅ Подтвердить</button>
+        <p id="code-status"></p>
+    </div>
+
+    <div id="message"></div>
+    <div class="ver">v2.0</div>
+</div>
+
+<script>
+    const form = document.getElementById('register-form');
+    const tg = document.getElementById('telegram-id');
+    const nick = document.getElementById('nickname');
+    const siteNick = document.getElementById('site-nick');
+    const siteId = document.getElementById('site-id');
+    const msg = document.getElementById('message');
+    const codeSection = document.getElementById('code-section');
+    const codeInput = document.getElementById('code-input');
+    const verifyBtn = document.getElementById('verify-btn');
+    const codeStatus = document.getElementById('code-status');
+    const registerBtn = document.getElementById('register-btn');
+
+    function showMessage(text, type) {
+        msg.textContent = text;
+        msg.className = type;
+        msg.style.display = 'block';
+    }
+    function hideMessage() { msg.style.display = 'none'; }
+    function generateCode() { return Math.floor(10000 + Math.random() * 90000).toString(); }
+    function goToMain() { window.location.href = 'main.html'; }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideMessage();
+
+        const telegramId = tg.value.trim();
+        const nickname = nick.value.trim();
+        const siteNickVal = siteNick.value.trim();
+        const siteIdVal = siteId.value.trim();
+
+        if (!telegramId || !nickname || !siteNickVal || !siteIdVal) {
+            showMessage('❌ Заполните все поля!', 'error');
+            return;
+        }
+        if (!/^\d+$/.test(telegramId)) {
+            showMessage('❌ Telegram ID должен содержать только цифры!', 'error');
+            return;
+        }
+
+        try {
+            registerBtn.disabled = true;
+            registerBtn.textContent = '⏳ Отправка...';
+
+            // Проверка ника
+            const snap = await db.collection('users').where('nickname', '==', nickname).get();
+            if (!snap.empty) {
+                showMessage('❌ Этот ник уже зарегистрирован!', 'error');
+                registerBtn.disabled = false;
+                registerBtn.textContent = '🚀 Зарегистрироваться';
+                return;
+            }
+
+            // Проверка Telegram ID
+            const tgSnap = await db.collection('users').where('telegram_id', '==', telegramId).get();
+            if (!tgSnap.empty) {
+                showMessage('❌ Этот Telegram ID уже зарегистрирован!', 'error');
+                registerBtn.disabled = false;
+                registerBtn.textContent = '🚀 Зарегистрироваться';
+                return;
+            }
+
+            const code = generateCode();
+
+            await db.collection('users').doc(telegramId).set({
+                telegram_id: telegramId,
+                nickname: nickname,
+                site_nick: siteNickVal,
+                site_id: siteIdVal,
+                code: code,
+                verified: false,
+                code_sent: false,
+                registered_at: new Date().toLocaleString()
+            });
+
+            codeSection.style.display = 'block';
+            codeInput.value = '';
+            codeStatus.textContent = '📨 Код отправлен в чат сервера!';
+            codeStatus.style.color = '#34d399';
+            form.style.display = 'none';
+
+            showMessage('✅ Запрос отправлен! Введите код из чата сервера.', 'success');
+
+        } catch (error) {
+            console.error('Ошибка:', error);
+            showMessage('❌ Ошибка: ' + error.message, 'error');
+        } finally {
+            registerBtn.disabled = false;
+            registerBtn.textContent = '🚀 Зарегистрироваться';
+        }
+    });
+
+    verifyBtn.addEventListener('click', async () => {
+        const code = codeInput.value.trim();
+        const telegramId = tg.value.trim();
+
+        if (!code || code.length !== 5) {
+            codeStatus.textContent = '❌ Введите 5-значный код!';
+            codeStatus.style.color = '#f87171';
+            return;
+        }
+
+        try {
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = '⏳ Проверка...';
+
+            const docRef = db.collection('users').doc(telegramId);
+            const docSnap = await docRef.get();
+
+            if (!docSnap.exists) {
+                codeStatus.textContent = '❌ Пользователь не найден!';
+                codeStatus.style.color = '#f87171';
+                return;
+            }
+
+            const data = docSnap.data();
+
+            if (data.verified) {
+                codeStatus.textContent = '✅ Аккаунт уже подтверждён!';
+                codeStatus.style.color = '#34d399';
+                goToMain();
+                return;
+            }
+
+            if (data.code === code) {
+                await docRef.update({
+                    verified: true,
+                    verified_at: new Date().toLocaleString()
+                });
+
+                codeStatus.textContent = '✅ Аккаунт успешно зарегистрирован!';
+                codeStatus.style.color = '#34d399';
+                goToMain();
+            } else {
+                codeStatus.textContent = '❌ Неверный код! Попробуйте снова.';
+                codeStatus.style.color = '#f87171';
+            }
+
+        } catch (error) {
+            console.error('Ошибка проверки кода:', error);
+            codeStatus.textContent = '❌ Ошибка: ' + error.message;
+            codeStatus.style.color = '#f87171';
+        } finally {
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = '✅ Подтвердить';
+        }
+    });
+</script>
+
+</body>
+</html>
