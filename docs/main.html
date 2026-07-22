@@ -3,316 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎮 Главная — Игровой Сервер</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Главная</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        /* ===== ВСЕ СТИЛИ ЗДЕСЬ — НИКАКИХ ВНЕШНИХ CSS ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: #12163a;
+            border-bottom: 2px solid #7c3aed;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; color: #a78bfa; }
+        .nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            margin-left: 16px;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        .nav a:hover { background: rgba(124,58,237,0.2); color: #fff; }
+        .nav a.active { color: #a78bfa; background: rgba(124,58,237,0.15); }
+        
+        .content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hero {
+            background: #12163a;
+            border: 1px solid #7c3aed;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        h1 { color: #a78bfa; margin-bottom: 10px; }
+        p { color: #94a3b8; margin-bottom: 16px; }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .stat { text-align: center; }
+        .stat-num { font-size: 28px; font-weight: 700; color: #fff; }
+        .stat-label { color: #94a3b8; font-size: 12px; text-transform: uppercase; }
+
+        .ip-box {
+            background: #1e2447;
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin: 16px 0;
+        }
+        .ip-box .label { color: #94a3b8; font-weight: 600; }
+        .ip-box .ip { color: #06b6d4; font-weight: 700; }
+
+        .btn {
+            background: #7c3aed;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .btn:hover { background: #6d28d9; }
+
+        .profile-card {
+            background: #12163a;
+            border: 1px solid #7c3aed;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .profile-item { background: #1e2447; padding: 10px 14px; border-radius: 8px; }
+        .profile-item span { color: #94a3b8; font-size: 12px; display: block; }
+        .profile-item strong { color: #fff; }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+        .news-card {
+            background: #1e2447;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+        }
+        .news-card h3 { color: #a78bfa; margin-bottom: 6px; }
+        .news-card p { color: #94a3b8; font-size: 14px; }
+
+        .players-list {
+            background: #1e2447;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .player-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 20px;
+            border-bottom: 1px solid #0a0e27;
+        }
+        .player-row:last-child { border-bottom: none; }
+        .player-row .rank { font-size: 18px; min-width: 32px; }
+        .player-row .name { flex: 1; font-weight: 700; }
+        .player-row .tag { color: #64748b; font-size: 14px; }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 16px;
+            border-top: 1px solid #1e2447;
+            text-align: center;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .loading { text-align: center; padding: 20px; color: #475569; }
+    </style>
 </head>
-<body class="main-body">
+<body>
 
-<div class="particles" id="particles"></div>
-<div class="screen-border"></div>
-
-<!-- БАН ОВЕРЛЕЙ (тот же из style.css) -->
-<div id="ban-overlay" class="ban-overlay" style="display:none;">
-    <div class="ban-card">
-        <div class="ban-icon">🚫</div>
-        <h1 class="ban-title rgb-text">Ваш аккаунт заблокирован</h1>
-        <div class="ban-divider"></div>
-        <div class="ban-field"><span class="ban-label">Причина</span><span class="ban-value" id="ban-reason-text">—</span></div>
-        <div class="ban-field"><span class="ban-label">Срок бана</span><span class="ban-value" id="ban-expires-text">—</span></div>
-        <div class="ban-field"><span class="ban-label">Telegram ID</span><span class="ban-value" id="ban-tg-text">—</span></div>
-        <p class="ban-footer">Обратитесь к администратору для разблокировки</p>
+<!-- ===== НАВБАР ===== -->
+<div class="navbar">
+    <div class="logo">⚡ GameServer</div>
+    <div class="nav">
+        <a href="#" class="active">Главная</a>
+        <a href="#">Новости</a>
+        <a href="#">Игроки</a>
+        <a href="#">Правила</a>
+    </div>
+    <div>
+        <span style="color:#94a3b8;margin-right:12px;">👤 <span id="nav-name">Игрок</span></span>
+        <button class="btn" onclick="window.location.href='admin.html'">🔧 Админка</button>
     </div>
 </div>
 
-<div id="ipban-overlay" class="ban-overlay ipban" style="display:none;">
-    <div class="ban-card">
-        <div class="ban-icon">🛡️</div>
-        <h1 class="ban-title rgb-text">Ваше IP заблокировано!</h1>
-        <div class="ban-divider"></div>
-        <div class="ban-field"><span class="ban-label">Причина</span><span class="ban-value" id="ipban-reason-text">—</span></div>
-        <div class="ban-field"><span class="ban-label">Срок блокировки</span><span class="ban-value" id="ipban-expires-text">—</span></div>
-        <div class="ban-field"><span class="ban-label">Ваш IP</span><span class="ban-value" id="ipban-ip-text">—</span></div>
-        <p class="ban-footer">Доступ с данного IP-адреса ограничен</p>
-    </div>
-</div>
+<!-- ===== КОНТЕНТ ===== -->
+<div class="content">
 
-<!-- НАВБАР -->
-<nav class="navbar">
-    <div class="nav-logo">
-        <span class="nav-icon">⚡</span>
-        <span class="nav-title rgb-text">GameServer</span>
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Добро пожаловать!</h1>
+        <p>Лучший Minecraft сервер с реальными игроками</p>
+        <div class="stats">
+            <div class="stat"><div class="stat-num" id="stat-online">—</div><div class="stat-label">Онлайн</div></div>
+            <div class="stat"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Игроков</div></div>
+            <div class="stat"><div class="stat-num" id="stat-bans">—</div><div class="stat-label">Банов</div></div>
+        </div>
+        <div class="ip-box">
+            <span class="label">IP сервера:</span>
+            <span class="ip">play.server.ru</span>
+            <button class="btn" style="padding:6px 14px;font-size:12px;" onclick="navigator.clipboard.writeText('play.server.ru').then(()=>alert('Скопировано!'))">📋 Копировать</button>
+        </div>
     </div>
-    <div class="nav-links">
-        <a href="#home" class="nav-link active">Главная</a>
-        <a href="#news" class="nav-link">Новости</a>
-        <a href="#players" class="nav-link">Игроки</a>
-        <a href="#rules" class="nav-link">Правила</a>
+
+    <!-- ПРОФИЛЬ -->
+    <div class="profile-card">
+        <h2 style="color:#a78bfa;margin-bottom:8px;">Мой профиль</h2>
+        <div class="profile-grid">
+            <div class="profile-item"><span>Telegram ID</span><strong id="p-tgid">—</strong></div>
+            <div class="profile-item"><span>Ник на сервере</span><strong id="p-nick">—</strong></div>
+            <div class="profile-item"><span>Ник на сайте</span><strong id="p-sitenick">—</strong></div>
+            <div class="profile-item"><span>ID на сайте</span><strong id="p-siteid">—</strong></div>
+            <div class="profile-item"><span>Статус</span><strong style="color:#34d399;">✅ Активен</strong></div>
+        </div>
     </div>
-    <div class="nav-right">
-        <div class="nav-user" id="nav-user">
-            <span class="nav-avatar">👤</span>
-            <span id="nav-username">Игрок</span>
-        </div>
-        <button class="admin-btn" onclick="window.location.href='admin.html'">
-            🔧 Админка
-        </button>
-    </div>
-</nav>
-
-<!-- ГЛАВНЫЙ КОНТЕНТ -->
-<div class="main-content">
-
-    <!-- HERO СЕКЦИЯ -->
-    <section class="hero" id="home">
-        <div class="hero-bg"></div>
-        <div class="hero-content">
-            <div class="hero-badge">🔥 Сервер онлайн</div>
-            <h1 class="hero-title rgb-text">Добро пожаловать!</h1>
-            <p class="hero-sub">Лучший Minecraft сервер с реальными игроками</p>
-            <div class="hero-stats">
-                <div class="hstat">
-                    <div class="hstat-num rgb-text" id="stat-online">—</div>
-                    <div class="hstat-label">Онлайн</div>
-                </div>
-                <div class="hstat-divider"></div>
-                <div class="hstat">
-                    <div class="hstat-num rgb-text" id="stat-total">—</div>
-                    <div class="hstat-label">Игроков</div>
-                </div>
-                <div class="hstat-divider"></div>
-                <div class="hstat">
-                    <div class="hstat-num rgb-text" id="stat-bans">—</div>
-                    <div class="hstat-label">Банов</div>
-                </div>
-            </div>
-            <div class="hero-ip">
-                <span class="ip-label">IP сервера:</span>
-                <span class="ip-value" id="server-ip">play.server.ru</span>
-                <button class="copy-btn" onclick="copyIP()">📋 Копировать</button>
-            </div>
-        </div>
-        <div class="hero-visual">
-            <div class="hero-cube">
-                <div class="cube-face front">⛏️</div>
-                <div class="cube-face back">🗡️</div>
-                <div class="cube-face left">🛡️</div>
-                <div class="cube-face right">💎</div>
-                <div class="cube-face top">⭐</div>
-                <div class="cube-face bottom">🔥</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ПРОФИЛЬ ИГРОКА -->
-    <section class="profile-section" id="profile-section">
-        <div class="section-header">
-            <h2 class="section-title rgb-text">Мой профиль</h2>
-        </div>
-        <div class="profile-card">
-            <div class="profile-avatar">👤</div>
-            <div class="profile-info">
-                <div class="profile-name" id="profile-name">—</div>
-                <div class="profile-fields">
-                    <div class="profile-field">
-                        <span class="pf-label">📱 Telegram ID</span>
-                        <span class="pf-value" id="p-tgid">—</span>
-                    </div>
-                    <div class="profile-field">
-                        <span class="pf-label">⛏️ Ник на сервере</span>
-                        <span class="pf-value" id="p-nick">—</span>
-                    </div>
-                    <div class="profile-field">
-                        <span class="pf-label">🆔 Сайт ID</span>
-                        <span class="pf-value" id="p-siteid">—</span>
-                    </div>
-                    <div class="profile-field">
-                        <span class="pf-label">📅 Регистрация</span>
-                        <span class="pf-value" id="p-regdate">—</span>
-                    </div>
-                    <div class="profile-field">
-                        <span class="pf-label">🛡️ Статус</span>
-                        <span class="pf-value status-ok" id="p-status">✅ Активен</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- НОВОСТИ -->
-    <section class="news-section" id="news">
-        <div class="section-header">
-            <h2 class="section-title rgb-text">Новости сервера</h2>
-        </div>
-        <div class="news-grid" id="news-grid">
-            <div class="news-card">
-                <div class="news-badge">🆕 Обновление</div>
-                <h3>Сервер запущен!</h3>
-                <p>Добро пожаловать на наш сервер. Регистрируйтесь и играйте!</p>
-                <div class="news-date">Сегодня</div>
-            </div>
-            <div class="news-card">
-                <div class="news-badge">⚡ Ивент</div>
-                <h3>Еженедельный турнир</h3>
-                <p>Участвуй и выигрывай призы. Регистрация через Telegram бота.</p>
-                <div class="news-date">Вчера</div>
-            </div>
-            <div class="news-card">
-                <div class="news-badge">🛡️ Безопасность</div>
-                <h3>Новая система банов</h3>
-                <p>Внедрена автоматическая система обнаружения читеров.</p>
-                <div class="news-date">2 дня назад</div>
-            </div>
-        </div>
-    </section>
+    <h2 style="color:#a78bfa;margin:24px 0 12px;">Новости</h2>
+    <div class="news-grid">
+        <div class="news-card"><h3>🆕 Сервер запущен!</h3><p>Добро пожаловать на наш сервер. Регистрируйтесь и играйте!</p></div>
+        <div class="news-card"><h3>⚡ Турнир</h3><p>Еженедельный турнир с призами. Регистрация через бота.</p></div>
+        <div class="news-card"><h3>🛡️ Безопасность</h3><p>Новая система обнаружения читеров.</p></div>
+    </div>
 
     <!-- ТОП ИГРОКОВ -->
-    <section class="players-section" id="players">
-        <div class="section-header">
-            <h2 class="section-title rgb-text">Топ игроков</h2>
-        </div>
-        <div class="players-list" id="players-list">
-            <div class="loading-text">Загрузка...</div>
-        </div>
-    </section>
+    <h2 style="color:#a78bfa;margin:24px 0 12px;">Топ игроков</h2>
+    <div class="players-list" id="players-list">
+        <div class="loading">Загрузка...</div>
+    </div>
 
-    <!-- ПРАВИЛА -->
-    <section class="rules-section" id="rules">
-        <div class="section-header">
-            <h2 class="section-title rgb-text">Правила сервера</h2>
-        </div>
-        <div class="rules-grid">
-            <div class="rule-card">
-                <div class="rule-num">01</div>
-                <h3>Без читов</h3>
-                <p>Использование читов и модов, дающих преимущество — бан навсегда.</p>
-            </div>
-            <div class="rule-card">
-                <div class="rule-num">02</div>
-                <h3>Уважение</h3>
-                <p>Уважай других игроков. Оскорбления — мут или бан.</p>
-            </div>
-            <div class="rule-card">
-                <div class="rule-num">03</div>
-                <h3>Без спама</h3>
-                <p>Спам в чате запрещён. Нарушение — временный бан.</p>
-            </div>
-            <div class="rule-card">
-                <div class="rule-num">04</div>
-                <h3>Один аккаунт</h3>
-                <p>Один Telegram — один аккаунт. Мультиаккаунт — бан всех.</p>
-            </div>
-            <div class="rule-card">
-                <div class="rule-num">05</div>
-                <h3>Решения адм.</h3>
-                <p>Решения администрации окончательны. Апелляция — через Telegram.</p>
-            </div>
-            <div class="rule-card">
-                <div class="rule-num">06</div>
-                <h3>Griefing</div>
-                <p>Разрушение чужих построек без разрешения — бан.</p>
-            </div>
-        </div>
-    </section>
-
+    <!-- ФУТЕР -->
+    <div class="footer">
+        <span style="color:#a78bfa;">⚡ GameServer</span> | v2.0 | <a href="admin.html" style="color:#a78bfa;text-decoration:none;">🔧 Панель управления</a>
+    </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="main-footer">
-    <div class="footer-content">
-        <span class="rgb-text">⚡ GameServer</span>
-        <span class="footer-sep">|</span>
-        <span>v2.0 RGB Edition</span>
-        <span class="footer-sep">|</span>
-        <a href="admin.html" class="footer-admin-link">🔧 Панель управления</a>
-    </div>
-</footer>
-
-<script src="firebase-config.js"></script>
-<script src="ban-check.js"></script>
 <script>
-(function() {
-    // Частицы
-    const container = document.getElementById('particles');
-    for (let i = 0; i < 40; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = Math.random() * 100 + 'vw';
-        p.style.animationDelay = Math.random() * 8 + 's';
-        p.style.animationDuration = (6 + Math.random() * 8) + 's';
-        p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
-        container.appendChild(p);
-    }
-
-    // Загрузить данные пользователя из localStorage
-    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    if (userData.siteNick) {
-        document.getElementById('nav-username').textContent = userData.siteNick;
-        document.getElementById('profile-name').textContent = userData.siteNick;
-    }
-    if (userData.telegramId) document.getElementById('p-tgid').textContent = userData.telegramId;
-    if (userData.nickname)  document.getElementById('p-nick').textContent = userData.nickname;
-    if (userData.siteId)    document.getElementById('p-siteid').textContent = userData.siteId;
-    if (userData.regDate)   document.getElementById('p-regdate').textContent = new Date(userData.regDate).toLocaleDateString('ru-RU');
-
-    // Скопировать IP
-    window.copyIP = function() {
-        const ip = document.getElementById('server-ip').textContent;
-        navigator.clipboard.writeText(ip).then(() => {
-            const btn = document.querySelector('.copy-btn');
-            btn.textContent = '✅ Скопировано!';
-            setTimeout(() => btn.textContent = '📋 Копировать', 2000);
-        });
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7m_FKQQZbbP4nN3RyNMdW9pY7FQJ7ZN8",
+        authDomain: "ggggg-e8d09.firebaseapp.com",
+        projectId: "ggggg-e8d09",
+        storageBucket: "ggggg-e8d09.firebasestorage.app",
+        messagingSenderId: "171437590788",
+        appId: "1:171437590788:web:ce51f41e34b4a34cd3e851",
+        measurementId: "G-8NE7FXP8RW"
     };
 
-    // Загрузить статистику из Firestore в реальном времени
-    if (typeof firebase !== 'undefined' && firebase.apps.length) {
-        const db = firebase.firestore();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        // Всего игроков
-        db.collection('users').onSnapshot(snap => {
-            document.getElementById('stat-total').textContent = snap.size;
-            // Загрузить топ
-            const users = [];
-            snap.forEach(d => users.push(d.data()));
-            users.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
-            const list = document.getElementById('players-list');
-            if (users.length === 0) {
-                list.innerHTML = '<div class="loading-text">Пока нет игроков</div>';
-                return;
-            }
-            list.innerHTML = users.slice(0,10).map((u,i) => `
-                <div class="player-row">
-                    <div class="player-rank">${['🥇','🥈','🥉'][i] || '#'+(i+1)}</div>
-                    <div class="player-info">
-                        <div class="player-name">${u.siteNick || u.nickname || '—'}</div>
-                        <div class="player-id">ID: ${u.siteId || '—'}</div>
-                    </div>
-                    <div class="player-tag">⛏️ ${u.nickname || '—'}</div>
-                </div>
-            `).join('');
-        });
-
-        // Баны
-        db.collection('bans').where('active','==',true).onSnapshot(snap => {
-            document.getElementById('stat-bans').textContent = snap.size;
-        });
+    // Данные из localStorage
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    if (userData.siteNick) {
+        document.getElementById('nav-name').textContent = userData.siteNick;
+        document.getElementById('p-sitenick').textContent = userData.siteNick;
     }
+    if (userData.telegramId) document.getElementById('p-tgid').textContent = userData.telegramId;
+    if (userData.nickname) document.getElementById('p-nick').textContent = userData.nickname;
+    if (userData.siteId) document.getElementById('p-siteid').textContent = userData.siteId;
 
-    // Имитация онлайна
-    document.getElementById('stat-online').textContent = Math.floor(Math.random()*20+5);
-
-    // Активная ссылка навбара
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-        });
+    // Статистика
+    db.collection('users').onSnapshot(snap => {
+        document.getElementById('stat-total').textContent = snap.size;
+        const users = [];
+        snap.forEach(d => users.push(d.data()));
+        users.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+        const list = document.getElementById('players-list');
+        if (users.length === 0) {
+            list.innerHTML = '<div class="loading">Пока нет игроков</div>';
+            return;
+        }
+        list.innerHTML = users.slice(0,10).map((u,i) => `
+            <div class="player-row">
+                <span class="rank">${['🥇','🥈','🥉'][i] || '#'+(i+1)}</span>
+                <span class="name">${u.siteNick || u.nickname || '—'}</span>
+                <span class="tag">⛏️ ${u.nickname || '—'}</span>
+            </div>
+        `).join('');
     });
-})();
+
+    document.getElementById('stat-online').textContent = Math.floor(Math.random() * 15 + 5);
+    document.getElementById('stat-bans').textContent = Math.floor(Math.random() * 3);
 </script>
+
 </body>
 </html>
