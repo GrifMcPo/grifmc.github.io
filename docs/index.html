@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация на сервер</title>
+    <title>🎮 Регистрация на сервер</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
     <style>
+        /* ===== МАКСИМАЛЬНО ПРОСТОЙ И ВИДНЫЙ ДИЗАЙН ===== */
         * {
             margin: 0;
             padding: 0;
@@ -12,7 +18,7 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0a0e27;
             color: #ffffff;
             min-height: 100vh;
@@ -24,37 +30,65 @@
 
         .container {
             background: #161b3d;
-            padding: 40px;
+            padding: 40px 35px;
             border-radius: 16px;
             border: 2px solid #7c3aed;
-            max-width: 500px;
+            max-width: 480px;
             width: 100%;
-            box-shadow: 0 0 40px rgba(124, 58, 237, 0.4);
+            box-shadow: 0 0 50px rgba(124, 58, 237, 0.3);
+        }
+
+        .logo-icon {
+            text-align: center;
+            font-size: 40px;
+            margin-bottom: 6px;
         }
 
         h1 {
             text-align: center;
-            font-size: 28px;
-            margin-bottom: 8px;
+            font-size: 26px;
             color: #a78bfa;
+            margin-bottom: 4px;
         }
 
         .subtitle {
             text-align: center;
             color: #94a3b8;
-            margin-bottom: 25px;
             font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .badges {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .badge {
+            background: #1e2447;
+            border: 1px solid #334155;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #94a3b8;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             color: #e2e8f0;
+            font-size: 14px;
+        }
+
+        .tooltip {
+            color: #7c3aed;
+            cursor: pointer;
             font-size: 14px;
         }
 
@@ -66,7 +100,7 @@
             border-radius: 10px;
             color: #ffffff;
             font-size: 15px;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         input:focus {
@@ -94,7 +128,7 @@
             width: 100%;
             padding: 14px;
             background: #7c3aed;
-            color: #fff;
+            color: #ffffff;
             border: none;
             border-radius: 10px;
             font-size: 16px;
@@ -123,13 +157,15 @@
         #code-section h3 {
             text-align: center;
             color: #fbbf24;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            font-size: 18px;
         }
 
         #code-status {
             text-align: center;
             margin-top: 10px;
             color: #94a3b8;
+            font-size: 14px;
         }
 
         #message {
@@ -162,39 +198,6 @@
             font-size: 12px;
         }
 
-        .badges {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 12px;
-        }
-
-        .badge {
-            background: #1e2447;
-            border: 1px solid #334155;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        .logo-icon {
-            text-align: center;
-            font-size: 40px;
-            margin-bottom: 6px;
-        }
-
-        .tooltip {
-            color: #7c3aed;
-            cursor: pointer;
-        }
-
-        .code-icon {
-            text-align: center;
-            font-size: 30px;
-            margin-bottom: 6px;
-        }
-
         .fade-in {
             animation: fadeIn 0.5s ease;
         }
@@ -203,256 +206,277 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-    </style>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+        .code-icon {
+            text-align: center;
+            font-size: 30px;
+            margin-bottom: 6px;
+        }
+
+        .beta-screen {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .beta-screen h1 {
+            font-size: 40px;
+        }
+
+        .beta-screen h2 {
+            color: #34d399;
+            margin-top: 10px;
+        }
+
+        .beta-screen p {
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="container" id="app">
-        <div class="logo-icon">⚡</div>
-        <h1>Регистрация</h1>
-        <p class="subtitle">Заполните форму для доступа на сервер</p>
-        <div class="badges">
-            <span class="badge">🎮 Minecraft</span>
-            <span class="badge">🔐 Secure</span>
-        </div>
-
-        <!-- Форма -->
-        <form id="register-form">
-            <div class="form-group">
-                <label for="telegram-id">📱 Telegram ID <span class="tooltip" title="Напишите боту !id">❓</span></label>
-                <input type="text" id="telegram-id" placeholder="Например: 123456789" required>
-                <span class="hint">Напишите боту <strong>!id</strong> в Telegram</span>
-            </div>
-
-            <div class="form-group">
-                <label for="nickname">⛏️ Ник на сервере</label>
-                <input type="text" id="nickname" placeholder="Ваш Minecraft ник" required>
-            </div>
-
-            <div class="form-group">
-                <label for="site-nick">👤 Ник на сайте</label>
-                <input type="text" id="site-nick" placeholder="Как вас называть" required>
-            </div>
-
-            <div class="form-group">
-                <label for="site-id">🆔 ID на сайте</label>
-                <input type="text" id="site-id" placeholder="Уникальный ID для друзей" required>
-                <span class="hint">Придумайте уникальный идентификатор</span>
-            </div>
-
-            <button type="submit" id="register-btn" class="btn-primary">🚀 Зарегистрироваться</button>
-        </form>
-
-        <!-- Код подтверждения -->
-        <div id="code-section" style="display: none;">
-            <div class="code-icon">🔐</div>
-            <h3>Введите код</h3>
-            <p class="hint" style="text-align:center;">Код отправлен в чат сервера</p>
-            <div class="form-group" style="margin-top:12px;">
-                <input type="text" id="code-input" placeholder="Код из 5 цифр" maxlength="5" style="text-align:center;font-size:20px;letter-spacing:4px;">
-            </div>
-            <button id="verify-btn" class="btn-primary">✅ Подтвердить</button>
-            <p id="code-status"></p>
-        </div>
-
-        <!-- Сообщение -->
-        <div id="message"></div>
-
-        <div class="version-label">v1.0</div>
+<div class="container" id="app">
+    <div class="logo-icon">⚡</div>
+    <h1>Регистрация</h1>
+    <p class="subtitle">Заполните форму для доступа на сервер</p>
+    <div class="badges">
+        <span class="badge">🎮 Minecraft</span>
+        <span class="badge">🔐 Защищено</span>
+        <span class="badge">⚡ Быстро</span>
     </div>
 
-    <script>
-        // ===== FIREBASE =====
-        const firebaseConfig = {
-            apiKey: "AIzaSyD7m_FKQQZbbP4nN3RyNMdW9pY7FQJ7ZN8",
-            authDomain: "ggggg-e8d09.firebaseapp.com",
-            projectId: "ggggg-e8d09",
-            storageBucket: "ggggg-e8d09.firebasestorage.app",
-            messagingSenderId: "171437590788",
-            appId: "1:171437590788:web:ce51f41e34b4a34cd3e851",
-            measurementId: "G-8NE7FXP8RW"
-        };
+    <!-- ===== ФОРМА РЕГИСТРАЦИИ ===== -->
+    <form id="register-form">
+        <div class="form-group">
+            <label for="telegram-id">📱 Telegram ID <span class="tooltip" title="Напишите боту !id">❓</span></label>
+            <input type="text" id="telegram-id" placeholder="Например: 123456789" required>
+            <span class="hint">Напишите боту <strong>!id</strong> в Telegram</span>
+        </div>
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        <div class="form-group">
+            <label for="nickname">⛏️ Ник на сервере</label>
+            <input type="text" id="nickname" placeholder="Ваш Minecraft ник" required>
+        </div>
 
-        // ===== ЭЛЕМЕНТЫ =====
-        const form = document.getElementById('register-form');
-        const telegramIdInput = document.getElementById('telegram-id');
-        const nicknameInput = document.getElementById('nickname');
-        const siteNickInput = document.getElementById('site-nick');
-        const siteIdInput = document.getElementById('site-id');
-        const messageDiv = document.getElementById('message');
-        const codeSection = document.getElementById('code-section');
-        const codeInput = document.getElementById('code-input');
-        const verifyBtn = document.getElementById('verify-btn');
-        const codeStatus = document.getElementById('code-status');
-        const registerBtn = document.getElementById('register-btn');
+        <div class="form-group">
+            <label for="site-nick">👤 Ник на сайте</label>
+            <input type="text" id="site-nick" placeholder="Как вас называть" required>
+        </div>
 
-        // ===== ПОКАЗАТЬ СООБЩЕНИЕ =====
-        function showMessage(text, type) {
-            messageDiv.textContent = text;
-            messageDiv.className = type;
-            messageDiv.style.display = 'block';
+        <div class="form-group">
+            <label for="site-id">🆔 ID на сайте</label>
+            <input type="text" id="site-id" placeholder="Уникальный ID для друзей" required>
+            <span class="hint">Придумайте уникальный идентификатор</span>
+        </div>
+
+        <button type="submit" id="register-btn" class="btn-primary">🚀 Зарегистрироваться</button>
+    </form>
+
+    <!-- ===== КОД ПОДТВЕРЖДЕНИЯ ===== -->
+    <div id="code-section" style="display: none;">
+        <div class="code-icon">🔐</div>
+        <h3>Введите код</h3>
+        <p class="hint" style="text-align:center;">Код отправлен в чат сервера</p>
+        <div class="form-group" style="margin-top: 12px;">
+            <input type="text" id="code-input" placeholder="Код из 5 цифр" maxlength="5" style="text-align:center;font-size:20px;letter-spacing:4px;">
+        </div>
+        <button id="verify-btn" class="btn-primary">✅ Подтвердить</button>
+        <p id="code-status"></p>
+    </div>
+
+    <!-- ===== СООБЩЕНИЯ ===== -->
+    <div id="message"></div>
+    <div class="version-label">v1.0</div>
+</div>
+
+<script>
+    // ===== FIREBASE =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7m_FKQQZbbP4nN3RyNMdW9pY7FQJ7ZN8",
+        authDomain: "ggggg-e8d09.firebaseapp.com",
+        projectId: "ggggg-e8d09",
+        storageBucket: "ggggg-e8d09.firebasestorage.app",
+        messagingSenderId: "171437590788",
+        appId: "1:171437590788:web:ce51f41e34b4a34cd3e851",
+        measurementId: "G-8NE7FXP8RW"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ===== ЭЛЕМЕНТЫ =====
+    const form = document.getElementById('register-form');
+    const telegramIdInput = document.getElementById('telegram-id');
+    const nicknameInput = document.getElementById('nickname');
+    const siteNickInput = document.getElementById('site-nick');
+    const siteIdInput = document.getElementById('site-id');
+    const messageDiv = document.getElementById('message');
+    const codeSection = document.getElementById('code-section');
+    const codeInput = document.getElementById('code-input');
+    const verifyBtn = document.getElementById('verify-btn');
+    const codeStatus = document.getElementById('code-status');
+    const registerBtn = document.getElementById('register-btn');
+
+    // ===== ПОКАЗАТЬ СООБЩЕНИЕ =====
+    function showMessage(text, type) {
+        messageDiv.textContent = text;
+        messageDiv.className = type;
+        messageDiv.style.display = 'block';
+    }
+
+    function hideMessage() {
+        messageDiv.style.display = 'none';
+    }
+
+    // ===== ГЕНЕРАЦИЯ КОДА =====
+    function generateCode() {
+        return Math.floor(10000 + Math.random() * 90000).toString();
+    }
+
+    // ===== ОТПРАВКА ФОРМЫ =====
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideMessage();
+
+        const telegramId = telegramIdInput.value.trim();
+        const nickname = nicknameInput.value.trim();
+        const siteNick = siteNickInput.value.trim();
+        const siteId = siteIdInput.value.trim();
+
+        if (!telegramId || !nickname || !siteNick || !siteId) {
+            showMessage('❌ Заполните все поля!', 'error');
+            return;
         }
 
-        function hideMessage() {
-            messageDiv.style.display = 'none';
+        if (!/^\d+$/.test(telegramId)) {
+            showMessage('❌ Telegram ID должен содержать только цифры!', 'error');
+            return;
         }
 
-        // ===== ГЕНЕРАЦИЯ КОДА =====
-        function generateCode() {
-            return Math.floor(10000 + Math.random() * 90000).toString();
-        }
+        try {
+            registerBtn.disabled = true;
+            registerBtn.textContent = '⏳ Отправка...';
 
-        // ===== ОТПРАВКА ФОРМЫ =====
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideMessage();
-
-            const telegramId = telegramIdInput.value.trim();
-            const nickname = nicknameInput.value.trim();
-            const siteNick = siteNickInput.value.trim();
-            const siteId = siteIdInput.value.trim();
-
-            if (!telegramId || !nickname || !siteNick || !siteId) {
-                showMessage('❌ Заполните все поля!', 'error');
-                return;
-            }
-
-            if (!/^\d+$/.test(telegramId)) {
-                showMessage('❌ Telegram ID должен содержать только цифры!', 'error');
-                return;
-            }
-
-            try {
-                registerBtn.disabled = true;
-                registerBtn.textContent = '⏳ Отправка...';
-
-                // Проверка ника
-                const snap = await db.collection('users').where('nickname', '==', nickname).get();
-                if (!snap.empty) {
-                    showMessage('❌ Этот ник уже зарегистрирован!', 'error');
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '🚀 Зарегистрироваться';
-                    return;
-                }
-
-                // Проверка Telegram ID
-                const tgSnap = await db.collection('users').where('telegram_id', '==', telegramId).get();
-                if (!tgSnap.empty) {
-                    showMessage('❌ Этот Telegram ID уже зарегистрирован!', 'error');
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '🚀 Зарегистрироваться';
-                    return;
-                }
-
-                const code = generateCode();
-
-                await db.collection('users').doc(telegramId).set({
-                    telegram_id: telegramId,
-                    nickname: nickname,
-                    site_nick: siteNick,
-                    site_id: siteId,
-                    code: code,
-                    verified: false,
-                    code_sent: false,
-                    registered_at: new Date().toLocaleString()
-                });
-
-                codeSection.style.display = 'block';
-                codeInput.value = '';
-                codeStatus.textContent = '📨 Код отправлен в чат сервера!';
-                codeStatus.style.color = '#34d399';
-                form.style.display = 'none';
-
-                showMessage('✅ Запрос отправлен! Введите код из чата сервера.', 'success');
-
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showMessage('❌ Ошибка: ' + error.message, 'error');
-            } finally {
+            // Проверка ника
+            const snap = await db.collection('users').where('nickname', '==', nickname).get();
+            if (!snap.empty) {
+                showMessage('❌ Этот ник уже зарегистрирован!', 'error');
                 registerBtn.disabled = false;
                 registerBtn.textContent = '🚀 Зарегистрироваться';
+                return;
             }
-        });
 
-        // ===== ПРОВЕРКА КОДА =====
-        verifyBtn.addEventListener('click', async () => {
-            const code = codeInput.value.trim();
-            const telegramId = telegramIdInput.value.trim();
+            // Проверка Telegram ID
+            const tgSnap = await db.collection('users').where('telegram_id', '==', telegramId).get();
+            if (!tgSnap.empty) {
+                showMessage('❌ Этот Telegram ID уже зарегистрирован!', 'error');
+                registerBtn.disabled = false;
+                registerBtn.textContent = '🚀 Зарегистрироваться';
+                return;
+            }
 
-            if (!code || code.length !== 5) {
-                codeStatus.textContent = '❌ Введите 5-значный код!';
+            const code = generateCode();
+
+            await db.collection('users').doc(telegramId).set({
+                telegram_id: telegramId,
+                nickname: nickname,
+                site_nick: siteNick,
+                site_id: siteId,
+                code: code,
+                verified: false,
+                code_sent: false,
+                registered_at: new Date().toLocaleString()
+            });
+
+            codeSection.style.display = 'block';
+            codeInput.value = '';
+            codeStatus.textContent = '📨 Код отправлен в чат сервера!';
+            codeStatus.style.color = '#34d399';
+            form.style.display = 'none';
+
+            showMessage('✅ Запрос отправлен! Введите код из чата сервера.', 'success');
+
+        } catch (error) {
+            console.error('Ошибка:', error);
+            showMessage('❌ Ошибка: ' + error.message, 'error');
+        } finally {
+            registerBtn.disabled = false;
+            registerBtn.textContent = '🚀 Зарегистрироваться';
+        }
+    });
+
+    // ===== ПРОВЕРКА КОДА =====
+    verifyBtn.addEventListener('click', async () => {
+        const code = codeInput.value.trim();
+        const telegramId = telegramIdInput.value.trim();
+
+        if (!code || code.length !== 5) {
+            codeStatus.textContent = '❌ Введите 5-значный код!';
+            codeStatus.style.color = '#f87171';
+            return;
+        }
+
+        try {
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = '⏳ Проверка...';
+
+            const docRef = db.collection('users').doc(telegramId);
+            const docSnap = await docRef.get();
+
+            if (!docSnap.exists) {
+                codeStatus.textContent = '❌ Пользователь не найден!';
                 codeStatus.style.color = '#f87171';
                 return;
             }
 
-            try {
-                verifyBtn.disabled = true;
-                verifyBtn.textContent = '⏳ Проверка...';
+            const data = docSnap.data();
 
-                const docRef = db.collection('users').doc(telegramId);
-                const docSnap = await docRef.get();
-
-                if (!docSnap.exists) {
-                    codeStatus.textContent = '❌ Пользователь не найден!';
-                    codeStatus.style.color = '#f87171';
-                    return;
-                }
-
-                const data = docSnap.data();
-
-                if (data.verified) {
-                    codeStatus.textContent = '✅ Аккаунт уже подтверждён!';
-                    codeStatus.style.color = '#34d399';
-                    showBetaScreen();
-                    return;
-                }
-
-                if (data.code === code) {
-                    await docRef.update({
-                        verified: true,
-                        verified_at: new Date().toLocaleString()
-                    });
-
-                    codeStatus.textContent = '✅ Аккаунт успешно зарегистрирован!';
-                    codeStatus.style.color = '#34d399';
-                    showBetaScreen();
-                } else {
-                    codeStatus.textContent = '❌ Неверный код! Попробуйте снова.';
-                    codeStatus.style.color = '#f87171';
-                }
-
-            } catch (error) {
-                console.error('Ошибка проверки кода:', error);
-                codeStatus.textContent = '❌ Ошибка: ' + error.message;
-                codeStatus.style.color = '#f87171';
-            } finally {
-                verifyBtn.disabled = false;
-                verifyBtn.textContent = '✅ Подтвердить';
+            if (data.verified) {
+                codeStatus.textContent = '✅ Аккаунт уже подтверждён!';
+                codeStatus.style.color = '#34d399';
+                showBetaScreen();
+                return;
             }
-        });
 
-        // ===== БЕТА-ЭКРАН =====
-        function showBetaScreen() {
-            const container = document.querySelector('.container');
-            container.innerHTML = `
-                <div style="text-align:center;padding:30px;">
-                    <div style="font-size:50px;">🎉</div>
-                    <h1 style="color:#34d399;font-size:32px;">Сайт в бета-тесте!</h1>
-                    <p style="color:#94a3b8;margin-top:12px;">Спасибо за регистрацию!</p>
-                    <p style="color:#475569;margin-top:30px;font-size:12px;">Версия 1.0</p>
-                </div>
-            `;
+            if (data.code === code) {
+                await docRef.update({
+                    verified: true,
+                    verified_at: new Date().toLocaleString()
+                });
+
+                codeStatus.textContent = '✅ Аккаунт успешно зарегистрирован!';
+                codeStatus.style.color = '#34d399';
+                showBetaScreen();
+            } else {
+                codeStatus.textContent = '❌ Неверный код! Попробуйте снова.';
+                codeStatus.style.color = '#f87171';
+            }
+
+        } catch (error) {
+            console.error('Ошибка проверки кода:', error);
+            codeStatus.textContent = '❌ Ошибка: ' + error.message;
+            codeStatus.style.color = '#f87171';
+        } finally {
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = '✅ Подтвердить';
         }
+    });
 
-        console.log('✅ Сайт загружен!');
-    </script>
+    // ===== БЕТА-ЭКРАН =====
+    function showBetaScreen() {
+        const container = document.querySelector('.container');
+        container.innerHTML = `
+            <div class="beta-screen">
+                <h1>🎉</h1>
+                <h2>Сайт в бета-тесте!</h2>
+                <p>Спасибо за регистрацию!</p>
+                <p style="color:#475569; margin-top:20px; font-size:12px;">Версия 1.0</p>
+            </div>
+        `;
+    }
+
+    console.log('✅ Сайт загружен!');
+</script>
 
 </body>
 </html>
