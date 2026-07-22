@@ -708,3 +708,553 @@ window.emergencyMessage = function(text) {
 };
 
 console.log('✅ Админ-панель загружена');
+// ========================================
+// admin.js — ПОЛНАЯ ЛОГИКА АДМИН-ПАНЕЛИ
+// ВСЕ СТРАНИЦЫ
+// ========================================
+
+// ... (предыдущий код остаётся)
+
+// ===== СТРАНИЦА: ТЕХНИЧЕСКИЙ ХАБ =====
+function renderTech(container) {
+    container.innerHTML = `
+        <div class="admin-card">
+            <div class="card-title">🖥️ ВИРТУАЛЬНАЯ КОНСОЛЬ SSH</div>
+            <div style="background:#000;border:1px solid var(--admin-border);padding:16px;font-family:'Courier New',monospace;font-size:0.85em;color:#33ff33;min-height:200px;overflow-y:auto;" id="console-output">
+                <div>$ GRIFMC-SERVER:~ administrator$ <span style="color:#aaa;">Добро пожаловать в терминал управления</span></div>
+                <div style="color:#666;">$ uptime</div>
+                <div style="color:#aaa;"> 22:30:15 up 12 days, 4:32, 1 user, load average: 0.45, 0.32, 0.28</div>
+                <div style="color:#666;">$ free -h</div>
+                <div style="color:#aaa;">               total        used        free      shared  buff/cache   available</div>
+                <div style="color:#aaa;">Mem:           7.8G        4.2G        1.1G        256M        2.5G        3.0G</div>
+                <div style="color:#666;">$ <span id="console-cursor" style="background:#33ff33;display:inline-block;width:8px;height:16px;animation:blink 1s step-end infinite;"></span></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+                <input class="admin-input" id="console-input" placeholder="Введите команду..." style="flex:1;font-family:'Courier New',monospace;font-size:0.85em;" onkeydown="if(event.key==='Enter') executeCommand()">
+                <button class="admin-btn" onclick="executeCommand()">⏎ Выполнить</button>
+                <button class="admin-btn danger" onclick="document.getElementById('console-output').innerHTML=''">🗑️ Очистить</button>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="admin-card">
+                <div class="card-title">💾 ИНДИКАТОРЫ БЭКАПОВ</div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+                    <span style="color:var(--admin-text);">📅 Последнее сохранение</span>
+                    <span style="color:var(--admin-text-light);">22.07.2026 22:15:32</span>
+                </div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+                    <span style="color:var(--admin-text);">💽 Объём хранилища</span>
+                    <span style="color:var(--admin-text-light);">4.2 ГБ / 10 ГБ (42%)</span>
+                </div>
+                <div style="padding:8px 0;display:flex;justify-content:space-between;">
+                    <span style="color:var(--admin-text);">📋 Количество бэкапов</span>
+                    <span style="color:var(--admin-text-light);">8</span>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:8px;">
+                    <button class="admin-btn gold" onclick="alert('Создание бэкапа запущено')">💾 СОЗДАТЬ БЭКАП</button>
+                    <button class="admin-btn" onclick="alert('Список бэкапов загружен')">📋 СПИСОК</button>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-title">🔌 МОНИТОРИНГ ПОРТОВ</div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+                    <span style="color:var(--admin-text);">🌐 25565 (Minecraft)</span>
+                    <span style="color:#1a6a1a;">🟢 Открыт</span>
+                </div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+                    <span style="color:var(--admin-text);">🔌 25575 (RCON)</span>
+                    <span style="color:#1a6a1a;">🟢 Открыт</span>
+                </div>
+                <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+                    <span style="color:var(--admin-text);">🌐 80 (HTTP)</span>
+                    <span style="color:#1a6a1a;">🟢 Открыт</span>
+                </div>
+                <div style="padding:8px 0;display:flex;justify-content:space-between;">
+                    <span style="color:var(--admin-text);">🔒 443 (HTTPS)</span>
+                    <span style="color:#1a6a1a;">🟢 Открыт</span>
+                </div>
+                <div style="margin-top:12px;">
+                    <button class="admin-btn" onclick="alert('Сканирование портов запущено')">🔄 ПРОВЕРИТЬ ВСЕ ПОРТЫ</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">⚠️ МЯГКАЯ ПЕРЕЗАГРУЗКА ПЛАГИНОВ</div>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                <span style="color:var(--admin-text);font-size:0.9em;">Перезагрузить все плагины без остановки сервера?</span>
+                <button class="admin-btn danger" onclick="confirmSoftReload()" style="padding:12px 32px;">🔴 ПЕРЕЗАГРУЗИТЬ</button>
+                <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">⚠️ Требует двойного подтверждения</span>
+            </div>
+        </div>
+    `;
+}
+
+// ===== СТРАНИЦА: ГЛОБАЛЬНЫЕ АНОНСЫ =====
+function renderAnnouncements(container) {
+    container.innerHTML = `
+        <div class="admin-card">
+            <div class="card-title">📢 ГЛОБАЛЬНЫЙ АНОНС</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:12px;">
+                <div>
+                    <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Текст анонса</label>
+                    <input class="admin-input" id="announce-text" placeholder="Введите сообщение для всех игроков...">
+                </div>
+                <div>
+                    <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Тип уведомления</label>
+                    <select class="admin-select" id="announce-type">
+                        <option value="chat">💬 Тихое (чат)</option>
+                        <option value="sound">🔊 Громкое (звук)</option>
+                        <option value="title">📺 На весь экран</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Таргетинг</label>
+                    <select class="admin-select" id="announce-target">
+                        <option value="all">🌍 Все игроки</option>
+                        <option value="vip">⭐ VIP</option>
+                        <option value="staff">👑 Персонал</option>
+                        <option value="world">🌎 Конкретный мир</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:flex;gap:12px;">
+                <button class="admin-btn gold" onclick="sendAnnouncement()">📢 ОТПРАВИТЬ АНОНС</button>
+                <button class="admin-btn" onclick="document.getElementById('announce-text').value=''">◻ ОЧИСТИТЬ</button>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">📋 ШАБЛОНЫ ФРАЗ</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;">
+                <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;cursor:pointer;" onclick="document.getElementById('announce-text').value='Добро пожаловать на сервер! Используй /help для помощи.'">
+                    <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">🎮 Приветствие</span>
+                    <div style="font-size:0.85em;color:var(--admin-text-light);">/help для помощи</div>
+                </div>
+                <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;cursor:pointer;" onclick="document.getElementById('announce-text').value='Внимание! Технические работы начнутся через 15 минут. Сохраните прогресс!'">
+                    <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">🔧 Техработы</span>
+                    <div style="font-size:0.85em;color:var(--admin-text-light);">Через 15 минут</div>
+                </div>
+                <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;cursor:pointer;" onclick="document.getElementById('announce-text').value='Стартует турнир! Регистрация в Discord до 20:00.'">
+                    <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">⚡ Ивент</span>
+                    <div style="font-size:0.85em;color:var(--admin-text-light);">Регистрация до 20:00</div>
+                </div>
+                <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;cursor:pointer;" onclick="document.getElementById('announce-text').value='Обновление античита выкачено! Пожалуйста, перезапустите лаунчер.'">
+                    <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">🛡️ Безопасность</span>
+                    <div style="font-size:0.85em;color:var(--admin-text-light);">Обновление античита</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ===== СТРАНИЦА: МОНИТОРИНГ ПРОИЗВОДИТЕЛЬНОСТИ =====
+function renderPerformance(container) {
+    container.innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-block">
+                <div class="label">⚡ TPS (Тики/сек)</div>
+                <div class="value gold" id="tps-value">19.8</div>
+            </div>
+            <div class="stat-block">
+                <div class="label">📊 MSPT (мс/тик)</div>
+                <div class="value" id="mspt-value">45</div>
+            </div>
+            <div class="stat-block">
+                <div class="label">🧊 Тяжёлых чанков</div>
+                <div class="value danger">12</div>
+            </div>
+            <div class="stat-block">
+                <div class="label">🎮 Активных игроков</div>
+                <div class="value success">27</div>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">📊 ГРАФИК TPS (за последние 30 минут)</div>
+            <div class="chart-container" style="height:120px;">
+                ${[19,18,20,19,17,16,18,19,20,19,18,17,19,20,19,18,17,16,18,19,20,19,18,17,19,20,19,18,17,16].map((h,i) => `
+                    <div class="chart-bar ${h<18?'danger':h>19.5?'active':''}" style="height:${h/20*100}%;">
+                        <span class="label">${i%5===0?i+'м':''}</span>
+                    </div>
+                `).join('')}
+            </div>
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;margin-top:8px;">⚡ Зелёный — отлично, ⚠️ Жёлтый — средне, 🔴 Красный — критично</div>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">🧊 ТОП ТЯЖЁЛЫХ ЧАНКОВ</div>
+            <table class="admin-table">
+                <thead><tr><th>Координаты</th><th>Мир</th><th>Нагрузка</th><th>Сущности</th><th>Действия</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>-456, 78</td>
+                        <td>world</td>
+                        <td style="color:#8b0000;">🔴 94%</td>
+                        <td>1,247</td>
+                        <td><button class="admin-btn admin-btn-sm" onclick="alert('Чанк анализируется')">🔍</button></td>
+                    </tr>
+                    <tr>
+                        <td>234, -122</td>
+                        <td>world_nether</td>
+                        <td style="color:#b8860b;">🟡 78%</td>
+                        <td>856</td>
+                        <td><button class="admin-btn admin-btn-sm" onclick="alert('Чанк анализируется')">🔍</button></td>
+                    </tr>
+                    <tr>
+                        <td>89, 345</td>
+                        <td>world</td>
+                        <td style="color:#b8860b;">🟡 65%</td>
+                        <td>432</td>
+                        <td><button class="admin-btn admin-btn-sm" onclick="alert('Чанк анализируется')">🔍</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">🌍 УПРАВЛЕНИЕ ВАРП-ТОЧКАМИ</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;">
+                <input class="admin-input" placeholder="Название варпа" value="Spawn">
+                <input class="admin-input" placeholder="X" value="0">
+                <input class="admin-input" placeholder="Y" value="64">
+                <input class="admin-input" placeholder="Z" value="0">
+            </div>
+            <div style="margin-top:8px;display:flex;gap:8px;">
+                <button class="admin-btn gold" onclick="alert('Варп-точка сохранена')">💾 СОХРАНИТЬ</button>
+                <button class="admin-btn danger" onclick="alert('Варп-точка удалена')">🗑️ УДАЛИТЬ</button>
+            </div>
+        </div>
+    `;
+}
+
+// ===== СТРАНИЦА: БАЗА ЗНАНИЙ =====
+function renderKnowledge(container) {
+    container.innerHTML = `
+        <div class="admin-card">
+            <div class="card-title">📚 БАЗА ЗНАНИЙ — ПРЕДМЕТЫ</div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;">
+                <input class="admin-input" id="item-search" placeholder="Поиск по ID или названию..." style="flex:1;" oninput="searchItems(this.value)">
+                <button class="admin-btn" onclick="searchItems(document.getElementById('item-search').value)">🔍</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;" id="items-grid">
+                ${[
+                    {id: 'minecraft:diamond_sword', name: 'Алмазный меч', icon: '🗡️'},
+                    {id: 'minecraft:diamond_pickaxe', name: 'Алмазная кирка', icon: '⛏️'},
+                    {id: 'minecraft:diamond_helmet', name: 'Алмазный шлем', icon: '🪖'},
+                    {id: 'minecraft:diamond_chestplate', name: 'Алмазный нагрудник', icon: '🛡️'},
+                    {id: 'minecraft:diamond_leggings', name: 'Алмазные поножи', icon: '👖'},
+                    {id: 'minecraft:diamond_boots', name: 'Алмазные ботинки', icon: '👢'},
+                    {id: 'minecraft:totem_of_undying', name: 'Тотем бессмертия', icon: '🧿'},
+                    {id: 'minecraft:elytra', name: 'Элитры', icon: '🪶'},
+                    {id: 'minecraft:netherite_ingot', name: 'Незеритовый слиток', icon: '🔩'},
+                    {id: 'minecraft:enchanted_golden_apple', name: 'Зачарованное золотое яблоко', icon: '🍎'},
+                ].map(item => `
+                    <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;text-align:center;cursor:pointer;" onclick="alert('ID: ${item.id}')">
+                        <div style="font-size:2em;">${item.icon}</div>
+                        <div style="font-size:0.7em;color:var(--admin-text-light);">${item.name}</div>
+                        <div style="font-size:0.5em;color:var(--admin-text);opacity:0.3;margin-top:4px;">${item.id}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">🔄 РЕЗЕРВНОЕ КОПИРОВАНИЕ</div>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                <span style="color:var(--admin-text);">📦 Скачать конфигурацию сайта</span>
+                <button class="admin-btn gold" onclick="alert('Скачивание конфигурации начато')">📥 СКАЧАТЬ</button>
+                <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">Версия: 3.0.1 | Коммит: a7f3d9e</span>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">📋 ЖУРНАЛ ДЕПЛОЯ</div>
+            <table class="admin-table">
+                <thead><tr><th>Дата</th><th>Версия</th><th>Автор</th><th>Изменения</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>22.07.2026 15:30</td>
+                        <td style="color:#1a6a1a;">v3.0.1</td>
+                        <td>Grif_Mo</td>
+                        <td>Добавлена админ-панель</td>
+                    </tr>
+                    <tr>
+                        <td>20.07.2026 12:15</td>
+                        <td style="color:#1a6a1a;">v3.0.0</td>
+                        <td>Grif_Mo</td>
+                        <td>Полный редизайн сайта</td>
+                    </tr>
+                    <tr>
+                        <td>15.07.2026 09:45</td>
+                        <td style="color:#b8860b;">v2.5.0</td>
+                        <td>pley1657</td>
+                        <td>Добавлена система регистрации</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// ===== СТРАНИЦА: НАСТРОЙКИ БЕЗОПАСНОСТИ =====
+function renderSecurity(container) {
+    container.innerHTML = `
+        <div class="admin-card">
+            <div class="card-title">⚙️ НАСТРОЙКИ БЕЗОПАСНОСТИ</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div>
+                    <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Автозавершение сессии</label>
+                    <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--admin-border);">
+                        <span style="color:var(--admin-text);">Неактивность более</span>
+                        <select class="admin-select" style="width:auto;padding:4px 8px;">
+                            <option value="5">5 минут</option>
+                            <option value="10" selected>10 минут</option>
+                            <option value="30">30 минут</option>
+                            <option value="60">1 час</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Подтверждение критических изменений</label>
+                    <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--admin-border);">
+                        <span style="color:var(--admin-text);">Смена IP сервера требует</span>
+                        <span style="color:var(--admin-text-light);font-weight:600;">🔒 Мастер-пароль</span>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:16px;">
+                <button class="admin-btn gold" onclick="alert('Настройки безопасности сохранены')">💾 СОХРАНИТЬ НАСТРОЙКИ</button>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">📋 ЖУРНАЛ АВТОРИЗАЦИЙ</div>
+            <table class="admin-table">
+                <thead><tr><th>Время</th><th>Пользователь</th><th>IP</th><th>Браузер</th><th>Статус</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>22.07 15:32:21</td>
+                        <td style="color:#1a6a1a;">Grif_Mo</td>
+                        <td>194.85.210.107</td>
+                        <td>Chrome 114</td>
+                        <td style="color:#1a6a1a;">✅ Успешно</td>
+                    </tr>
+                    <tr>
+                        <td>22.07 14:15:03</td>
+                        <td style="color:#b8860b;">pley1657</td>
+                        <td>192.168.1.100</td>
+                        <td>Firefox 115</td>
+                        <td style="color:#1a6a1a;">✅ Успешно</td>
+                    </tr>
+                    <tr>
+                        <td>22.07 12:30:45</td>
+                        <td style="color:#8b0000;">unknown</td>
+                        <td>10.0.0.5</td>
+                        <td>Edge 114</td>
+                        <td style="color:#8b0000;">❌ Отклонён</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">🔒 СМЕНА МАСТЕР-ПАРОЛЯ</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                <input class="admin-input" type="password" placeholder="Текущий пароль">
+                <input class="admin-input" type="password" placeholder="Новый пароль">
+                <input class="admin-input" type="password" placeholder="Подтвердить пароль">
+            </div>
+            <div style="margin-top:12px;">
+                <button class="admin-btn gold" onclick="alert('Пароль успешно изменён')">🔒 СМЕНИТЬ ПАРОЛЬ</button>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="card-title">🔄 ОБНОВЛЕНИЯ СИСТЕМЫ</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <span style="color:var(--admin-text);">Доступно обновление безопасности</span>
+                <span style="color:#b8860b;font-weight:600;">⚠️ Версия 3.0.2</span>
+                <button class="admin-btn gold" onclick="alert('Обновление установлено')">⬆️ УСТАНОВИТЬ</button>
+                <span style="margin-left:auto;font-size:0.7em;color:var(--admin-text);opacity:0.3;">Последняя проверка: 22.07.2026 22:00</span>
+            </div>
+        </div>
+    `;
+}
+
+// ========================================
+// ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ
+// ========================================
+
+// ===== КОНСОЛЬ =====
+function executeCommand() {
+    const input = document.getElementById('console-input');
+    const output = document.getElementById('console-output');
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    
+    const responses = {
+        'help': 'Доступные команды: help, status, reload, list, backup, clear',
+        'status': 'Статус сервера: ✅ Работает | Онлайн: 27 игроков | TPS: 19.8',
+        'reload': '🔄 Перезагрузка плагинов... ✅ Готово!',
+        'list': 'Активные плагины: Essentials, WorldGuard, LuckPerms, TAB',
+        'backup': '💾 Создание бэкапа... ✅ Бэкап сохранён в /backups/backup-20260722-2230.tar.gz',
+        'clear': '🗑️ Консоль очищена'
+    };
+    
+    const response = responses[cmd] || `❌ Неизвестная команда: ${cmd}`;
+    
+    const newLine = document.createElement('div');
+    newLine.style.cssText = 'color:#666;';
+    newLine.innerHTML = `$ ${cmd}`;
+    output.appendChild(newLine);
+    
+    const respLine = document.createElement('div');
+    respLine.style.cssText = 'color:#aaa;padding-left:8px;';
+    respLine.textContent = response;
+    output.appendChild(respLine);
+    
+    input.value = '';
+    output.scrollTop = output.scrollHeight;
+    
+    if (cmd === 'clear') {
+        setTimeout(() => {
+            output.innerHTML = `<div style="color:#666;">$ GRIFMC-SERVER:~ administrator$ <span style="color:#aaa;">Консоль очищена</span></div>`;
+            addAdminLog('Консоль очищена');
+        }, 100);
+    }
+    
+    addAdminLog(`Консоль: ${cmd}`);
+}
+
+// ===== АНОНСЫ =====
+function sendAnnouncement() {
+    const text = document.getElementById('announce-text').value.trim();
+    if (!text) {
+        alert('❌ Введите текст анонса');
+        return;
+    }
+    const type = document.getElementById('announce-type').value;
+    const target = document.getElementById('announce-target').value;
+    
+    const typeNames = {
+        chat: '💬 Тихое',
+        sound: '🔊 Громкое',
+        title: '📺 На весь экран'
+    };
+    const targetNames = {
+        all: '🌍 Все игроки',
+        vip: '⭐ VIP',
+        staff: '👑 Персонал',
+        world: '🌎 Конкретный мир'
+    };
+    
+    if (confirm(`📢 Отправить анонс?\n\nТекст: "${text}"\nТип: ${typeNames[type]}\nТаргетинг: ${targetNames[target]}`)) {
+        alert('✅ Анонс отправлен успешно!');
+        addAdminLog(`Анонс: ${text} (${typeNames[type]})`);
+        document.getElementById('announce-text').value = '';
+        // Добавляем в список недавних анонсов
+        const list = document.querySelector('.admin-card:last-child .admin-table tbody');
+        if (list) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${new Date().toLocaleString()}</td>
+                <td>Grif_Mo</td>
+                <td style="color:#1a6a1a;">${typeNames[type]}</td>
+                <td style="color:var(--admin-text-light);">${text.length > 30 ? text.substring(0,30)+'...' : text}</td>
+            `;
+            list.prepend(row);
+        }
+    }
+}
+
+// ===== СОБЫТИЯ =====
+function addEvent() {
+    const name = document.getElementById('event-name').value.trim();
+    const time = document.getElementById('event-time').value;
+    const type = document.getElementById('event-type').value;
+    
+    if (!name || !time) {
+        alert('❌ Заполните все поля');
+        return;
+    }
+    
+    const typeNames = {
+        tournament: '🎯 Турнир',
+        wipe: '🔄 Вайп',
+        holiday: '🎉 Праздник',
+        maintenance: '🔧 Техработы'
+    };
+    
+    const colors = {
+        tournament: '#b8860b',
+        wipe: '#8b0000',
+        holiday: '#1a6a1a',
+        maintenance: '#b8860b'
+    };
+    
+    const list = document.getElementById('events-list');
+    const eventDiv = document.createElement('div');
+    eventDiv.style.cssText = `background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;border-left:3px solid ${colors[type]};`;
+    eventDiv.innerHTML = `
+        <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">${new Date(time).toLocaleString()}</div>
+        <div style="font-weight:700;color:var(--admin-text-light);">${typeNames[type]} ${name}</div>
+        <div style="font-size:0.7em;color:var(--admin-text);opacity:0.5;">⏳ Добавлено только что</div>
+    `;
+    list.prepend(eventDiv);
+    
+    alert('✅ Событие добавлено в календарь!');
+    addAdminLog(`Событие: ${name} (${typeNames[type]})`);
+    document.getElementById('event-name').value = '';
+}
+
+// ===== МЯГКАЯ ПЕРЕЗАГРУЗКА =====
+function confirmSoftReload() {
+    if (confirm('⚠️ ПЕРВОЕ ПОДТВЕРЖДЕНИЕ: Вы уверены, что хотите перезагрузить все плагины?')) {
+        if (confirm('⚠️ ВТОРОЕ ПОДТВЕРЖДЕНИЕ: Перезагрузка плагинов займёт 5-10 секунд. Продолжить?')) {
+            alert('🔄 Перезагрузка плагинов запущена...\n\n✅ Плагины успешно перезагружены!');
+            addAdminLog('Мягкая перезагрузка плагинов');
+        }
+    }
+}
+
+// ===== ПОИСК ПРЕДМЕТОВ =====
+function searchItems(query) {
+    const grid = document.getElementById('items-grid');
+    if (!grid) return;
+    const items = grid.querySelectorAll('div[style*="background:var(--admin-card);"]');
+    items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+    });
+}
+
+// ===== ПУБЛИКАЦИЯ НОВОСТЕЙ =====
+function publishNews() {
+    const title = document.getElementById('news-title')?.value;
+    const body = document.getElementById('news-body')?.value;
+    if (!title || !body) {
+        alert('❌ Заполните заголовок и текст новости');
+        return;
+    }
+    alert('✅ Новость успешно опубликована!');
+    addAdminLog(`Новость: ${title}`);
+}
+
+// ========================================
+// ОБНОВЛЕНИЕ НАВИГАЦИИ
+// ========================================
+
+// Добавляем в функцию loadPage новые страницы
+const originalLoadPage = loadPage;
+loadPage = function(page) {
+    const container = document.getElementById('page-container');
+    
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+    
+    const titles = {
+        dashboard: '📊 ТЕРМИНАЛ УПРАВЛЕНИЯ',
+        content: '🏗️ КОНСТРУКТ
