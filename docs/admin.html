@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Панель администратора</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="admin-body">
+
+<div class="particles" id="particles"></div>
+<div class="screen-border"></div>
+
+<!-- ЭКРАН ЛОГИНА В АДМИНКУ -->
+<div id="admin-login-screen" class="admin-login-screen">
+    <div class="admin-login-card">
+        <div class="admin-login-icon">🔧</div>
+        <h1 class="rgb-text" style="font-family:'Orbitron',monospace;font-size:1.6em;margin-bottom:6px;">Панель администратора</h1>
+        <p style="color:rgba(255,255,255,0.35);font-size:0.85em;margin-bottom:28px;">Введите пароль для доступа</p>
+        <div class="input-wrapper" style="margin-bottom:16px;">
+            <input type="password" id="admin-password-input" placeholder="Пароль администратора" style="text-align:center;">
+            <div class="input-glow"></div>
+        </div>
+        <button class="btn-primary" onclick="checkAdminPassword()">
+            <span class="btn-text">🚀 Войти в панель</span>
+            <span class="btn-shimmer"></span>
+        </button>
+        <p id="login-error" style="color:#ff0080;text-align:center;margin-top:12px;font-size:0.85em;min-height:20px;"></p>
+        <div style="margin-top:20px;text-align:center;">
+            <a href="main.html" style="color:rgba(255,255,255,0.3);font-size:0.8em;text-decoration:none;">← Назад на сайт</a>
+        </div>
+    </div>
+</div>
+
+<!-- ОСНОВНАЯ ПАНЕЛЬ ADMIN -->
+<div id="admin-panel" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="sidebar-logo">
+            <span class="sidebar-icon">⚡</span>
+            <span class="rgb-text" style="font-family:'Orbitron',monospace;font-size:0.85em;font-weight:900;">Admin Panel</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <div class="nav-group-title">📊 Мониторинг</div>
+                <a class="s-link active" onclick="showSection('dashboard')">🏠 Dashboard</a>
+                <a class="s-link" onclick="showSection('realtime')">⚡ Реальное время</a>
+                <a class="s-link" onclick="showSection('logs')">📋 Логи</a>
+                <a class="s-link" onclick="showSection('analytics')">📈 Аналитика</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">👥 Пользователи</div>
+                <a class="s-link" onclick="showSection('users')">👤 Все игроки</a>
+                <a class="s-link" onclick="showSection('search-users')">🔍 Поиск игрока</a>
+                <a class="s-link" onclick="showSection('roles')">🎖️ Роли</a>
+                <a class="s-link" onclick="showSection('messages')">✉️ Сообщения</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">🚫 Система банов</div>
+                <a class="s-link" onclick="showSection('bans')">🚫 Все баны</a>
+                <a class="s-link" onclick="showSection('ban-account')">👤 Бан аккаунта</a>
+                <a class="s-link" onclick="showSection('ban-ip')">🌐 IP-бан</a>
+                <a class="s-link" onclick="showSection('ban-telegram')">📱 Бан Telegram ID</a>
+                <a class="s-link" onclick="showSection('ban-siteid')">🆔 Бан Site ID</a>
+                <a class="s-link" onclick="showSection('mass-ban')">💥 Массовый бан</a>
+                <a class="s-link" onclick="showSection('appeals')">📨 Апелляции</a>
+                <a class="s-link" onclick="showSection('warns')">⚠️ Предупреждения</a>
+                <a class="s-link" onclick="showSection('ip-whitelist')">✅ IP Whitelist</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">📢 Контент</div>
+                <a class="s-link" onclick="showSection('announcements')">📢 Объявления</a>
+                <a class="s-link" onclick="showSection('news-admin')">📰 Новости</a>
+                <a class="s-link" onclick="showSection('rules-admin')">📜 Правила</a>
+                <a class="s-link" onclick="showSection('motd')">💬 MOTD</a>
+                <a class="s-link" onclick="showSection('blacklist-nicks')">🔇 Чёрный список ников</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">🛡️ Безопасность</div>
+                <a class="s-link" onclick="showSection('security')">🛡️ Безопасность</a>
+                <a class="s-link" onclick="showSection('suspicious')">🔍 Подозрительные</a>
+                <a class="s-link" onclick="showSection('admin-log')">📖 Лог админа</a>
+                <a class="s-link" onclick="showSection('lockdown')">🔒 Локдаун</a>
+                <a class="s-link" onclick="showSection('rate-limits')">⏱️ Rate Limits</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">⚙️ Настройки</div>
+                <a class="s-link" onclick="showSection('settings')">⚙️ Настройки сайта</a>
+                <a class="s-link" onclick="showSection('server-settings')">🖥️ Настройки сервера</a>
+                <a class="s-link" onclick="showSection('notifications-settings')">🔔 Уведомления</a>
+                <a class="s-link" onclick="showSection('webhook')">🔗 Webhook</a>
+                <a class="s-link" onclick="showSection('backup')">💾 Бэкап</a>
+                <a class="s-link" onclick="showSection('export')">📤 Экспорт данных</a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="adminLogout()">🚪 Выход</button>
+            <a href="main.html" class="back-link">← На сайт</a>
+        </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="admin-main">
+        <!-- TOPBAR -->
+        <div class="admin-topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+                <span class="topbar-title" id="section-title">Dashboard</span>
+            </div>
+            <div class="topbar-right">
+                <div class="realtime-badge">
+                    <span class="rt-dot"></span>
+                    Реальное время
+                </div>
+                <div class="admin-info">
+                    <span class="admin-avatar">👑</span>
+                    <span>Администратор</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- УВЕДОМЛЕНИЯ -->
+        <div id="admin-notifications" class="admin-notifications"></div>
+
+        <!-- =================== DASHBOARD =================== -->
+        <section class="a-section active" id="sec-dashboard">
+            <div class="a-grid-4">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-num rgb-text" id="dash-users">0</div>
+                    <div class="stat-label">Всего игроков</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚫</div>
+                    <div class="stat-num" id="dash-bans" style="color:#ff0080">0</div>
+                    <div class="stat-label">Активных банов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🌐</div>
+                    <div class="stat-num" id="dash-ipbans" style="color:#ff6600">0</div>
+                    <div class="stat-label">IP-банов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-num" id="dash-warns" style="color:#f1c40f">0</div>
+                    <div class="stat-label">Предупреждений</div>
+                </div>
+            </div>
+            <div class="a-grid-2" style="margin-top:20px;">
+                <div class="a-card">
+                    <div class="a-card-header">⚡ Последние регистрации</div>
+                    <div id="recent-registrations" class="feed-list"></div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">🚫 Последние баны</div>
+                    <div id="recent-bans-feed" class="feed-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== REALTIME =================== -->
+        <section class="a-section" id="sec-realtime">
+            <div class="a-card">
+                <div class="a-card-header">⚡ Лента событий в реальном времени</div>
+                <div id="realtime-feed" class="realtime-feed"></div>
+            </div>
+        </section>
+
+        <!-- =================== LOGS =================== -->
+        <section class="a-section" id="sec-logs">
+            <div class="a-card">
+                <div class="a-card-header">
+                    📋 Все логи
+                    <div class="card-actions">
+                        <input type="text" placeholder="Поиск в логах..." id="log-search" oninput="filterLogs()" style="width:200px;padding:6px 10px;font-size:0.82em;">
+                        <button class="btn-sm" onclick="clearLogs()">🗑️ Очистить</button>
+                    </div>
+                </div>
+                <div id="all-logs" class="log-list"></div>
+            </div>
+        </section>
+
+        <!-- =================== ANALYTICS =================== -->
+        <section class="a-section" id="sec-analytics">
+            <div class="a-grid-2">
+                <div class="a-card"><div class="a-card-header">📈 Регистрации по дням</div><div id="chart-regs" class="chart-area"></div></div>
+                <div class="a-card"><div class="a-card-header">🚫 Баны по типу</div><div id="chart-bans" class="chart-area"></div></div>
+                <div class="a-card"><div class="a-card-header">📊 Активность по часам</div><div id="chart-hours" class="chart-area"></div></div>
+                <div class="a-card"><div class="a-card-header">🌐 IP-баны</div><div id="chart-ipbans" class="chart-area"></div></div>
+            </div>
+        </section>
+
+        <!-- =================== USERS =================== -->
+        <section class="a-section" id="sec-users">
+            <div class="a-card">
+                <div class="a-card-header">👤 Все игроки
+                    <div class="card-actions">
+                        <input type="text" placeholder="Фильтр..." id="users-filter" oninput="filterUsers()" style="width:180px;padding:6px 10px;font-size:0.82em;">
+                        <button class="btn-sm" onclick="exportUsers()">📤 Экспорт CSV</button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="a-table" id="users-table">
+                        <thead><tr><th>Ник сайта</th><th>Ник Minecraft</th><th>Site ID</th><th>TG ID</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
+                        <tbody id="users-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== SEARCH USERS =================== -->
+        <section class="a-section" id="sec-search-users">
+            <div class="a-card">
+                <div class="a-card-header">🔍 Поиск игрока</div>
+                <div class="search-box">
+                    <input type="text" id="user-search-input" placeholder="Telegram ID / Ник / Site ID...">
+                    <button class="btn-primary" style="width:auto;padding:12px 24px;" onclick="searchUser()">Найти</button>
+                </div>
+                <div id="user-search-result" class="user-search-result"></div>
+            </div>
+        </section>
+
+        <!-- =================== ROLES =================== -->
+        <section class="a-section" id="sec-roles">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">🎖️ Назначить роль</div>
+                    <div class="form-col">
+                        <label>Site ID или Telegram ID</label>
+                        <input type="text" id="role-target" placeholder="Идентификатор игрока">
+                        <label>Роль</label>
+                        <select id="role-select" class="a-select">
+                            <option value="player">👤 Игрок</option>
+                            <option value="vip">⭐ VIP</option>
+                            <option value="moderator">🛡️ Модератор</option>
+                            <option value="admin">👑 Администратор</option>
+                            <option value="builder">🏗️ Строитель</option>
+                            <option value="helper">🤝 Помощник</option>
+                        </select>
+                        <button class="btn-primary" style="width:auto;" onclick="assignRole()">Назначить роль</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">👥 Игроки по ролям</div>
+                    <div id="roles-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== MESSAGES =================== -->
+        <section class="a-section" id="sec-messages">
+            <div class="a-card">
+                <div class="a-card-header">✉️ Отправить сообщение игроку</div>
+                <div class="form-col">
+                    <label>Site ID игрока</label>
+                    <input type="text" id="msg-target" placeholder="Site ID">
+                    <label>Тема</label>
+                    <input type="text" id="msg-subject" placeholder="Тема сообщения">
+                    <label>Сообщение</label>
+                    <textarea id="msg-body" rows="4" placeholder="Текст сообщения..."></textarea>
+                    <button class="btn-primary" style="width:auto;" onclick="sendMessage()">📨 Отправить</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== ALL BANS =================== -->
+        <section class="a-section" id="sec-bans">
+            <div class="a-card">
+                <div class="a-card-header">🚫 Активные баны
+                    <div class="card-actions">
+                        <select id="bans-type-filter" onchange="filterBans()" class="a-select" style="width:140px;">
+                            <option value="">Все типы</option>
+                            <option value="account">Аккаунт</option>
+                            <option value="ip">IP</option>
+                            <option value="telegram">Telegram</option>
+                            <option value="siteid">Site ID</option>
+                        </select>
+                        <button class="btn-sm danger" onclick="massUnban()">🔓 Снять все баны</button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="a-table" id="bans-table">
+                        <thead><tr><th>Тип</th><th>Цель</th><th>Причина</th><th>Срок</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
+                        <tbody id="bans-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== BAN ACCOUNT =================== -->
+        <section class="a-section" id="sec-ban-account">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">🚫 Бан аккаунта</div>
+                    <div class="form-col">
+                        <label>Telegram ID или Site ID</label>
+                        <input type="text" id="ban-acc-target" placeholder="Идентификатор">
+                        <label>Причина бана</label>
+                        <select id="ban-acc-reason-preset" class="a-select" onchange="setPresetReason('ban-acc-reason',this.value)">
+                            <option value="">-- Выберите причину --</option>
+                            <option value="Использование читов">🎯 Читы</option>
+                            <option value="Оскорбления в чате">💬 Оскорбления</option>
+                            <option value="Спам">📢 Спам</option>
+                            <option value="Griefing">🔨 Griefing</option>
+                            <option value="Мультиаккаунт">👥 Мультиаккаунт</option>
+                            <option value="Реклама">📣 Реклама</option>
+                            <option value="Нарушение правил">📜 Нарушение правил</option>
+                            <option value="Другое">❓ Другое</option>
+                        </select>
+                        <input type="text" id="ban-acc-reason" placeholder="Или введите вручную">
+                        <label>Срок</label>
+                        <select id="ban-acc-duration" class="a-select">
+                            <option value="permanent">♾️ Навсегда</option>
+                            <option value="1h">⏱️ 1 час</option>
+                            <option value="6h">⏱️ 6 часов</option>
+                            <option value="12h">⏱️ 12 часов</option>
+                            <option value="1d">📅 1 день</option>
+                            <option value="3d">📅 3 дня</option>
+                            <option value="7d">📅 7 дней</option>
+                            <option value="14d">📅 14 дней</option>
+                            <option value="30d">📅 30 дней</option>
+                        </select>
+                        <button class="btn-primary danger-btn" onclick="banAccount()">🚫 Выдать бан</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">🔓 Снять бан аккаунта</div>
+                    <div class="form-col">
+                        <label>Telegram ID или Site ID</label>
+                        <input type="text" id="unban-acc-target" placeholder="Идентификатор">
+                        <label>Причина снятия</label>
+                        <input type="text" id="unban-acc-reason" placeholder="Апелляция / Ошибочный бан">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#00ff88,#00d4ff);width:auto;" onclick="unbanAccount()">🔓 Снять бан</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== BAN IP =================== -->
+        <section class="a-section" id="sec-ban-ip">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">🌐 IP-бан</div>
+                    <div class="form-col">
+                        <label>IP-адрес</label>
+                        <input type="text" id="ban-ip-target" placeholder="Например: 192.168.1.1">
+                        <label>Причина</label>
+                        <select id="ban-ip-reason-preset" class="a-select" onchange="setPresetReason('ban-ip-reason',this.value)">
+                            <option value="">-- Выберите причину --</option>
+                            <option value="VPN/Прокси">🔀 VPN/Прокси</option>
+                            <option value="DDoS-атака">💥 DDoS</option>
+                            <option value="Мультиаккаунт с одного IP">👥 Мультиаккаунт</option>
+                            <option value="Боты / Парсинг">🤖 Боты</option>
+                            <option value="Читы">🎯 Читы</option>
+                            <option value="Другое">❓ Другое</option>
+                        </select>
+                        <input type="text" id="ban-ip-reason" placeholder="Или введите вручную">
+                        <label>Срок</label>
+                        <select id="ban-ip-duration" class="a-select">
+                            <option value="permanent">♾️ Навсегда</option>
+                            <option value="1d">📅 1 день</option>
+                            <option value="7d">📅 7 дней</option>
+                            <option value="30d">📅 30 дней</option>
+                        </select>
+                        <button class="btn-primary danger-btn" onclick="banIP()">🌐 Заблокировать IP</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">✅ Снять IP-бан</div>
+                    <div class="form-col">
+                        <label>IP-адрес</label>
+                        <input type="text" id="unban-ip-target" placeholder="Например: 192.168.1.1">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#00ff88,#00d4ff);width:auto;" onclick="unbanIP()">✅ Снять IP-бан</button>
+                    </div>
+                    <div class="a-card-header" style="margin-top:20px;">📋 Забаненные IP</div>
+                    <div id="ip-bans-list" class="feed-list" style="max-height:200px;overflow-y:auto;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== BAN TELEGRAM =================== -->
+        <section class="a-section" id="sec-ban-telegram">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">📱 Бан по Telegram ID</div>
+                    <div class="form-col">
+                        <label>Telegram ID</label>
+                        <input type="text" id="ban-tg-target" placeholder="Например: 123456789">
+                        <label>Причина</label>
+                        <input type="text" id="ban-tg-reason" placeholder="Причина блокировки">
+                        <label>Срок</label>
+                        <select id="ban-tg-duration" class="a-select">
+                            <option value="permanent">♾️ Навсегда</option>
+                            <option value="1d">📅 1 день</option>
+                            <option value="7d">📅 7 дней</option>
+                            <option value="30d">📅 30 дней</option>
+                        </select>
+                        <button class="btn-primary danger-btn" onclick="banTelegram()">📱 Заблокировать TG</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">🔓 Снять Telegram-бан</div>
+                    <div class="form-col">
+                        <label>Telegram ID</label>
+                        <input type="text" id="unban-tg-target" placeholder="Например: 123456789">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#00ff88,#00d4ff);width:auto;" onclick="unbanTelegram()">🔓 Снять Telegram-бан</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== BAN SITE ID =================== -->
+        <section class="a-section" id="sec-ban-siteid">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">🆔 Бан по Site ID</div>
+                    <div class="form-col">
+                        <label>Site ID</label>
+                        <input type="text" id="ban-sid-target" placeholder="Уникальный ID игрока">
+                        <label>Причина</label>
+                        <input type="text" id="ban-sid-reason" placeholder="Причина блокировки">
+                        <label>Срок</label>
+                        <select id="ban-sid-duration" class="a-select">
+                            <option value="permanent">♾️ Навсегда</option>
+                            <option value="1d">📅 1 день</option>
+                            <option value="7d">📅 7 дней</option>
+                            <option value="30d">📅 30 дней</option>
+                        </select>
+                        <button class="btn-primary danger-btn" onclick="banSiteId()">🆔 Заблокировать Site ID</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">🔓 Снять бан Site ID</div>
+                    <div class="form-col">
+                        <label>Site ID</label>
+                        <input type="text" id="unban-sid-target" placeholder="Site ID игрока">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#00ff88,#00d4ff);width:auto;" onclick="unbanSiteId()">🔓 Снять Site ID бан</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== MASS BAN =================== -->
+        <section class="a-section" id="sec-mass-ban">
+            <div class="a-card">
+                <div class="a-card-header">💥 Массовый бан</div>
+                <div class="form-col">
+                    <label>Список целей (по одной на строку — Site ID / TG ID)</label>
+                    <textarea id="mass-ban-targets" rows="6" placeholder="123456789&#10;player1&#10;player2"></textarea>
+                    <label>Тип бана</label>
+                    <select id="mass-ban-type" class="a-select">
+                        <option value="account">Аккаунт</option>
+                        <option value="telegram">Telegram ID</option>
+                        <option value="siteid">Site ID</option>
+                    </select>
+                    <label>Причина</label>
+                    <input type="text" id="mass-ban-reason" placeholder="Общая причина">
+                    <label>Срок</label>
+                    <select id="mass-ban-duration" class="a-select">
+                        <option value="permanent">♾️ Навсегда</option>
+                        <option value="7d">📅 7 дней</option>
+                        <option value="30d">📅 30 дней</option>
+                    </select>
+                    <button class="btn-primary danger-btn" onclick="massBan()">💥 Выдать массовый бан</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== APPEALS =================== -->
+        <section class="a-section" id="sec-appeals">
+            <div class="a-card">
+                <div class="a-card-header">📨 Апелляции игроков</div>
+                <div id="appeals-list" class="feed-list"></div>
+            </div>
+        </section>
+
+        <!-- =================== WARNS =================== -->
+        <section class="a-section" id="sec-warns">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">⚠️ Выдать предупреждение</div>
+                    <div class="form-col">
+                        <label>Site ID или TG ID</label>
+                        <input type="text" id="warn-target" placeholder="Идентификатор">
+                        <label>Причина</label>
+                        <input type="text" id="warn-reason" placeholder="За что предупреждение?">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#f1c40f,#e67e22);width:auto;" onclick="warnUser()">⚠️ Выдать варн</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">📋 Активные предупреждения</div>
+                    <div id="warns-list" class="feed-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== IP WHITELIST =================== -->
+        <section class="a-section" id="sec-ip-whitelist">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">✅ Добавить IP в whitelist</div>
+                    <div class="form-col">
+                        <label>IP-адрес</label>
+                        <input type="text" id="wl-ip-target" placeholder="Например: 192.168.1.1">
+                        <label>Комментарий</label>
+                        <input type="text" id="wl-ip-note" placeholder="Зачем этот IP в списке?">
+                        <button class="btn-primary" style="background:linear-gradient(135deg,#00ff88,#00d4ff);width:auto;" onclick="addIPWhitelist()">✅ Добавить</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">📋 Whitelist IP-адресов</div>
+                    <div id="ip-whitelist-list" class="feed-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== ANNOUNCEMENTS =================== -->
+        <section class="a-section" id="sec-announcements">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">📢 Создать объявление</div>
+                    <div class="form-col">
+                        <label>Заголовок</label>
+                        <input type="text" id="ann-title" placeholder="Заголовок объявления">
+                        <label>Тип</label>
+                        <select id="ann-type" class="a-select">
+                            <option value="info">ℹ️ Информация</option>
+                            <option value="update">🆕 Обновление</option>
+                            <option value="event">⚡ Ивент</option>
+                            <option value="warning">⚠️ Предупреждение</option>
+                            <option value="maintenance">🔧 Тех. работы</option>
+                        </select>
+                        <label>Текст</label>
+                        <textarea id="ann-body" rows="4" placeholder="Текст объявления..."></textarea>
+                        <label><input type="checkbox" id="ann-pinned"> 📌 Закрепить</label>
+                        <button class="btn-primary" style="width:auto;" onclick="createAnnouncement()">📢 Опубликовать</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">📋 Все объявления</div>
+                    <div id="announcements-list" class="feed-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== NEWS ADMIN =================== -->
+        <section class="a-section" id="sec-news-admin">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">📰 Создать новость</div>
+                    <div class="form-col">
+                        <input type="text" id="news-title" placeholder="Заголовок новости">
+                        <input type="text" id="news-badge-txt" placeholder="Бейдж (Обновление, Ивент...)">
+                        <textarea id="news-body" rows="4" placeholder="Текст новости..."></textarea>
+                        <button class="btn-primary" style="width:auto;" onclick="createNews()">📰 Опубликовать</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">📋 Новости</div>
+                    <div id="news-admin-list" class="feed-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== RULES ADMIN =================== -->
+        <section class="a-section" id="sec-rules-admin">
+            <div class="a-card">
+                <div class="a-card-header">📜 Редактор правил</div>
+                <div class="form-col">
+                    <label>Номер правила</label>
+                    <input type="number" id="rule-num" placeholder="01">
+                    <label>Название</label>
+                    <input type="text" id="rule-title-input" placeholder="Название правила">
+                    <label>Описание</label>
+                    <textarea id="rule-body" rows="3" placeholder="Описание правила..."></textarea>
+                    <button class="btn-primary" style="width:auto;" onclick="saveRule()">💾 Сохранить правило</button>
+                </div>
+                <div id="rules-admin-list" class="feed-list" style="margin-top:20px;"></div>
+            </div>
+        </section>
+
+        <!-- =================== MOTD =================== -->
+        <section class="a-section" id="sec-motd">
+            <div class="a-card">
+                <div class="a-card-header">💬 MOTD — Сообщение дня</div>
+                <div class="form-col">
+                    <label>Текущий MOTD</label>
+                    <textarea id="motd-text" rows="3" placeholder="Введите MOTD сервера..."></textarea>
+                    <label>IP сервера</label>
+                    <input type="text" id="server-ip-setting" placeholder="play.server.ru">
+                    <button class="btn-primary" style="width:auto;" onclick="saveMOTD()">💾 Сохранить MOTD</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== BLACKLIST NICKS =================== -->
+        <section class="a-section" id="sec-blacklist-nicks">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">🔇 Добавить ник в чёрный список</div>
+                    <div class="form-col">
+                        <input type="text" id="bl-nick-input" placeholder="Запрещённый ник">
+                        <input type="text" id="bl-nick-reason" placeholder="Причина">
+                        <button class="btn-primary danger-btn" style="width:auto;" onclick="addBlacklistNick()">🔇 Запретить</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">📋 Чёрный список ников</div>
+                    <div id="bl-nicks-list" class="feed-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== SECURITY =================== -->
+        <section class="a-section" id="sec-security">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">🛡️ Настройки безопасности</div>
+                    <div class="form-col">
+                        <label class="toggle-label"><input type="checkbox" id="sec-maintenance" onchange="toggleMaintenance()"> 🔧 Режим тех. работ</label>
+                        <label class="toggle-label"><input type="checkbox" id="sec-registration" onchange="toggleRegistration()" checked> ✅ Регистрация открыта</label>
+                        <label class="toggle-label"><input type="checkbox" id="sec-vpn-detect"> 🔀 Блокировать VPN/Прокси</label>
+                        <label class="toggle-label"><input type="checkbox" id="sec-auto-ban"> 🤖 Авто-бан подозрительных</label>
+                        <button class="btn-primary" style="width:auto;" onclick="saveSecuritySettings()">💾 Сохранить</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">🔒 Сменить пароль администратора</div>
+                    <div class="form-col">
+                        <input type="password" id="new-admin-pass" placeholder="Новый пароль">
+                        <input type="password" id="confirm-admin-pass" placeholder="Подтвердить пароль">
+                        <button class="btn-primary" style="width:auto;" onclick="changeAdminPassword()">🔒 Сменить пароль</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== SUSPICIOUS =================== -->
+        <section class="a-section" id="sec-suspicious">
+            <div class="a-card">
+                <div class="a-card-header">🔍 Подозрительная активность</div>
+                <div id="suspicious-list" class="feed-list"></div>
+                <button class="btn-primary danger-btn" style="width:auto;margin-top:16px;" onclick="banAllSuspicious()">🚫 Забанить всех подозрительных</button>
+            </div>
+        </section>
+
+        <!-- =================== ADMIN LOG =================== -->
+        <section class="a-section" id="sec-admin-log">
+            <div class="a-card">
+                <div class="a-card-header">📖 Лог действий администратора</div>
+                <div id="admin-action-log" class="log-list"></div>
+            </div>
+        </section>
+
+        <!-- =================== LOCKDOWN =================== -->
+        <section class="a-section" id="sec-lockdown">
+            <div class="a-card">
+                <div class="a-card-header">🔒 Экстренный локдаун</div>
+                <div style="text-align:center;padding:40px;">
+                    <div style="font-size:4em;margin-bottom:20px;">🔒</div>
+                    <p style="color:rgba(255,255,255,0.5);margin-bottom:30px;">Полная блокировка всех входов на сайт. Используйте только в экстренных случаях.</p>
+                    <button class="btn-primary danger-btn" style="width:auto;padding:16px 40px;font-size:1.1em;" onclick="triggerLockdown()">⚠️ АКТИВИРОВАТЬ ЛОКДАУН</button>
+                    <button class="btn-primary" style="width:auto;padding:16px 40px;font-size:1.1em;margin-left:12px;background:linear-gradient(135deg,#00ff88,#00d4ff);" onclick="deactivateLockdown()">✅ Снять локдаун</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== RATE LIMITS =================== -->
+        <section class="a-section" id="sec-rate-limits">
+            <div class="a-card">
+                <div class="a-card-header">⏱️ Rate Limit настройки</div>
+                <div class="form-col">
+                    <label>Макс. запросов в минуту</label>
+                    <input type="number" id="rl-max-req" value="60" placeholder="60">
+                    <label>Макс. регистраций с одного IP в день</label>
+                    <input type="number" id="rl-max-reg" value="3" placeholder="3">
+                    <label>Время блокировки при превышении (минуты)</label>
+                    <input type="number" id="rl-block-time" value="30" placeholder="30">
+                    <button class="btn-primary" style="width:auto;" onclick="saveRateLimits()">💾 Сохранить</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== SETTINGS =================== -->
+        <section class="a-section" id="sec-settings">
+            <div class="a-grid-2">
+                <div class="a-card">
+                    <div class="a-card-header">⚙️ Настройки сайта</div>
+                    <div class="form-col">
+                        <label>Название сервера</label>
+                        <input type="text" id="set-server-name" placeholder="Название сервера" value="GameServer">
+                        <label>Описание</label>
+                        <textarea id="set-server-desc" rows="2" placeholder="Описание..."></textarea>
+                        <label>IP сервера</label>
+                        <input type="text" id="set-server-ip" placeholder="play.server.ru">
+                        <label>Discord ссылка</label>
+                        <input type="text" id="set-discord" placeholder="https://discord.gg/...">
+                        <label>Telegram ссылка</label>
+                        <input type="text" id="set-telegram" placeholder="https://t.me/...">
+                        <button class="btn-primary" style="width:auto;" onclick="saveSettings()">💾 Сохранить настройки</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="a-card-header">🎨 Тема оформления</div>
+                    <div class="form-col">
+                        <label>Цветовая схема</label>
+                        <select id="theme-select" class="a-select">
+                            <option value="purple">💜 Фиолетово-синяя (по умолчанию)</option>
+                            <option value="red">❤️ Красная</option>
+                            <option value="green">💚 Зелёная</option>
+                            <option value="gold">💛 Золотая</option>
+                            <option value="cyan">💙 Голубая</option>
+                        </select>
+                        <label>RGB анимация</label>
+                        <select id="rgb-speed" class="a-select">
+                            <option value="3s">⚡ Быстро (3с)</option>
+                            <option value="6s" selected>🌊 Нормально (6с)</option>
+                            <option value="12s">🐌 Медленно (12с)</option>
+                        </select>
+                        <button class="btn-primary" style="width:auto;" onclick="saveTheme()">🎨 Применить тему</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== SERVER SETTINGS =================== -->
+        <section class="a-section" id="sec-server-settings">
+            <div class="a-card">
+                <div class="a-card-header">🖥️ Настройки сервера</div>
+                <div class="form-col">
+                    <label>Версия Minecraft</label>
+                    <input type="text" id="mc-version" placeholder="1.20.1">
+                    <label>Порт сервера</label>
+                    <input type="text" id="mc-port" placeholder="25565">
+                    <label>RCON IP</label>
+                    <input type="text" id="rcon-ip" placeholder="localhost">
+                    <label>Слоты</label>
+                    <input type="number" id="mc-slots" placeholder="100">
+                    <button class="btn-primary" style="width:auto;" onclick="saveServerSettings()">💾 Сохранить</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== NOTIFICATIONS =================== -->
+        <section class="a-section" id="sec-notifications-settings">
+            <div class="a-card">
+                <div class="a-card-header">🔔 Настройки уведомлений</div>
+                <div class="form-col">
+                    <label class="toggle-label"><input type="checkbox" id="notif-ban" checked> 🚫 Уведомление о банах</label>
+                    <label class="toggle-label"><input type="checkbox" id="notif-reg" checked> 📋 Уведомление о регистрациях</label>
+                    <label class="toggle-label"><input type="checkbox" id="notif-suspicious" checked> 🔍 Уведомление о подозрительных</label>
+                    <label class="toggle-label"><input type="checkbox" id="notif-appeal"> 📨 Уведомление об апелляциях</label>
+                    <label>Telegram бот токен (для уведомлений)</label>
+                    <input type="text" id="notif-bot-token" placeholder="bot123456:ABC...">
+                    <label>Chat ID для уведомлений</label>
+                    <input type="text" id="notif-chat-id" placeholder="-100123456789">
+                    <button class="btn-primary" style="width:auto;" onclick="saveNotificationSettings()">💾 Сохранить</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== WEBHOOK =================== -->
+        <section class="a-section" id="sec-webhook">
+            <div class="a-card">
+                <div class="a-card-header">🔗 Discord Webhook</div>
+                <div class="form-col">
+                    <label>Webhook URL</label>
+                    <input type="text" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
+                    <label>Имя бота</label>
+                    <input type="text" id="webhook-name" placeholder="AdminBot">
+                    <label class="toggle-label"><input type="checkbox" id="webhook-bans" checked> 🚫 Отправлять баны</label>
+                    <label class="toggle-label"><input type="checkbox" id="webhook-regs"> 📋 Отправлять регистрации</label>
+                    <button class="btn-primary" style="width:auto;" onclick="saveWebhook()">💾 Сохранить</button>
+                    <button class="btn-sm" style="margin-top:8px;" onclick="testWebhook()">🧪 Тест Webhook</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== BACKUP =================== -->
+        <section class="a-section" id="sec-backup">
+            <div class="a-card">
+                <div class="a-card-header">💾 Бэкап данных</div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;padding:20px 0;">
+                    <button class="btn-primary" style="width:auto;" onclick="backupUsers()">👥 Бэкап игроков</button>
+                    <button class="btn-primary" style="width:auto;" onclick="backupBans()">🚫 Бэкап банов</button>
+                    <button class="btn-primary" style="width:auto;" onclick="backupLogs()">📋 Бэкап логов</button>
+                    <button class="btn-primary" style="width:auto;" onclick="fullBackup()">💾 Полный бэкап</button>
+                </div>
+                <div id="backup-status" style="margin-top:16px;"></div>
+            </div>
+        </section>
+
+        <!-- =================== EXPORT =================== -->
+        <section class="a-section" id="sec-export">
+            <div class="a-card">
+                <div class="a-card-header">📤 Экспорт данных</div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;padding:20px 0;">
+                    <button class="btn-primary" style="width:auto;" onclick="exportUsers()">👥 Игроки (CSV)</button>
+                    <button class="btn-primary" style="width:auto;" onclick="exportBansCSV()">🚫 Баны (CSV)</button>
+                    <button class="btn-primary" style="width:auto;" onclick="exportLogsCSV()">📋 Логи (CSV)</button>
+                    <button class="btn-primary" style="width:auto;" onclick="exportAllJSON()">📦 Все данные (JSON)</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="firebase-config.js"></script>
+<script src="admin.js"></script>
+<script>
+// Частицы
+(function() {
+    const c = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random()*100+'vw';
+        p.style.animationDelay = Math.random()*8+'s';
+        p.style.animationDuration = (6+Math.random()*8)+'s';
+        p.style.width = p.style.height = (2+Math.random()*3)+'px';
+        c.appendChild(p);
+    }
+    document.getElementById('admin-password-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') checkAdminPassword();
+    });
+})();
+</script>
+</body>
+</html>
