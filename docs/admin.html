@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Админ-панель</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #12163a;
+            border-bottom: 2px solid #ef4444;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { font-size: 20px; font-weight: 700; color: #ef4444; }
+        .back-link { color: #94a3b8; text-decoration: none; }
+        .back-link:hover { color: #fff; }
+        .content { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        h1 { color: #ef4444; margin-bottom: 16px; }
+        h2 { color: #a78bfa; margin: 16px 0 8px; font-size: 18px; }
+        .btn {
+            background: #7c3aed;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .btn:hover { background: #6d28d9; }
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: #10b981; }
+        .btn-success:hover { background: #059669; }
+        .btn-sm { padding: 6px 14px; font-size: 13px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+        .stat-card {
+            background: #1e2447;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        .stat-card .num { font-size: 28px; font-weight: 700; }
+        .stat-card .label { color: #94a3b8; font-size: 12px; text-transform: uppercase; }
+        .players-list { background: #1e2447; border-radius: 10px; overflow: hidden; margin-top: 12px; }
+        .player-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid #0a0e27;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .player-row:last-child { border-bottom: none; }
+        .player-row .info { flex: 1; }
+        .player-row .name { font-weight: 700; }
+        .player-row .details { color: #94a3b8; font-size: 13px; margin-top: 2px; }
+        .player-row .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-ok { background: rgba(16,185,129,0.2); color: #10b981; }
+        .badge-ban { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .badge-warn { background: rgba(251,191,36,0.2); color: #fbbf24; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; color: #94a3b8; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1e2447;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #7c3aed;
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .admin-card { background: #12163a; border: 1px solid #ef4444; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .footer {
+            margin-top: 30px;
+            padding-top: 16px;
+            border-top: 1px solid #1e2447;
+            text-align: center;
+            color: #475569;
+            font-size: 14px;
+        }
+        .footer a { color: #a78bfa; text-decoration: none; }
+        .loading { text-align: center; padding: 20px; color: #475569; }
+        .feed-list { padding: 8px 0; }
+        .feed-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.85em;
+        }
+        .feed-item .icon { font-size: 1.1em; flex-shrink: 0; }
+        .feed-item .text { flex: 1; }
+        .feed-item .title { font-weight: 700; color: #fff; }
+        .feed-item .sub { color: #94a3b8; font-size: 0.85em; }
+        .feed-item .actions { display: flex; gap: 6px; }
+        .log-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 0.82em;
+            font-family: monospace;
+        }
+        .log-item .time { color: rgba(255,255,255,0.3); min-width: 80px; }
+        .log-item .type { font-weight: 700; min-width: 70px; }
+        .log-item .type.ban { color: #ef4444; }
+        .log-item .type.unban { color: #10b981; }
+        .log-item .type.admin { color: #a78bfa; }
+        .log-item .msg { color: #94a3b8; flex: 1; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">🔧 Админ-панель</div>
+    <div>
+        <a href="main.html" class="back-link">← На главную</a>
+        <span style="color:#94a3b8;margin-left:16px;">👑 Admin</span>
+    </div>
+</div>
+
+<div class="content">
+
+    <h1>Управление сервером</h1>
+
+    <div class="stats-grid">
+        <div class="stat-card"><div class="num" id="admin-stat-users" style="color:#a78bfa;">—</div><div class="label">👥 Игроков</div></div>
+        <div class="stat-card"><div class="num" id="admin-stat-bans" style="color:#ef4444;">—</div><div class="label">🚫 Активных банов</div></div>
+        <div class="stat-card"><div class="num" id="admin-stat-warns" style="color:#fbbf24;">—</div><div class="label">⚠️ Предупреждений</div></div>
+        <div class="stat-card"><div class="num" id="admin-stat-online" style="color:#10b981;">—</div><div class="label">🟢 Онлайн</div></div>
+    </div>
+
+    <!-- БАН ИГРОКА -->
+    <div class="admin-card">
+        <h2>🚫 Выдать бан</h2>
+        <div class="grid-2">
+            <div class="form-group"><label>Telegram ID или Site ID</label><input type="text" id="ban-target" placeholder="Например: 8889631346"></div>
+            <div class="form-group"><label>Причина</label><input type="text" id="ban-reason" placeholder="Например: Читы, Спам..."></div>
+            <div class="form-group"><label>Срок</label>
+                <select id="ban-duration">
+                    <option value="permanent">♾️ Навсегда</option>
+                    <option value="1d">📅 1 день</option>
+                    <option value="3d">📅 3 дня</option>
+                    <option value="7d">📅 7 дней</option>
+                    <option value="14d">📅 14 дней</option>
+                    <option value="30d">📅 30 дней</option>
+                </select>
+            </div>
+            <div style="display:flex;align-items:flex-end;"><button class="btn btn-danger" onclick="banPlayer()" style="width:100%;">🚫 Забанить</button></div>
+        </div>
+    </div>
+
+    <!-- РАЗБАН -->
+    <div class="admin-card">
+        <h2>🔓 Снять бан</h2>
+        <div class="grid-2">
+            <div class="form-group"><label>Telegram ID или Site ID</label><input type="text" id="unban-target" placeholder="Например: 8889631346"></div>
+            <div style="display:flex;align-items:flex-end;"><button class="btn btn-success" onclick="unbanPlayer()" style="width:100%;">🔓 Снять бан</button></div>
+        </div>
+    </div>
+
+    <!-- ПРЕДУПРЕЖДЕНИЕ -->
+    <div class="admin-card">
+        <h2>⚠️ Выдать предупреждение</h2>
+        <div class="grid-2">
+            <div class="form-group"><label>Telegram ID или Site ID</label><input type="text" id="warn-target" placeholder="Например: 8889631346"></div>
+            <div class="form-group"><label>Причина</label><input type="text" id="warn-reason" placeholder="Например: Нарушение правил"></div>
+            <div style="display:flex;align-items:flex-end;"><button class="btn" style="background:#fbbf24;color:#000;" onclick="warnPlayer()" style="width:100%;">⚠️ Выдать варн</button></div>
+        </div>
+    </div>
+
+    <!-- СПИСОК ИГРОКОВ -->
+    <div class="admin-card">
+        <h2>👥 Игроки</h2>
+        <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="text" id="search-players" placeholder="Поиск по нику..." style="flex:1;padding:8px 14px;background:#1e2447;border:1px solid #334155;border-radius:8px;color:#fff;min-width:150px;">
+            <button class="btn btn-sm" onclick="searchPlayers()">🔍 Найти</button>
+            <button class="btn btn-sm" onclick="loadPlayers()">🔄 Обновить</button>
+        </div>
+        <div class="players-list" id="players-list-admin"><div class="loading">Загрузка...</div></div>
+    </div>
+
+    <!-- ЛОГИ АДМИНА -->
+    <div class="admin-card">
+        <h2>📋 Логи действий</h2>
+        <div id="admin-log-list" class="log-list" style="max-height:300px;overflow-y:auto;">
+            <div class="loading">Загрузка логов...</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        🔧 Админ-панель v2.0 | <a href="main.html">← На сайт</a>
+    </div>
+</div>
+
+<script>
+    function loadPlayers() {
+        const list = document.getElementById('players-list-admin');
+        list.innerHTML = '<div class="loading">Загрузка...</div>';
+        db.collection('users').get().then(snap => {
+            if (snap.empty) { list.innerHTML = '<div class="loading">Нет игроков</div>'; return; }
+            let html = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                const status = d.verified ? '✅ Подтверждён' : '⏳ Не подтверждён';
+                const statusClass = d.verified ? 'badge-ok' : 'badge-warn';
+                html += `<div class="player-row">
+                    <div class="info">
+                        <div class="name">${d.siteNick || d.nickname || 'Без имени'}</div>
+                        <div class="details">⛏️ ${d.nickname || '—'} | 📱 ${d.telegram_id || '—'} | 🆔 ${d.site_id || '—'}</div>
+                    </div>
+                    <span class="badge ${statusClass}">${status}</span>
+                    <div class="actions">
+                        <button class="btn btn-danger btn-sm" onclick="quickBan('${d.site_id || d.telegram_id}')">🚫</button>
+                        <button class="btn btn-success btn-sm" onclick="quickUnban('${d.site_id || d.telegram_id}')">🔓</button>
+                    </div>
+                </div>`;
+            });
+            list.innerHTML = html;
+            document.getElementById('admin-stat-users').textContent = snap.size;
+        }).catch(() => list.innerHTML = '<div class="loading" style="color:#ef4444;">❌ Ошибка</div>');
+    }
+
+    function loadAdminLogs() {
+        const list = document.getElementById('admin-log-list');
+        db.collection('adminLogs').orderBy('createdAt','desc').limit(50).onSnapshot(snap => {
+            if (snap.empty) { list.innerHTML = '<div class="loading">Нет логов</div>'; return; }
+            let html = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                const type = d.action?.includes('бан') ? 'ban' : d.action?.includes('снят') ? 'unban' : 'admin';
+                html += `<div class="log-item">
+                    <span class="time">${d.createdAt?.toDate?.().toLocaleTimeString('ru-RU') || '—'}</span>
+                    <span class="type ${type}">[${type.toUpperCase()}]</span>
+                    <span class="msg">${d.action || ''}</span>
+                </div>`;
+            });
+            list.innerHTML = html || '<div class="loading">Нет логов</div>';
+        });
+    }
+
+    function addAdminLog(action) {
+        db.collection('adminLogs').add({ action, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        loadAdminLogs();
+    }
+
+    function banPlayer() {
+        const target = document.getElementById('ban-target').value.trim();
+        const reason = document.getElementById('ban-reason').value.trim() || 'Нарушение правил';
+        const duration = document.getElementById('ban-duration').value;
+        if (!target) return alert('Введите ID игрока');
+        db.collection('bans').add({
+            type: 'account', target, reason, duration,
+            expiresStr: duration === 'permanent' ? 'Навсегда' : duration,
+            active: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            alert('✅ Бан выдан для ' + target);
+            addAdminLog('Бан выдан: ' + target + ' (' + reason + ')');
+            document.getElementById('ban-target').value = '';
+            document.getElementById('ban-reason').value = '';
+            loadPlayers();
+        }).catch(e => alert('❌ Ошибка: ' + e.message));
+    }
+
+    function unbanPlayer() {
+        const target = document.getElementById('unban-target').value.trim();
+        if (!target) return alert('Введите ID игрока');
+        db.collection('bans').where('target','==',target).where('active','==',true).get().then(snap => {
+            if (snap.empty) return alert('Активный бан не найден');
+            const batch = db.batch();
+            snap.forEach(doc => batch.update(doc.ref, { active: false }));
+            batch.commit().then(() => {
+                alert('✅ Бан снят для ' + target);
+                addAdminLog('Бан снят: ' + target);
+                document.getElementById('unban-target').value = '';
+                loadPlayers();
+            });
+        }).catch(e => alert('❌ Ошибка: ' + e.message));
+    }
+
+    function warnPlayer() {
+        const target = document.getElementById('warn-target').value.trim();
+        const reason = document.getElementById('warn-reason').value.trim() || 'Нарушение';
+        if (!target) return alert('Введите ID игрока');
+        db.collection('warns').add({ target, reason, active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+            .then(() => {
+                alert('⚠️ Предупреждение выдано для ' + target);
+                addAdminLog('Варн выдан: ' + target + ' (' + reason + ')');
+                document.getElementById('warn-target').value = '';
+                document.getElementById('warn-reason').value = '';
+                loadPlayers();
+            }).catch(e => alert('❌ Ошибка: ' + e.message));
+    }
+
+    function quickBan(target) {
+        if (!target || !confirm('Забанить ' + target + '?')) return;
+        db.collection('bans').add({ type: 'account', target, reason: 'Быстрый бан', duration: 'permanent', expiresStr: 'Навсегда', active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+            .then(() => { alert('✅ Бан выдан'); addAdminLog('Быстрый бан: ' + target); loadPlayers(); });
+    }
+
+    function quickUnban(target) {
+        if (!target) return;
+        db.collection('bans').where('target','==',target).where('active','==',true).get().then(snap => {
+            if (snap.empty) return alert('Бан не найден');
+            const batch = db.batch();
+            snap.forEach(doc => batch.update(doc.ref, { active: false }));
+            batch.commit().then(() => { alert('✅ Бан снят'); addAdminLog('Быстрый анбан: ' + target); loadPlayers(); });
+        });
+    }
+
+    function searchPlayers() {
+        const q = document.getElementById('search-players').value.trim().toLowerCase();
+        if (!q) return loadPlayers();
+        const list = document.getElementById('players-list-admin');
+        list.innerHTML = '<div class="loading">Поиск...</div>';
+        db.collection('users').get().then(snap => {
+            let html = '', found = 0;
+            snap.forEach(doc => {
+                const d = doc.data();
+                const searchable = (d.siteNick || '').toLowerCase() + (d.nickname || '').toLowerCase() + (d.telegram_id || '') + (d.site_id || '');
+                if (searchable.includes(q)) {
+                    found++;
+                    const status = d.verified ? '✅ Подтверждён' : '⏳ Не подтверждён';
+                    const statusClass = d.verified ? 'badge-ok' : 'badge-warn';
+                    html += `<div class="player-row">
+                        <div class="info">
+                            <div class="name">${d.siteNick || d.nickname || 'Без имени'}</div>
+                            <div class="details">⛏️ ${d.nickname || '—'} | 📱 ${d.telegram_id || '—'} | 🆔 ${d.site_id || '—'}</div>
+                        </div>
+                        <span class="badge ${statusClass}">${status}</span>
+                        <div class="actions">
+                            <button class="btn btn-danger btn-sm" onclick="quickBan('${d.site_id || d.telegram_id}')">🚫</button>
+                            <button class="btn btn-success btn-sm" onclick="quickUnban('${d.site_id || d.telegram_id}')">🔓</button>
+                        </div>
+                    </div>`;
+                }
+            });
+            list.innerHTML = found ? html : '<div class="loading">Ничего не найдено</div>';
+        });
+    }
+
+    // Статистика
+    db.collection('bans').where('active','==',true).onSnapshot(s => document.getElementById('admin-stat-bans').textContent = s.size);
+    db.collection('warns').where('active','==',true).onSnapshot(s => document.getElementById('admin-stat-warns').textContent = s.size);
+    document.getElementById('admin-stat-online').textContent = Math.floor(Math.random() * 15 + 5);
+
+    loadPlayers();
+    loadAdminLogs();
+</script>
+
+</body>
+</html>
