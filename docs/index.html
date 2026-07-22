@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация на сервер</title>
+    <title>🎮 Регистрация на сервер</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -12,54 +13,188 @@
 </head>
 <body>
 
-    <div class="container" id="app">
-        <h1>🎮 Регистрация на сервере</h1>
-        <p class="subtitle">Заполните форму для регистрации</p>
+<!-- Частицы -->
+<div class="particles" id="particles"></div>
 
-        <!-- Форма регистрации -->
-        <form id="register-form">
-            <div class="form-group">
-                <label for="telegram-id">Telegram ID <span class="tooltip">❓</span></label>
-                <input type="text" id="telegram-id" placeholder="Например: 123456789" required>
-                <small class="hint">Для получения ID напишите боту <strong>!id</strong></small>
-            </div>
+<!-- RGB рамка экрана -->
+<div class="screen-border"></div>
 
-            <div class="form-group">
-                <label for="nickname">Ник на сервере</label>
-                <input type="text" id="nickname" placeholder="Ваш Minecraft ник" required>
-            </div>
-
-            <div class="form-group">
-                <label for="site-nick">Ник на сайте</label>
-                <input type="text" id="site-nick" placeholder="Как вас называть на сайте" required>
-            </div>
-
-            <div class="form-group">
-                <label for="site-id">ID на сайте (для друзей)</label>
-                <input type="text" id="site-id" placeholder="Придумайте ID" required>
-                <small class="hint">Уникальный идентификатор, чтобы друзья могли вас найти</small>
-            </div>
-
-            <button type="submit" id="register-btn">Зарегистрироваться</button>
-        </form>
-
-        <!-- Поле для кода -->
-        <div id="code-section" style="display: none;">
-            <h3>🔐 Введите код подтверждения</h3>
-            <p class="hint">Код отправлен в чат сервера</p>
-            <div class="form-group">
-                <input type="text" id="code-input" placeholder="Код из 5 цифр" maxlength="5">
-            </div>
-            <button id="verify-btn">Подтвердить</button>
-            <p id="code-status"></p>
+<!-- Оверлей бана по аккаунту -->
+<div id="ban-overlay" class="ban-overlay" style="display:none;">
+    <div class="ban-card">
+        <div class="ban-icon">🚫</div>
+        <h1 class="ban-title rgb-text">Ваш аккаунт заблокирован</h1>
+        <div class="ban-divider"></div>
+        <div class="ban-field">
+            <span class="ban-label">Причина</span>
+            <span class="ban-value" id="ban-reason-text">—</span>
         </div>
+        <div class="ban-field">
+            <span class="ban-label">Срок бана</span>
+            <span class="ban-value" id="ban-expires-text">—</span>
+        </div>
+        <div class="ban-field">
+            <span class="ban-label">Telegram ID</span>
+            <span class="ban-value" id="ban-tg-text">—</span>
+        </div>
+        <p class="ban-footer">Если считаете ошибкой — обратитесь к администратору</p>
+    </div>
+</div>
 
-        <!-- Сообщение о статусе -->
-        <div id="message"></div>
+<!-- Оверлей бана по IP -->
+<div id="ipban-overlay" class="ban-overlay ipban" style="display:none;">
+    <div class="ban-card">
+        <div class="ban-icon">🛡️</div>
+        <h1 class="ban-title rgb-text">Ваше IP заблокировано!</h1>
+        <div class="ban-divider"></div>
+        <div class="ban-field">
+            <span class="ban-label">Причина</span>
+            <span class="ban-value" id="ipban-reason-text">—</span>
+        </div>
+        <div class="ban-field">
+            <span class="ban-label">Срок блокировки</span>
+            <span class="ban-value" id="ipban-expires-text">—</span>
+        </div>
+        <div class="ban-field">
+            <span class="ban-label">Ваш IP</span>
+            <span class="ban-value" id="ipban-ip-text">—</span>
+        </div>
+        <p class="ban-footer">Доступ с данного IP-адреса ограничен</p>
+    </div>
+</div>
+
+<div class="container" id="app">
+    <!-- Заголовок -->
+    <div class="header-glow"></div>
+    <div class="logo-area">
+        <div class="logo-icon">⚡</div>
+        <h1 class="rgb-text">Регистрация на сервере</h1>
+        <p class="subtitle">Заполните форму для получения доступа</p>
+        <div class="badges">
+            <span class="badge">🔥 Онлайн</span>
+            <span class="badge">🛡️ Защищено</span>
+            <span class="badge">⚡ Быстро</span>
+        </div>
     </div>
 
-    <script src="firebase-config.js"></script>
-    <script src="script.js"></script>
+    <!-- Форма регистрации -->
+    <form id="register-form">
+        <div class="form-group">
+            <label for="telegram-id">
+                <span class="label-icon">📱</span>
+                Telegram ID
+                <span class="tooltip" title="Напишите боту !id для получения вашего ID">❓</span>
+            </label>
+            <div class="input-wrapper">
+                <input type="text" id="telegram-id" placeholder="Например: 123456789" required>
+                <div class="input-glow"></div>
+            </div>
+            <small class="hint">Для получения ID напишите боту <strong>!id</strong></small>
+        </div>
+
+        <div class="form-group">
+            <label for="nickname">
+                <span class="label-icon">⛏️</span>
+                Ник на сервере
+            </label>
+            <div class="input-wrapper">
+                <input type="text" id="nickname" placeholder="Ваш Minecraft ник" required>
+                <div class="input-glow"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="site-nick">
+                <span class="label-icon">👤</span>
+                Ник на сайте
+            </label>
+            <div class="input-wrapper">
+                <input type="text" id="site-nick" placeholder="Как вас называть на сайте" required>
+                <div class="input-glow"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="site-id">
+                <span class="label-icon">🆔</span>
+                ID на сайте (для друзей)
+            </label>
+            <div class="input-wrapper">
+                <input type="text" id="site-id" placeholder="Придумайте уникальный ID" required>
+                <div class="input-glow"></div>
+            </div>
+            <small class="hint">Уникальный идентификатор, чтобы друзья могли вас найти</small>
+        </div>
+
+        <button type="submit" id="register-btn" class="btn-primary">
+            <span class="btn-text">🚀 Зарегистрироваться</span>
+            <span class="btn-shimmer"></span>
+        </button>
+    </form>
+
+    <!-- Поле для кода — НЕ ТРОГАТЬ! -->
+    <div id="code-section" style="display: none;">
+        <div class="code-header">
+            <div class="code-icon">🔐</div>
+            <h3>Введите код подтверждения</h3>
+            <p class="hint">Код отправлен в чат сервера</p>
+        </div>
+        <div class="form-group">
+            <div class="input-wrapper">
+                <input type="text" id="code-input" placeholder="Код из 5 цифр" maxlength="5" style="text-align:center;letter-spacing:0.5em;font-size:1.4em;">
+                <div class="input-glow"></div>
+            </div>
+        </div>
+        <button id="verify-btn" class="btn-primary">
+            <span class="btn-text">✅ Подтвердить</span>
+            <span class="btn-shimmer"></span>
+        </button>
+        <p id="code-status"></p>
+    </div>
+
+    <!-- Сообщение о статусе -->
+    <div id="message"></div>
+
+    <!-- Кнопка в главное меню (появляется после успешной регистрации) -->
+    <div id="goto-main" style="display:none; margin-top:20px;">
+        <a href="main.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;">
+            <span class="btn-text">🎮 Перейти на сайт</span>
+            <span class="btn-shimmer"></span>
+        </a>
+    </div>
+</div>
+
+<!-- Версия -->
+<div class="version-label">v2.0 RGB Edition</div>
+
+<script src="firebase-config.js"></script>
+<script src="ban-check.js"></script>
+<script src="script.js"></script>
+<script>
+// Генерация частиц
+(function() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 60; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.animationDelay = Math.random() * 8 + 's';
+        p.style.animationDuration = (6 + Math.random() * 8) + 's';
+        p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
+        p.style.opacity = 0.3 + Math.random() * 0.5;
+        container.appendChild(p);
+    }
+
+    // После успешной регистрации показать кнопку "перейти на сайт"
+    // Патчим оригинальный script.js - ищем успешное сообщение и показываем кнопку
+    const origScript = setInterval(() => {
+        const msg = document.getElementById('message');
+        if (msg && msg.classList.contains('success') && msg.style.display !== 'none') {
+            document.getElementById('goto-main').style.display = 'block';
+        }
+    }, 500);
+})();
+</script>
 
 </body>
 </html>
