@@ -1,0 +1,79 @@
+<div class="admin-card">
+    <div class="card-title">⚙️ НАСТРОЙКИ БЕЗОПАСНОСТИ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Автозавершение сессии</label>
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--admin-border);">
+                <span style="color:var(--admin-text);">Неактивность более</span>
+                <select class="admin-select" style="width:auto;padding:4px 8px;">
+                    <option value="5">5 минут</option>
+                    <option value="10" selected>10 минут</option>
+                    <option value="30">30 минут</option>
+                    <option value="60">1 час</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Подтверждение критических изменений</label>
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--admin-border);">
+                <span style="color:var(--admin-text);">Смена IP сервера требует</span>
+                <span style="color:var(--admin-text-light);font-weight:600;">🔒 Мастер-пароль</span>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:16px;">
+        <button class="admin-btn gold" onclick="alert('Настройки безопасности сохранены')">💾 СОХРАНИТЬ НАСТРОЙКИ</button>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">📋 ЖУРНАЛ АВТОРИЗАЦИЙ</div>
+    <table class="admin-table">
+        <thead><tr><th>Время</th><th>Пользователь</th><th>IP</th><th>Браузер</th><th>Статус</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>22.07 15:32:21</td>
+                <td style="color:#1a6a1a;">Grif_Mo</td>
+                <td>194.85.210.107</td>
+                <td>Chrome 114</td>
+                <td style="color:#1a6a1a;">✅ Успешно</td>
+            </tr>
+            <tr>
+                <td>22.07 14:15:03</td>
+                <td style="color:#b8860b;">pley1657</td>
+                <td>192.168.1.100</td>
+                <td>Firefox 115</td>
+                <td style="color:#1a6a1a;">✅ Успешно</td>
+            </tr>
+            <tr>
+                <td>22.07 12:30:45</td>
+                <td style="color:#8b0000;">unknown</td>
+                <td>10.0.0.5</td>
+                <td>Edge 114</td>
+                <td style="color:#8b0000;">❌ Отклонён</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">🔒 СМЕНА МАСТЕР-ПАРОЛЯ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <input class="admin-input" type="password" placeholder="Текущий пароль">
+        <input class="admin-input" type="password" placeholder="Новый пароль">
+        <input class="admin-input" type="password" placeholder="Подтвердить пароль">
+    </div>
+    <div style="margin-top:12px;">
+        <button class="admin-btn gold" onclick="alert('Пароль успешно изменён')">🔒 СМЕНИТЬ ПАРОЛЬ</button>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">🔄 ОБНОВЛЕНИЯ СИСТЕМЫ</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <span style="color:var(--admin-text);">Доступно обновление безопасности</span>
+        <span style="color:#b8860b;font-weight:600;">⚠️ Версия 3.0.2</span>
+        <button class="admin-btn gold" onclick="alert('Обновление установлено')">⬆️ УСТАНОВИТЬ</button>
+        <span style="margin-left:auto;font-size:0.7em;color:var(--admin-text);opacity:0.3;">Последняя проверка: 22.07.2026 22:00</span>
+    </div>
+</div>
