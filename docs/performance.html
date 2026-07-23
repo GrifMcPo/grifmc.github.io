@@ -1,0 +1,74 @@
+<div class="stats-grid">
+    <div class="stat-block">
+        <div class="label">⚡ TPS (Тики/сек)</div>
+        <div class="value gold" id="tps-value">19.8</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">📊 MSPT (мс/тик)</div>
+        <div class="value" id="mspt-value">45</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">🧊 Тяжёлых чанков</div>
+        <div class="value danger">12</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">🎮 Активных игроков</div>
+        <div class="value success">27</div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">📊 ГРАФИК TPS (за последние 30 минут)</div>
+    <div class="chart-container" style="height:120px;">
+        ${[19,18,20,19,17,16,18,19,20,19,18,17,19,20,19,18,17,16,18,19,20,19,18,17,19,20,19,18,17,16].map((h,i) => `
+            <div class="chart-bar ${h<18?'danger':h>19.5?'active':''}" style="height:${h/20*100}%;">
+                <span class="label">${i%5===0?i+'м':''}</span>
+            </div>
+        `).join('')}
+    </div>
+    <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;margin-top:8px;">⚡ Зелёный — отлично, ⚠️ Жёлтый — средне, 🔴 Красный — критично</div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">🧊 ТОП ТЯЖЁЛЫХ ЧАНКОВ</div>
+    <table class="admin-table">
+        <thead><tr><th>Координаты</th><th>Мир</th><th>Нагрузка</th><th>Сущности</th><th>Действия</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>-456, 78</td>
+                <td>world</td>
+                <td style="color:#8b0000;">🔴 94%</td>
+                <td>1,247</td>
+                <td><button class="admin-btn admin-btn-sm" onclick="alert('Чанк анализируется')">🔍</button></td>
+            </tr>
+            <tr>
+                <td>234, -122</td>
+                <td>world_nether</td>
+                <td style="color:#b8860b;">🟡 78%</td>
+                <td>856</td>
+                <td><button class="admin-btn admin-btn-sm" onclick="alert('Чанк анализируется')">🔍</button></td>
+            </tr>
+            <tr>
+                <td>89, 345</td>
+                <td>world</td>
+                <td style="color:#b8860b;">🟡 65%</td>
+                <td>432</td>
+                <td><button class="admin-btn admin-btn-sm" onclick="alert('Чанк анализируется')">🔍</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">🌍 УПРАВЛЕНИЕ ВАРП-ТОЧКАМИ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;">
+        <input class="admin-input" placeholder="Название варпа" value="Spawn">
+        <input class="admin-input" placeholder="X" value="0">
+        <input class="admin-input" placeholder="Y" value="64">
+        <input class="admin-input" placeholder="Z" value="0">
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px;">
+        <button class="admin-btn gold" onclick="alert('Варп-точка сохранена')">💾 СОХРАНИТЬ</button>
+        <button class="admin-btn danger" onclick="alert('Варп-точка удалена')">🗑️ УДАЛИТЬ</button>
+    </div>
+</div>
