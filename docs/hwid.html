@@ -1,0 +1,89 @@
+<div class="hwid-section">
+    <div class="hwid-header">
+        <span class="hwid-icon">🛡️</span>
+        <h2>БЛОКИРОВКА HWID</h2>
+        <span class="hwid-sub">Аппаратная блокировка компьютера</span>
+    </div>
+
+    <div class="hwid-profile">
+        <div class="avatar">⛏️</div>
+        <div class="info">
+            <div class="name">pley1657</div>
+            <div class="uuid">UUID: 30a71527-9a29-3892-9391-14be43ce85d2</div>
+            <div class="hwid">HWID: 7F3A-9B2C-4D8E-1F5A-6B3C</div>
+        </div>
+    </div>
+
+    <div class="admin-card" style="margin-bottom:16px;">
+        <div class="card-title">🔍 Поиск игрока</div>
+        <input class="admin-input" placeholder="Введите ник для поиска..." id="hwid-search" oninput="searchHWID(this.value)">
+        <div id="hwid-results" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="admin-card">
+        <div class="card-title">⚙️ Параметры блокировки</div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div>
+                <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Причина</label>
+                <select class="admin-select" id="hwid-reason">
+                    <option value="chips">🎯 Использование читов</option>
+                    <option value="dupe">🔄 Использование дюпов</option>
+                    <option value="grief">🔨 Гриферство</option>
+                    <option value="ddos">💥 DDoS-атака</option>
+                    <option value="multihack">👥 Мультиаккаунтинг</option>
+                    <option value="other">❓ Другое</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Срок блокировки</label>
+                <select class="admin-select" id="hwid-duration">
+                    <option value="permanent">🔒 НАВСЕГДА</option>
+                    <option value="30d">📅 30 дней</option>
+                    <option value="90d">📅 90 дней</option>
+                    <option value="180d">📅 180 дней</option>
+                    <option value="365d">📅 365 дней</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Комментарий (виден только админам)</label>
+            <textarea class="admin-textarea" id="hwid-comment" rows="3" placeholder="Подробности блокировки..."></textarea>
+        </div>
+
+        <div class="hwid-warning">
+            ⚠️ Это действие необратимо! Игрок не сможет зайти даже с новым аккаунтом.
+        </div>
+
+        <div class="hwid-actions">
+            <button class="admin-btn danger" onclick="confirmHWIDBan()">🔒 ЗАБЛОКИРОВАТЬ HWID</button>
+            <button class="admin-btn" onclick="document.getElementById('hwid-comment').value=''">◻ ОЧИСТИТЬ</button>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="card-title">🔒 Заблокированные HWID</div>
+        <table class="admin-table">
+            <thead><tr><th>Игрок</th><th>HWID</th><th>Причина</th><th>Срок</th><th>Осталось</th><th>Действия</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>pley1657</td>
+                    <td style="font-family:monospace;font-size:0.8em;">7F3A-9B2C-4D8E-1F5A-6B3C</td>
+                    <td>Использование читов</td>
+                    <td style="color:#8b0000;">🔒 Навсегда</td>
+                    <td>♾️ Бессрочно</td>
+                    <td><button class="admin-btn admin-btn-sm danger" onclick="unbanHWID()">🔓 Снять</button></td>
+                </tr>
+                <tr>
+                    <td>test_hacker</td>
+                    <td style="font-family:monospace;font-size:0.8em;">1A2B-3C4D-5E6F-7G8H-9I0J</td>
+                    <td>DDoS-атака</td>
+                    <td style="color:#b8860b;">📅 30 дней</td>
+                    <td>12д 5ч</td>
+                    <td><button class="admin-btn admin-btn-sm danger" onclick="unbanHWID()">🔓 Снять</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
