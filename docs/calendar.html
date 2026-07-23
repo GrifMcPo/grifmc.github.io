@@ -1,0 +1,47 @@
+<div class="admin-card">
+    <div class="card-title">📅 КАЛЕНДАРЬ СОБЫТИЙ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Название события</label>
+            <input class="admin-input" id="event-name" placeholder="Турнир чемпионов">
+        </div>
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Дата и время (МСК)</label>
+            <input class="admin-input" type="datetime-local" id="event-time" value="2026-07-24T20:00">
+        </div>
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Тип</label>
+            <select class="admin-select" id="event-type">
+                <option value="tournament">🎯 Турнир</option>
+                <option value="wipe">🔄 Вайп</option>
+                <option value="holiday">🎉 Праздник</option>
+                <option value="maintenance">🔧 Техработы</option>
+            </select>
+        </div>
+    </div>
+    <div style="display:flex;gap:12px;">
+        <button class="admin-btn gold" onclick="addEvent()">➕ ДОБАВИТЬ СОБЫТИЕ</button>
+        <button class="admin-btn" onclick="document.getElementById('event-name').value=''">◻ ОЧИСТИТЬ</button>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">📋 БЛИЖАЙШИЕ СОБЫТИЯ</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="events-list">
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;border-left:3px solid #b8860b;">
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">24.07.2026 20:00</div>
+            <div style="font-weight:700;color:var(--admin-text-light);">🎯 Турнир чемпионов</div>
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.5;">⏳ 2д 4ч до начала</div>
+        </div>
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;border-left:3px solid #8b0000;">
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">01.08.2026 00:00</div>
+            <div style="font-weight:700;color:var(--admin-text-light);">🔄 Вайп мира</div>
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.5;">⚠️ Важно! Полный сброс</div>
+        </div>
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;border-left:3px solid #1a6a1a;">
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">15.08.2026 12:00</div>
+            <div style="font-weight:700;color:var(--admin-text-light);">🎉 День рождения сервера</div>
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.5;">🎊 Праздничные ивенты</div>
+        </div>
+    </div>
+</div>
