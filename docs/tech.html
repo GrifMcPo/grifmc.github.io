@@ -1,0 +1,71 @@
+<div class="admin-card">
+    <div class="card-title">🖥️ ВИРТУАЛЬНАЯ КОНСОЛЬ SSH</div>
+    <div style="background:#000;border:1px solid var(--admin-border);padding:16px;font-family:'Courier New',monospace;font-size:0.85em;color:#33ff33;min-height:200px;overflow-y:auto;" id="console-output">
+        <div>$ GRIFMC-SERVER:~ administrator$ <span style="color:#aaa;">Добро пожаловать в терминал управления</span></div>
+        <div style="color:#666;">$ uptime</div>
+        <div style="color:#aaa;"> 22:30:15 up 12 days, 4:32, 1 user, load average: 0.45, 0.32, 0.28</div>
+        <div style="color:#666;">$ free -h</div>
+        <div style="color:#aaa;">               total        used        free      shared  buff/cache   available</div>
+        <div style="color:#aaa;">Mem:           7.8G        4.2G        1.1G        256M        2.5G        3.0G</div>
+        <div style="color:#666;">$ <span id="console-cursor" style="background:#33ff33;display:inline-block;width:8px;height:16px;animation:blink 1s step-end infinite;"></span></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+        <input class="admin-input" id="console-input" placeholder="Введите команду..." style="flex:1;font-family:'Courier New',monospace;font-size:0.85em;" onkeydown="if(event.key==='Enter') executeCommand()">
+        <button class="admin-btn" onclick="executeCommand()">⏎ Выполнить</button>
+        <button class="admin-btn danger" onclick="document.getElementById('console-output').innerHTML=''">🗑️ Очистить</button>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div class="admin-card">
+        <div class="card-title">💾 ИНДИКАТОРЫ БЭКАПОВ</div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+            <span style="color:var(--admin-text);">📅 Последнее сохранение</span>
+            <span style="color:var(--admin-text-light);">22.07.2026 22:15:32</span>
+        </div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+            <span style="color:var(--admin-text);">💽 Объём хранилища</span>
+            <span style="color:var(--admin-text-light);">4.2 ГБ / 10 ГБ (42%)</span>
+        </div>
+        <div style="padding:8px 0;display:flex;justify-content:space-between;">
+            <span style="color:var(--admin-text);">📋 Количество бэкапов</span>
+            <span style="color:var(--admin-text-light);">8</span>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="admin-btn gold" onclick="alert('Создание бэкапа запущено')">💾 СОЗДАТЬ БЭКАП</button>
+            <button class="admin-btn" onclick="alert('Список бэкапов загружен')">📋 СПИСОК</button>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="card-title">🔌 МОНИТОРИНГ ПОРТОВ</div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+            <span style="color:var(--admin-text);">🌐 25565 (Minecraft)</span>
+            <span style="color:#1a6a1a;">🟢 Открыт</span>
+        </div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+            <span style="color:var(--admin-text);">🔌 25575 (RCON)</span>
+            <span style="color:#1a6a1a;">🟢 Открыт</span>
+        </div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--admin-border);display:flex;justify-content:space-between;">
+            <span style="color:var(--admin-text);">🌐 80 (HTTP)</span>
+            <span style="color:#1a6a1a;">🟢 Открыт</span>
+        </div>
+        <div style="padding:8px 0;display:flex;justify-content:space-between;">
+            <span style="color:var(--admin-text);">🔒 443 (HTTPS)</span>
+            <span style="color:#1a6a1a;">🟢 Открыт</span>
+        </div>
+        <div style="margin-top:12px;">
+            <button class="admin-btn" onclick="alert('Сканирование портов запущено')">🔄 ПРОВЕРИТЬ ВСЕ ПОРТЫ</button>
+        </div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">⚠️ МЯГКАЯ ПЕРЕЗАГРУЗКА ПЛАГИНОВ</div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <span style="color:var(--admin-text);font-size:0.9em;">Перезагрузить все плагины без остановки сервера?</span>
+        <button class="admin-btn danger" onclick="confirmSoftReload()" style="padding:12px 32px;">🔴 ПЕРЕЗАГРУЗИТЬ</button>
+        <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">⚠️ Требует двойного подтверждения</span>
+    </div>
+</div>
