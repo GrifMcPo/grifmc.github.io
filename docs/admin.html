@@ -4,39 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель • GRIFMC</title>
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="js/firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
 </head>
 <body class="admin-body">
 
-<!-- ===== ШЕСТЕРЁНКА (ВХОД) ===== -->
-<button class="admin-gear" id="admin-gear" title="Админ-панель">⚙️</button>
-
-<!-- ===== ОВЕРЛЕЙ ВХОДА ===== -->
-<div class="admin-login-overlay" id="admin-login">
-    <div class="admin-login-box">
-        <div class="icon">⚙️</div>
-        <h2>ДОСТУП ЗАПРЕЩЁН</h2>
-        <p class="sub">Введите мастер-пароль администратора</p>
-        <input type="password" id="admin-password" placeholder="Мастер-пароль">
-        <button class="login-btn" onclick="checkAdminPassword()">ВОЙТИ</button>
-        <div class="error" id="login-error"></div>
-    </div>
-</div>
-
 <!-- ===== САЙДБАР ===== -->
-<aside class="admin-sidebar" id="admin-sidebar" style="display:none;">
+<aside class="admin-sidebar" id="admin-sidebar">
     <div class="logo">GRIF<span>MC</span></div>
     <nav>
         <div class="nav-item active" data-page="dashboard">
             <span class="icon">📊</span> Терминал
         </div>
-        <div class="nav-item" data-page="content">
-            <span class="icon">🏗️</span> Конструктор
+        <div class="nav-item" data-page="bans">
+            <span class="icon">⚖️</span> Баны
         </div>
-        <div class="nav-item" data-page="analytics">
-            <span class="icon">📈</span> Аналитика
+        <div class="nav-item" data-page="hwid">
+            <span class="icon">🛡️</span> HWID-бан
         </div>
         <div class="nav-item" data-page="staff">
             <span class="icon">👥</span> Персонал
@@ -44,75 +31,403 @@
         <div class="nav-item" data-page="finance">
             <span class="icon">💰</span> Финансы
         </div>
-        <div class="nav-item" data-page="profile">
-            <span class="icon">👤</span> Досье
-        </div>
-        <div class="nav-item" data-page="calendar">
-            <span class="icon">📅</span> Календарь
-        </div>
-        <div class="nav-item" data-page="integrations">
-            <span class="icon">🔗</span> Интеграции
-        </div>
-        <div class="nav-item" data-page="tech">
-            <span class="icon">🖥️</span> Теххаб
-        </div>
-        <div class="nav-item" data-page="bans">
-            <span class="icon">⚖️</span> Наказания
-        </div>
         <div class="nav-item" data-page="reports">
             <span class="icon">📋</span> Жалобы
-            <span class="badge">3</span>
-        </div>
-        <div class="nav-item" data-page="announcements">
-            <span class="icon">📢</span> Анонсы
-        </div>
-        <div class="nav-item" data-page="performance">
-            <span class="icon">📊</span> Производительность
-        </div>
-        <div class="nav-item" data-page="knowledge">
-            <span class="icon">📚</span> База знаний
-        </div>
-        <div class="nav-item" data-page="hwid">
-            <span class="icon">🛡️</span> HWID-бан
-        </div>
-        <div class="nav-item" data-page="security">
-            <span class="icon">⚙️</span> Безопасность
         </div>
     </nav>
 </aside>
 
 <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
-<main class="admin-main" id="admin-main" style="display:none;">
+<main class="admin-main" id="admin-main">
     <div class="topbar">
         <div class="title" id="page-title">📊 ТЕРМИНАЛ УПРАВЛЕНИЯ</div>
-        <div class="user-info">👑 Администратор • <span class="gold">Владелец</span></div>
-    </div>
-
-    <!-- Строка экстренного оповещения -->
-    <div class="emergency-bar" id="emergency-bar" style="display:none;">
-        ⚠️ ЭКСТРЕННОЕ ОПОВЕЩЕНИЕ
-        <button class="emergency-close" onclick="document.getElementById('emergency-bar').style.display='none'">✕</button>
+        <div class="user-info">👑 Администратор • <span class="gold">Тестовый режим</span></div>
     </div>
 
     <!-- ===== КОНТЕЙНЕР ДЛЯ СТРАНИЦ ===== -->
     <div id="page-container">
-        <!-- Страницы загружаются через JS -->
         <div class="loading-terminal">ЗАГРУЗКА ТЕРМИНАЛА...</div>
     </div>
 </main>
 
-<script src="js/admin.js"></script>
 <script>
-    // Быстрый вход через шестерёнку
-    document.addEventListener('DOMContentLoaded', function() {
-        // Если уже залогинены — показать панель
-        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
-            document.getElementById('admin-gear').style.display = 'none';
-            document.getElementById('admin-sidebar').style.display = 'flex';
-            document.getElementById('admin-main').style.display = 'block';
-            loadPage('dashboard');
+    let currentPage = 'dashboard';
+
+    // ===== ЗАГРУЗКА СТРАНИЦ =====
+    function loadPage(page) {
+        currentPage = page;
+        const container = document.getElementById('page-container');
+        
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+
+        const titles = {
+            dashboard: '📊 ТЕРМИНАЛ УПРАВЛЕНИЯ',
+            bans: '⚖️ СИСТЕМА НАКАЗАНИЙ',
+            hwid: '🛡️ БЛОКИРОВКА HWID',
+            staff: '👥 УПРАВЛЕНИЕ ПЕРСОНАЛОМ',
+            finance: '💰 ФИНАНСЫ',
+            reports: '📋 ЖАЛОБЫ ИГРОКОВ'
+        };
+        document.getElementById('page-title').textContent = titles[page] || 'АДМИН-ПАНЕЛЬ';
+
+        container.innerHTML = '<div class="loading-terminal">ЗАГРУЗКА...</div>';
+
+        setTimeout(() => {
+            switch(page) {
+                case 'dashboard': renderDashboard(container); break;
+                case 'bans': renderBans(container); break;
+                case 'hwid': renderHWID(container); break;
+                case 'staff': renderStaff(container); break;
+                case 'finance': renderFinance(container); break;
+                case 'reports': renderReports(container); break;
+                default: renderDefault(container, page);
+            }
+        }, 300);
+    }
+
+    // ===== ДАШБОРД =====
+    function renderDashboard(container) {
+        container.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-block">
+                    <div class="label">👥 Онлайн</div>
+                    <div class="value gold">${Math.floor(Math.random()*30+5)}</div>
+                </div>
+                <div class="stat-block">
+                    <div class="label">📈 Пик за сутки</div>
+                    <div class="value">${Math.floor(Math.random()*50+20)}</div>
+                </div>
+                <div class="stat-block">
+                    <div class="label">🚫 Активных банов</div>
+                    <div class="value danger" id="ban-count">${Math.floor(Math.random()*10+2)}</div>
+                </div>
+                <div class="stat-block">
+                    <div class="label">💻 CPU</div>
+                    <div class="value">${Math.floor(Math.random()*40+10)}%</div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-title">📋 Последние события</div>
+                <table class="admin-table">
+                    <thead><tr><th>Время</th><th>Событие</th><th>Игрок</th></tr></thead>
+                    <tbody>
+                        <tr><td>${new Date().toLocaleTimeString()}</td><td>🚫 Бан</td><td>test_player</td></tr>
+                        <tr><td>${new Date(Date.now()-3600000).toLocaleTimeString()}</td><td>📝 Регистрация</td><td>new_user</td></tr>
+                        <tr><td>${new Date(Date.now()-7200000).toLocaleTimeString()}</td><td>🛡️ HWID-бан</td><td>hacker_1337</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // ===== БАНЫ =====
+    function renderBans(container) {
+        container.innerHTML = `
+            <div class="admin-card">
+                <div class="card-title">🚫 ВЫДАТЬ БАН</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+                    <div>
+                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Ник игрока</label>
+                        <input class="admin-input" placeholder="Введите ник..." id="ban-nick">
+                    </div>
+                    <div>
+                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Причина</label>
+                        <select class="admin-select" id="ban-reason">
+                            <option value="Читы">🎯 Читы</option>
+                            <option value="Оскорбления">💬 Оскорбления</option>
+                            <option value="Спам">📢 Спам</option>
+                            <option value="Гриферство">🔨 Гриферство</option>
+                            <option value="Дюпы">🔄 Дюпы</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Срок</label>
+                        <select class="admin-select" id="ban-duration">
+                            <option value="permanent">🔒 Навсегда</option>
+                            <option value="1d">📅 1 день</option>
+                            <option value="3d">📅 3 дня</option>
+                            <option value="7d">📅 7 дней</option>
+                            <option value="14d">📅 14 дней</option>
+                            <option value="30d">📅 30 дней</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top:16px;display:flex;gap:12px;">
+                    <button class="admin-btn danger" onclick="executeBan()">🚫 ВЫДАТЬ БАН</button>
+                    <button class="admin-btn" onclick="document.getElementById('ban-nick').value=''">◻ ОЧИСТИТЬ</button>
+                    <span style="margin-left:auto;font-size:0.7em;color:#1a6a1a;">⚡ Режим: ТЕСТОВЫЙ</span>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-title">🔓 СНЯТЬ БАН</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div>
+                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Ник игрока</label>
+                        <input class="admin-input" placeholder="Введите ник..." id="unban-nick">
+                    </div>
+                    <div style="display:flex;align-items:flex-end;">
+                        <button class="admin-btn success" onclick="executeUnban()" style="width:100%;">🔓 СНЯТЬ БАН</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-title">📋 АКТИВНЫЕ БАНЫ</div>
+                <table class="admin-table" id="bans-table">
+                    <thead><tr><th>Игрок</th><th>Причина</th><th>Срок</th><th>Дата выдачи</th><th>Статус</th></tr></thead>
+                    <tbody id="bans-tbody">
+                        <tr>
+                            <td>test_player</td>
+                            <td>Читы</td>
+                            <td>7 дней</td>
+                            <td>${new Date().toLocaleDateString()}</td>
+                            <td style="color:#8b0000;">🔒 Активен</td>
+                        </tr>
+                        <tr>
+                            <td>spammer_99</td>
+                            <td>Спам</td>
+                            <td>1 день</td>
+                            <td>${new Date(Date.now()-86400000).toLocaleDateString()}</td>
+                            <td style="color:#8b0000;">🔒 Активен</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // ===== HWID =====
+    function renderHWID(container) {
+        container.innerHTML = `
+            <div class="admin-card">
+                <div class="card-title">🛡️ БЛОКИРОВКА HWID</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                    <div>
+                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Ник игрока</label>
+                        <input class="admin-input" placeholder="Введите ник..." id="hwid-nick">
+                    </div>
+                    <div>
+                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Причина</label>
+                        <select class="admin-select" id="hwid-reason">
+                            <option value="Читы">🎯 Читы</option>
+                            <option value="Дюпы">🔄 Дюпы</option>
+                            <option value="DDoS">💥 DDoS-атака</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="hwid-warning">⚠️ Блокировка HWID — компьютер игрока будет заблокирован навсегда!</div>
+                <div style="margin-top:16px;display:flex;gap:12px;">
+                    <button class="admin-btn danger" onclick="executeHWIDBan()">🛡️ ЗАБЛОКИРОВАТЬ HWID</button>
+                    <button class="admin-btn" onclick="document.getElementById('hwid-nick').value=''">◻ ОЧИСТИТЬ</button>
+                </div>
+            </div>
+        `;
+    }
+
+    // ===== ПЕРСОНАЛ =====
+    function renderStaff(container) {
+        container.innerHTML = `
+            <div class="admin-card">
+                <div class="card-title">👥 УПРАВЛЕНИЕ ПЕРСОНАЛОМ</div>
+                <table class="admin-table">
+                    <thead><tr><th>Имя</th><th>Роль</th><th>Права</th><th>Статус</th></tr></thead>
+                    <tbody>
+                        <tr><td>Grif_Mo</td><td style="color:#b8860b;">👑 Владелец</td><td>Полный доступ</td><td style="color:#1a6a1a;">🟢 Онлайн</td></tr>
+                        <tr><td>pley1657</td><td style="color:#1a6a1a;">🛡️ Модератор</td><td>Баны, Муты</td><td style="color:#1a6a1a;">🟢 Онлайн</td></tr>
+                        <tr><td>helper_01</td><td style="color:#b8860b;">🤝 Хелпер</td><td>Только чат</td><td style="color:#8b0000;">🔴 Офлайн</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="admin-card">
+                <div class="card-title">➕ ДОБАВИТЬ СОТРУДНИКА</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+                    <input class="admin-input" placeholder="Telegram ID">
+                    <select class="admin-select"><option>Модератор</option><option>Хелпер</option></select>
+                    <button class="admin-btn gold">👥 ДОБАВИТЬ</button>
+                </div>
+            </div>
+        `;
+    }
+
+    // ===== ФИНАНСЫ =====
+    function renderFinance(container) {
+        container.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-block"><div class="label">💰 Баланс</div><div class="value gold">$1,247.50</div></div>
+                <div class="stat-block"><div class="label">📊 Транзакций</div><div class="value">156</div></div>
+                <div class="stat-block"><div class="label">📈 Прибыль</div><div class="value success">+12.4%</div></div>
+            </div>
+            <div class="admin-card">
+                <div class="card-title">📋 ТРАНЗАКЦИИ</div>
+                <table class="admin-table">
+                    <thead><tr><th>ID</th><th>Игрок</th><th>Сумма</th><th>Статус</th></tr></thead>
+                    <tbody>
+                        <tr><td>#1284</td><td>pley1657</td><td style="color:#1a6a1a;">$25.00</td><td style="color:#1a6a1a;">✅ Успешно</td></tr>
+                        <tr><td>#1283</td><td>test_user</td><td style="color:#1a6a1a;">$10.00</td><td style="color:#1a6a1a;">✅ Успешно</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // ===== ЖАЛОБЫ =====
+    function renderReports(container) {
+        container.innerHTML = `
+            <div class="admin-card">
+                <div class="card-title">📋 ВХОДЯЩИЕ ЖАЛОБЫ <span style="color:#8b0000;">● 3 новых</span></div>
+                <table class="admin-table">
+                    <thead><tr><th>ID</th><th>Игрок</th><th>Нарушитель</th><th>Причина</th><th>Статус</th></tr></thead>
+                    <tbody>
+                        <tr><td>#R-001</td><td>new_player</td><td>hacker_1337</td><td>Читы</td><td style="color:#0066cc;">🔵 Новая</td></tr>
+                        <tr><td>#R-002</td><td>pley1657</td><td>spammer_99</td><td>Спам</td><td style="color:#b8860b;">🟡 Изучается</td></tr>
+                        <tr><td>#R-003</td><td>test_user</td><td>griefer_01</td><td>Гриферство</td><td style="color:#0066cc;">🔵 Новая</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // ===== ФУНКЦИИ ДЛЯ БАНОВ =====
+    function executeBan() {
+        const nick = document.getElementById('ban-nick')?.value || 'test_player';
+        const reason = document.getElementById('ban-reason')?.value || 'Нарушение';
+        const duration = document.getElementById('ban-duration')?.value || 'permanent';
+        const durationText = duration === 'permanent' ? 'Навсегда' : duration;
+        
+        if (confirm(`⚠️ Выдать бан для ${nick}?\nПричина: ${reason}\nСрок: ${durationText}`)) {
+            showNotification(`✅ ${nick} забанен на ${durationText}`, 'success');
+            addAdminLog(`Бан: ${nick} (${reason})`);
+            
+            // Добавляем в таблицу
+            const tbody = document.getElementById('bans-tbody');
+            if (tbody) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${nick}</td>
+                    <td>${reason}</td>
+                    <td>${durationText}</td>
+                    <td>${new Date().toLocaleDateString()}</td>
+                    <td style="color:#8b0000;">🔒 Активен</td>
+                `;
+                tbody.prepend(row);
+            }
+            
+            if (document.getElementById('ban-nick')) {
+                document.getElementById('ban-nick').value = '';
+            }
         }
+    }
+
+    function executeUnban() {
+        const nick = document.getElementById('unban-nick')?.value;
+        if (!nick) {
+            alert('❌ Введите ник игрока');
+            return;
+        }
+        if (confirm(`🔓 Снять бан с ${nick}?`)) {
+            showNotification(`✅ Бан снят с ${nick}`, 'success');
+            addAdminLog(`Анбан: ${nick}`);
+            document.getElementById('unban-nick').value = '';
+        }
+    }
+
+    function executeHWIDBan() {
+        const nick = document.getElementById('hwid-nick')?.value || 'test_player';
+        const reason = document.getElementById('hwid-reason')?.value || 'Нарушение';
+        
+        if (confirm(`🛡️ Заблокировать HWID для ${nick}?\nПричина: ${reason}`)) {
+            showNotification(`✅ HWID ${nick} заблокирован!`, 'success');
+            addAdminLog(`HWID-бан: ${nick} (${reason})`);
+            document.getElementById('hwid-nick').value = '';
+        }
+    }
+
+    // ===== УВЕДОМЛЕНИЯ =====
+    function showNotification(message, type = 'info') {
+        const container = document.getElementById('admin-notifications') || createNotificationContainer();
+        const el = document.createElement('div');
+        el.className = `admin-notif ${type}`;
+        el.textContent = message;
+        el.style.cssText = `
+            background: var(--admin-card);
+            border: 1px solid ${type === 'success' ? '#1a6a1a' : type === 'danger' ? '#6b0000' : 'var(--admin-border)'};
+            color: var(--admin-text-light);
+            padding: 12px 20px;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            letter-spacing: 0.05em;
+            animation: slideIn 0.3s ease;
+        `;
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+    }
+
+    function createNotificationContainer() {
+        const container = document.createElement('div');
+        container.id = 'admin-notifications';
+        container.style.cssText = `
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 99999;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            pointer-events: none;
+        `;
+        document.body.appendChild(container);
+        return container;
+    }
+
+    function addAdminLog(action, ...details) {
+        console.log('[ADMIN LOG]', action, details.join(' | '));
+    }
+
+    function renderDefault(container, page) {
+        container.innerHTML = `<div class="admin-card"><div class="card-title">⚠️ СТРАНИЦА В РАЗРАБОТКЕ</div><div style="padding:30px;text-align:center;color:var(--admin-text);opacity:0.3;">${page}</div></div>`;
+    }
+
+    // ===== СТИЛИ ДЛЯ НОТИФИКАЦИЙ =====
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .admin-notif {
+            animation: slideIn 0.3s ease forwards;
+            pointer-events: all;
+            border-radius: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        .hwid-warning {
+            background: rgba(107,0,0,0.05);
+            border: 1px solid #6b0000;
+            padding: 12px 16px;
+            color: #8b0000;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ===== НАВИГАЦИЯ =====
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const page = this.dataset.page;
+                if (page) loadPage(page);
+            });
+        });
+        loadPage('dashboard');
     });
+
+    console.log('✅ Админ-панель загружена (ТЕСТОВЫЙ РЕЖИМ)');
 </script>
 
 </body>
