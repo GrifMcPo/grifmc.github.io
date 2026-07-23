@@ -1,0 +1,52 @@
+<div class="stats-grid">
+    <div class="stat-block">
+        <div class="label">💰 Баланс доната</div>
+        <div class="value gold">$1,247.50</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">📊 Транзакций за месяц</div>
+        <div class="value">156</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">📈 Прибыль за месяц</div>
+        <div class="value success">+12.4%</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">🎟️ Активных купонов</div>
+        <div class="value gold">8</div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">📋 ТРАНЗАКЦИИ</div>
+    <table class="admin-table">
+        <thead><tr><th>ID</th><th>Игрок</th><th>Сумма</th><th>Привилегия</th><th>Дата</th><th>Статус</th></tr></thead>
+        <tbody>
+            <tr><td>#1284</td><td>pley1657</td><td style="color:#1a6a1a;">$25.00</td><td>VIP</td><td>22.07.2026 15:30</td><td style="color:#1a6a1a;">✅ Успешно</td></tr>
+            <tr><td>#1283</td><td>test_user</td><td style="color:#1a6a1a;">$10.00</td><td>Премиум</td><td>22.07.2026 14:20</td><td style="color:#1a6a1a;">✅ Успешно</td></tr>
+            <tr><td>#1282</td><td>hacker_1337</td><td style="color:#8b0000;">$50.00</td><td>VIP+</td><td>22.07.2026 12:15</td><td style="color:#8b0000;">❌ Отменён</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">💳 РУЧНАЯ КОМПЕНСАЦИЯ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+        <input class="admin-input" placeholder="Ник игрока">
+        <input class="admin-input" placeholder="Сумма (USD)" type="number">
+        <input class="admin-input" placeholder="Причина компенсации">
+    </div>
+    <div style="margin-top:12px;">
+        <button class="admin-btn gold">💰 ВЫДАТЬ КОМПЕНСАЦИЮ</button>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">🎟️ СОЗДАТЬ КУПОН</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+        <input class="admin-input" placeholder="Код купона" value="GRIFMC2026">
+        <input class="admin-input" placeholder="Скидка %" type="number" value="20">
+        <input class="admin-input" placeholder="Дата истечения" value="31.08.2026">
+        <button class="admin-btn gold">🎟️ СОЗДАТЬ</button>
+    </div>
+</div>
