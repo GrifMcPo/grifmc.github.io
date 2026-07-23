@@ -1,0 +1,50 @@
+<div class="stats-grid">
+    <div class="stat-block">
+        <div class="label">👥 Онлайн сейчас</div>
+        <div class="value gold" id="online-now">${Math.floor(Math.random()*30+5)}</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">📈 Пик за сутки</div>
+        <div class="value" id="peak-today">${Math.floor(Math.random()*50+20)}</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">📊 Посещаемость (30 дн)</div>
+        <div class="value" id="visits-30d">${Math.floor(Math.random()*500+200)}</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">💻 Нагрузка CPU</div>
+        <div class="value" id="cpu-load">${Math.floor(Math.random()*40+10)}%</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">🧠 RAM использование</div>
+        <div class="value" id="ram-usage">${Math.floor(Math.random()*60+20)}%</div>
+    </div>
+    <div class="stat-block">
+        <div class="label">🌐 Сетевой трафик</div>
+        <div class="value" id="network-traffic">${Math.floor(Math.random()*100+50)} пак/с</div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">🌡️ Тепловая карта посещаемости (30 дней)</div>
+    <div class="chart-container" id="heatmap">
+        ${[40,25,15,30,70,95,60,45,55,85,65,35,20,50,75,90,45,60,80,55,30,70,85,40].map((h,i) => `
+            <div class="chart-bar ${h>70?'active':h<20?'danger':''}" style="height:${h}%;">
+                <span class="label">${['00','02','04','06','08','10','12','14','16','18','20','22'][i%12]||''}</span>
+            </div>
+        `).join('')}
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">📋 Последние события</div>
+    <table class="admin-table">
+        <thead><tr><th>Время</th><th>Событие</th><th>Игрок</th><th>Статус</th></tr></thead>
+        <tbody>
+            <tr><td>15:32:21</td><td>🚫 Бан</td><td>pley1657</td><td><span style="color:#1a6a1a;">Выполнено</span></td></tr>
+            <tr><td>14:15:03</td><td>📝 Регистрация</td><td>new_player</td><td><span style="color:#b8860b;">Ожидает</span></td></tr>
+            <tr><td>13:48:12</td><td>💬 Мут</td><td>spammer_99</td><td><span style="color:#1a6a1a;">Выполнено</span></td></tr>
+            <tr><td>12:30:45</td><td>🛡️ HWID-бан</td><td>hacker_1337</td><td><span style="color:#8b0000;">Заблокирован</span></td></tr>
+        </tbody>
+    </table>
+</div>
