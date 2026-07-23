@@ -18,4 +18,35 @@
             <select class="admin-select" id="announce-target">
                 <option value="all">🌍 Все игроки</option>
                 <option value="vip">⭐ VIP</option>
-                <option value="staff">
+                <option value="staff">👑 Персонал</option>
+                <option value="world">🌎 Конкретный мир</option>
+            </select>
+        </div>
+    </div>
+    <div style="display:flex;gap:12px;">
+        <button class="admin-btn gold" onclick="sendAnnouncement()">📢 ОТПРАВИТЬ АНОНС</button>
+        <button class="admin-btn" onclick="document.getElementById('announce-text').value=''">◻ ОЧИСТИТЬ</button>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">📋 ШАБЛОНЫ ФРАЗ</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;">
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;cursor:pointer;" onclick="document.getElementById('announce-text').value='Добро пожаловать на сервер! Используй /help для помощи.'">
+            <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">🎮 Приветствие</span>
+            <div style="font-size:0.85em;color:var(--admin-text-light);">/help для помощи</div>
+        </div>
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;cursor:pointer;" onclick="document.getElementById('announce-text').value='Внимание! Технические работы начнутся через 15 минут. Сохраните прогресс!'">
+            <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">🔧 Техработы</span>
+            <div style="font-size:0.85em;color:var(--admin-text-light);">Через 15 минут</div>
+        </div>
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;cursor:pointer;" onclick="document.getElementById('announce-text').value='Стартует турнир! Регистрация в Discord до 20:00.'">
+            <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">⚡ Ивент</span>
+            <div style="font-size:0.85em;color:var(--admin-text-light);">Регистрация до 20:00</div>
+        </div>
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;cursor:pointer;" onclick="document.getElementById('announce-text').value='Обновление античита выкачено! Пожалуйста, перезапустите лаунчер.'">
+            <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">🛡️ Безопасность</span>
+            <div style="font-size:0.85em;color:var(--admin-text-light);">Обновление античита</div>
+        </div>
+    </div>
+</div>
