@@ -4,431 +4,842 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель • GRIFMC</title>
-    <link rel="stylesheet" href="admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
-</head>
-<body class="admin-body">
+    <style>
+        /* ========================================
+           СТИЛИ АДМИН-ПАНЕЛИ (ВСЁ ВНУТРИ)
+           ======================================== */
 
-<!-- ===== САЙДБАР ===== -->
-<aside class="admin-sidebar" id="admin-sidebar">
-    <div class="logo">GRIF<span>MC</span></div>
-    <nav>
-        <div class="nav-item active" data-page="dashboard">
-            <span class="icon">📊</span> Терминал
-        </div>
-        <div class="nav-item" data-page="bans">
-            <span class="icon">⚖️</span> Баны
-        </div>
-        <div class="nav-item" data-page="hwid">
-            <span class="icon">🛡️</span> HWID-бан
-        </div>
-        <div class="nav-item" data-page="staff">
-            <span class="icon">👥</span> Персонал
-        </div>
-        <div class="nav-item" data-page="finance">
-            <span class="icon">💰</span> Финансы
-        </div>
-        <div class="nav-item" data-page="reports">
-            <span class="icon">📋</span> Жалобы
-        </div>
-    </nav>
-</aside>
-
-<!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
-<main class="admin-main" id="admin-main">
-    <div class="topbar">
-        <div class="title" id="page-title">📊 ТЕРМИНАЛ УПРАВЛЕНИЯ</div>
-        <div class="user-info">👑 Администратор • <span class="gold">Тестовый режим</span></div>
-    </div>
-
-    <!-- ===== КОНТЕЙНЕР ДЛЯ СТРАНИЦ ===== -->
-    <div id="page-container">
-        <div class="loading-terminal">ЗАГРУЗКА ТЕРМИНАЛА...</div>
-    </div>
-</main>
-
-<script>
-    let currentPage = 'dashboard';
-
-    // ===== ЗАГРУЗКА СТРАНИЦ =====
-    function loadPage(page) {
-        currentPage = page;
-        const container = document.getElementById('page-container');
-        
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
-
-        const titles = {
-            dashboard: '📊 ТЕРМИНАЛ УПРАВЛЕНИЯ',
-            bans: '⚖️ СИСТЕМА НАКАЗАНИЙ',
-            hwid: '🛡️ БЛОКИРОВКА HWID',
-            staff: '👥 УПРАВЛЕНИЕ ПЕРСОНАЛОМ',
-            finance: '💰 ФИНАНСЫ',
-            reports: '📋 ЖАЛОБЫ ИГРОКОВ'
-        };
-        document.getElementById('page-title').textContent = titles[page] || 'АДМИН-ПАНЕЛЬ';
-
-        container.innerHTML = '<div class="loading-terminal">ЗАГРУЗКА...</div>';
-
-        setTimeout(() => {
-            switch(page) {
-                case 'dashboard': renderDashboard(container); break;
-                case 'bans': renderBans(container); break;
-                case 'hwid': renderHWID(container); break;
-                case 'staff': renderStaff(container); break;
-                case 'finance': renderFinance(container); break;
-                case 'reports': renderReports(container); break;
-                default: renderDefault(container, page);
-            }
-        }, 300);
-    }
-
-    // ===== ДАШБОРД =====
-    function renderDashboard(container) {
-        container.innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-block">
-                    <div class="label">👥 Онлайн</div>
-                    <div class="value gold">${Math.floor(Math.random()*30+5)}</div>
-                </div>
-                <div class="stat-block">
-                    <div class="label">📈 Пик за сутки</div>
-                    <div class="value">${Math.floor(Math.random()*50+20)}</div>
-                </div>
-                <div class="stat-block">
-                    <div class="label">🚫 Активных банов</div>
-                    <div class="value danger" id="ban-count">${Math.floor(Math.random()*10+2)}</div>
-                </div>
-                <div class="stat-block">
-                    <div class="label">💻 CPU</div>
-                    <div class="value">${Math.floor(Math.random()*40+10)}%</div>
-                </div>
-            </div>
-
-            <div class="admin-card">
-                <div class="card-title">📋 Последние события</div>
-                <table class="admin-table">
-                    <thead><tr><th>Время</th><th>Событие</th><th>Игрок</th></tr></thead>
-                    <tbody>
-                        <tr><td>${new Date().toLocaleTimeString()}</td><td>🚫 Бан</td><td>test_player</td></tr>
-                        <tr><td>${new Date(Date.now()-3600000).toLocaleTimeString()}</td><td>📝 Регистрация</td><td>new_user</td></tr>
-                        <tr><td>${new Date(Date.now()-7200000).toLocaleTimeString()}</td><td>🛡️ HWID-бан</td><td>hacker_1337</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        `;
-    }
-
-    // ===== БАНЫ =====
-    function renderBans(container) {
-        container.innerHTML = `
-            <div class="admin-card">
-                <div class="card-title">🚫 ВЫДАТЬ БАН</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
-                    <div>
-                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Ник игрока</label>
-                        <input class="admin-input" placeholder="Введите ник..." id="ban-nick">
-                    </div>
-                    <div>
-                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Причина</label>
-                        <select class="admin-select" id="ban-reason">
-                            <option value="Читы">🎯 Читы</option>
-                            <option value="Оскорбления">💬 Оскорбления</option>
-                            <option value="Спам">📢 Спам</option>
-                            <option value="Гриферство">🔨 Гриферство</option>
-                            <option value="Дюпы">🔄 Дюпы</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Срок</label>
-                        <select class="admin-select" id="ban-duration">
-                            <option value="permanent">🔒 Навсегда</option>
-                            <option value="1d">📅 1 день</option>
-                            <option value="3d">📅 3 дня</option>
-                            <option value="7d">📅 7 дней</option>
-                            <option value="14d">📅 14 дней</option>
-                            <option value="30d">📅 30 дней</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="margin-top:16px;display:flex;gap:12px;">
-                    <button class="admin-btn danger" onclick="executeBan()">🚫 ВЫДАТЬ БАН</button>
-                    <button class="admin-btn" onclick="document.getElementById('ban-nick').value=''">◻ ОЧИСТИТЬ</button>
-                    <span style="margin-left:auto;font-size:0.7em;color:#1a6a1a;">⚡ Режим: ТЕСТОВЫЙ</span>
-                </div>
-            </div>
-
-            <div class="admin-card">
-                <div class="card-title">🔓 СНЯТЬ БАН</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                    <div>
-                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Ник игрока</label>
-                        <input class="admin-input" placeholder="Введите ник..." id="unban-nick">
-                    </div>
-                    <div style="display:flex;align-items:flex-end;">
-                        <button class="admin-btn success" onclick="executeUnban()" style="width:100%;">🔓 СНЯТЬ БАН</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="admin-card">
-                <div class="card-title">📋 АКТИВНЫЕ БАНЫ</div>
-                <table class="admin-table" id="bans-table">
-                    <thead><tr><th>Игрок</th><th>Причина</th><th>Срок</th><th>Дата выдачи</th><th>Статус</th></tr></thead>
-                    <tbody id="bans-tbody">
-                        <tr>
-                            <td>test_player</td>
-                            <td>Читы</td>
-                            <td>7 дней</td>
-                            <td>${new Date().toLocaleDateString()}</td>
-                            <td style="color:#8b0000;">🔒 Активен</td>
-                        </tr>
-                        <tr>
-                            <td>spammer_99</td>
-                            <td>Спам</td>
-                            <td>1 день</td>
-                            <td>${new Date(Date.now()-86400000).toLocaleDateString()}</td>
-                            <td style="color:#8b0000;">🔒 Активен</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        `;
-    }
-
-    // ===== HWID =====
-    function renderHWID(container) {
-        container.innerHTML = `
-            <div class="admin-card">
-                <div class="card-title">🛡️ БЛОКИРОВКА HWID</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-                    <div>
-                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Ник игрока</label>
-                        <input class="admin-input" placeholder="Введите ник..." id="hwid-nick">
-                    </div>
-                    <div>
-                        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Причина</label>
-                        <select class="admin-select" id="hwid-reason">
-                            <option value="Читы">🎯 Читы</option>
-                            <option value="Дюпы">🔄 Дюпы</option>
-                            <option value="DDoS">💥 DDoS-атака</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="hwid-warning">⚠️ Блокировка HWID — компьютер игрока будет заблокирован навсегда!</div>
-                <div style="margin-top:16px;display:flex;gap:12px;">
-                    <button class="admin-btn danger" onclick="executeHWIDBan()">🛡️ ЗАБЛОКИРОВАТЬ HWID</button>
-                    <button class="admin-btn" onclick="document.getElementById('hwid-nick').value=''">◻ ОЧИСТИТЬ</button>
-                </div>
-            </div>
-        `;
-    }
-
-    // ===== ПЕРСОНАЛ =====
-    function renderStaff(container) {
-        container.innerHTML = `
-            <div class="admin-card">
-                <div class="card-title">👥 УПРАВЛЕНИЕ ПЕРСОНАЛОМ</div>
-                <table class="admin-table">
-                    <thead><tr><th>Имя</th><th>Роль</th><th>Права</th><th>Статус</th></tr></thead>
-                    <tbody>
-                        <tr><td>Grif_Mo</td><td style="color:#b8860b;">👑 Владелец</td><td>Полный доступ</td><td style="color:#1a6a1a;">🟢 Онлайн</td></tr>
-                        <tr><td>pley1657</td><td style="color:#1a6a1a;">🛡️ Модератор</td><td>Баны, Муты</td><td style="color:#1a6a1a;">🟢 Онлайн</td></tr>
-                        <tr><td>helper_01</td><td style="color:#b8860b;">🤝 Хелпер</td><td>Только чат</td><td style="color:#8b0000;">🔴 Офлайн</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="admin-card">
-                <div class="card-title">➕ ДОБАВИТЬ СОТРУДНИКА</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
-                    <input class="admin-input" placeholder="Telegram ID">
-                    <select class="admin-select"><option>Модератор</option><option>Хелпер</option></select>
-                    <button class="admin-btn gold">👥 ДОБАВИТЬ</button>
-                </div>
-            </div>
-        `;
-    }
-
-    // ===== ФИНАНСЫ =====
-    function renderFinance(container) {
-        container.innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-block"><div class="label">💰 Баланс</div><div class="value gold">$1,247.50</div></div>
-                <div class="stat-block"><div class="label">📊 Транзакций</div><div class="value">156</div></div>
-                <div class="stat-block"><div class="label">📈 Прибыль</div><div class="value success">+12.4%</div></div>
-            </div>
-            <div class="admin-card">
-                <div class="card-title">📋 ТРАНЗАКЦИИ</div>
-                <table class="admin-table">
-                    <thead><tr><th>ID</th><th>Игрок</th><th>Сумма</th><th>Статус</th></tr></thead>
-                    <tbody>
-                        <tr><td>#1284</td><td>pley1657</td><td style="color:#1a6a1a;">$25.00</td><td style="color:#1a6a1a;">✅ Успешно</td></tr>
-                        <tr><td>#1283</td><td>test_user</td><td style="color:#1a6a1a;">$10.00</td><td style="color:#1a6a1a;">✅ Успешно</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        `;
-    }
-
-    // ===== ЖАЛОБЫ =====
-    function renderReports(container) {
-        container.innerHTML = `
-            <div class="admin-card">
-                <div class="card-title">📋 ВХОДЯЩИЕ ЖАЛОБЫ <span style="color:#8b0000;">● 3 новых</span></div>
-                <table class="admin-table">
-                    <thead><tr><th>ID</th><th>Игрок</th><th>Нарушитель</th><th>Причина</th><th>Статус</th></tr></thead>
-                    <tbody>
-                        <tr><td>#R-001</td><td>new_player</td><td>hacker_1337</td><td>Читы</td><td style="color:#0066cc;">🔵 Новая</td></tr>
-                        <tr><td>#R-002</td><td>pley1657</td><td>spammer_99</td><td>Спам</td><td style="color:#b8860b;">🟡 Изучается</td></tr>
-                        <tr><td>#R-003</td><td>test_user</td><td>griefer_01</td><td>Гриферство</td><td style="color:#0066cc;">🔵 Новая</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        `;
-    }
-
-    // ===== ФУНКЦИИ ДЛЯ БАНОВ =====
-    function executeBan() {
-        const nick = document.getElementById('ban-nick')?.value || 'test_player';
-        const reason = document.getElementById('ban-reason')?.value || 'Нарушение';
-        const duration = document.getElementById('ban-duration')?.value || 'permanent';
-        const durationText = duration === 'permanent' ? 'Навсегда' : duration;
-        
-        if (confirm(`⚠️ Выдать бан для ${nick}?\nПричина: ${reason}\nСрок: ${durationText}`)) {
-            showNotification(`✅ ${nick} забанен на ${durationText}`, 'success');
-            addAdminLog(`Бан: ${nick} (${reason})`);
-            
-            // Добавляем в таблицу
-            const tbody = document.getElementById('bans-tbody');
-            if (tbody) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${nick}</td>
-                    <td>${reason}</td>
-                    <td>${durationText}</td>
-                    <td>${new Date().toLocaleDateString()}</td>
-                    <td style="color:#8b0000;">🔒 Активен</td>
-                `;
-                tbody.prepend(row);
-            }
-            
-            if (document.getElementById('ban-nick')) {
-                document.getElementById('ban-nick').value = '';
-            }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    }
 
-    function executeUnban() {
-        const nick = document.getElementById('unban-nick')?.value;
-        if (!nick) {
-            alert('❌ Введите ник игрока');
-            return;
+        :root {
+            --admin-bg: #0a0a14;
+            --admin-card: #111122;
+            --admin-border: #1a1a30;
+            --admin-text: #8888aa;
+            --admin-text-light: #c8c8e0;
+            --admin-gold: #b8860b;
+            --admin-danger: #8b0000;
+            --admin-success: #1a6a1a;
         }
-        if (confirm(`🔓 Снять бан с ${nick}?`)) {
-            showNotification(`✅ Бан снят с ${nick}`, 'success');
-            addAdminLog(`Анбан: ${nick}`);
-            document.getElementById('unban-nick').value = '';
+
+        .admin-body {
+            font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+            background: var(--admin-bg);
+            color: var(--admin-text);
+            min-height: 100vh;
+            display: flex;
         }
-    }
 
-    function executeHWIDBan() {
-        const nick = document.getElementById('hwid-nick')?.value || 'test_player';
-        const reason = document.getElementById('hwid-reason')?.value || 'Нарушение';
-        
-        if (confirm(`🛡️ Заблокировать HWID для ${nick}?\nПричина: ${reason}`)) {
-            showNotification(`✅ HWID ${nick} заблокирован!`, 'success');
-            addAdminLog(`HWID-бан: ${nick} (${reason})`);
-            document.getElementById('hwid-nick').value = '';
-        }
-    }
-
-    // ===== УВЕДОМЛЕНИЯ =====
-    function showNotification(message, type = 'info') {
-        const container = document.getElementById('admin-notifications') || createNotificationContainer();
-        const el = document.createElement('div');
-        el.className = `admin-notif ${type}`;
-        el.textContent = message;
-        el.style.cssText = `
-            background: var(--admin-card);
-            border: 1px solid ${type === 'success' ? '#1a6a1a' : type === 'danger' ? '#6b0000' : 'var(--admin-border)'};
-            color: var(--admin-text-light);
-            padding: 12px 20px;
-            margin-bottom: 8px;
-            font-size: 0.85em;
-            letter-spacing: 0.05em;
-            animation: slideIn 0.3s ease;
-        `;
-        container.appendChild(el);
-        setTimeout(() => el.remove(), 4000);
-    }
-
-    function createNotificationContainer() {
-        const container = document.createElement('div');
-        container.id = 'admin-notifications';
-        container.style.cssText = `
+        /* ===== САЙДБАР ===== */
+        .admin-sidebar {
             position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 99999;
-            max-width: 340px;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 220px;
+            background: var(--admin-card);
+            border-right: 1px solid var(--admin-border);
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            pointer-events: none;
-        `;
-        document.body.appendChild(container);
-        return container;
-    }
-
-    function addAdminLog(action, ...details) {
-        console.log('[ADMIN LOG]', action, details.join(' | '));
-    }
-
-    function renderDefault(container, page) {
-        container.innerHTML = `<div class="admin-card"><div class="card-title">⚠️ СТРАНИЦА В РАЗРАБОТКЕ</div><div style="padding:30px;text-align:center;color:var(--admin-text);opacity:0.3;">${page}</div></div>`;
-    }
-
-    // ===== СТИЛИ ДЛЯ НОТИФИКАЦИЙ =====
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
+            padding: 20px 0;
+            z-index: 100;
+            overflow-y: auto;
         }
+
+        .admin-sidebar::-webkit-scrollbar {
+            width: 3px;
+        }
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: var(--admin-border);
+        }
+
+        .admin-sidebar .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1em;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            color: var(--admin-text-light);
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--admin-border);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .admin-sidebar .logo span {
+            color: var(--admin-gold);
+        }
+
+        .admin-sidebar .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            color: var(--admin-text);
+            text-decoration: none;
+            font-size: 0.82em;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-left: 2px solid transparent;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .admin-sidebar .nav-item:hover {
+            color: var(--admin-text-light);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .admin-sidebar .nav-item.active {
+            color: var(--admin-gold);
+            border-left-color: var(--admin-gold);
+            background: rgba(184, 134, 11, 0.04);
+        }
+
+        .admin-sidebar .nav-item .icon {
+            font-size: 1em;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+        .admin-main {
+            margin-left: 220px;
+            flex: 1;
+            padding: 24px 32px;
+            min-height: 100vh;
+        }
+
+        .admin-main .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--admin-border);
+            margin-bottom: 24px;
+        }
+
+        .admin-main .topbar .title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1em;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--admin-text-light);
+            text-transform: uppercase;
+        }
+
+        .admin-main .topbar .user-info {
+            font-size: 0.85em;
+            color: var(--admin-text);
+        }
+
+        .admin-main .topbar .user-info .gold {
+            color: var(--admin-gold);
+        }
+
+        /* ===== КАРТОЧКИ ===== */
+        .admin-card {
+            background: var(--admin-card);
+            border: 1px solid var(--admin-border);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            border-radius: 0;
+        }
+
+        .admin-card .card-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--admin-text);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* ===== СТАТИСТИКА ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-block {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--admin-border);
+            padding: 16px 20px;
+        }
+
+        .stat-block .label {
+            font-size: 0.65em;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--admin-text);
+            opacity: 0.4;
+        }
+
+        .stat-block .value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--admin-text-light);
+            margin-top: 4px;
+        }
+
+        .stat-block .value.gold {
+            color: var(--admin-gold);
+        }
+        .stat-block .value.danger {
+            color: var(--admin-danger);
+        }
+        .stat-block .value.success {
+            color: var(--admin-success);
+        }
+
+        /* ===== ТАБЛИЦЫ ===== */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82em;
+        }
+
+        .admin-table th {
+            text-align: left;
+            padding: 10px 12px;
+            color: var(--admin-text);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 0.65em;
+            border-bottom: 1px solid var(--admin-border);
+            opacity: 0.5;
+        }
+
+        .admin-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: var(--admin-text-light);
+        }
+
+        .admin-table tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        /* ===== ФОРМЫ ===== */
+        .admin-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--admin-border);
+            color: var(--admin-text-light);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9em;
+            transition: border-color 0.3s;
+            border-radius: 0;
+        }
+
+        .admin-input:focus {
+            outline: none;
+            border-color: var(--admin-gold);
+        }
+
+        .admin-select {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--admin-border);
+            color: var(--admin-text-light);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9em;
+            width: 100%;
+            appearance: none;
+            border-radius: 0;
+        }
+
+        .admin-select:focus {
+            outline: none;
+            border-color: var(--admin-gold);
+        }
+
+        .admin-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--admin-border);
+            color: var(--admin-text-light);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9em;
+            min-height: 80px;
+            resize: vertical;
+            transition: border-color 0.3s;
+            border-radius: 0;
+        }
+
+        .admin-textarea:focus {
+            outline: none;
+            border-color: var(--admin-gold);
+        }
+
+        /* ===== КНОПКИ ===== */
+        .admin-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--admin-border);
+            color: var(--admin-text);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .admin-btn:hover {
+            border-color: var(--admin-gold);
+            color: var(--admin-gold);
+        }
+
+        .admin-btn.danger {
+            border-color: var(--admin-danger);
+            color: var(--admin-danger);
+        }
+
+        .admin-btn.danger:hover {
+            background: rgba(139, 0, 0, 0.05);
+        }
+
+        .admin-btn.success {
+            border-color: var(--admin-success);
+            color: var(--admin-success);
+        }
+
+        .admin-btn.success:hover {
+            background: rgba(26, 106, 26, 0.05);
+        }
+
+        .admin-btn.gold {
+            border-color: var(--admin-gold);
+            color: var(--admin-gold);
+        }
+
+        .admin-btn.gold:hover {
+            background: rgba(184, 134, 11, 0.05);
+        }
+
+        .admin-btn-sm {
+            padding: 6px 14px;
+            font-size: 0.7em;
+        }
+
+        /* ===== ГРАФИКИ ===== */
+        .chart-container {
+            height: 140px;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding: 16px 0;
+        }
+
+        .chart-bar {
+            flex: 1;
+            min-height: 8px;
+            background: var(--admin-border);
+            transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .chart-bar.active {
+            background: var(--admin-gold);
+        }
+        .chart-bar.danger {
+            background: var(--admin-danger);
+        }
+
+        .chart-bar .label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5em;
+            color: var(--admin-text);
+            opacity: 0.3;
+            white-space: nowrap;
+        }
+
+        /* ===== HWID ===== */
+        .hwid-warning {
+            background: rgba(139, 0, 0, 0.05);
+            border: 1px solid var(--admin-danger);
+            padding: 12px 16px;
+            color: var(--admin-danger);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 12px;
+        }
+
+        /* ===== ЗАГРУЗКА ===== */
+        .loading-terminal {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--admin-text);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9em;
+            letter-spacing: 0.15em;
+            opacity: 0.3;
+        }
+
+        /* ===== УВЕДОМЛЕНИЯ ===== */
         .admin-notif {
             animation: slideIn 0.3s ease forwards;
             pointer-events: all;
             border-radius: 0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
-        .hwid-warning {
-            background: rgba(107,0,0,0.05);
-            border: 1px solid #6b0000;
-            padding: 12px 16px;
-            color: #8b0000;
-            font-size: 0.8em;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-    `;
-    document.head.appendChild(style);
 
-    // ===== НАВИГАЦИЯ =====
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const page = this.dataset.page;
-                if (page) loadPage(page);
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 260px;
+            }
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+            .admin-main {
+                margin-left: 0;
+                padding: 16px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+
+    <!-- ===== САЙДБАР ===== -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="logo">GRIF<span>MC</span></div>
+        <nav>
+            <div class="nav-item active" data-page="dashboard">
+                <span class="icon">📊</span> Терминал
+            </div>
+            <div class="nav-item" data-page="bans">
+                <span class="icon">⚖️</span> Баны
+            </div>
+            <div class="nav-item" data-page="hwid">
+                <span class="icon">🛡️</span> HWID-бан
+            </div>
+            <div class="nav-item" data-page="staff">
+                <span class="icon">👥</span> Персонал
+            </div>
+            <div class="nav-item" data-page="finance">
+                <span class="icon">💰</span> Финансы
+            </div>
+            <div class="nav-item" data-page="reports">
+                <span class="icon">📋</span> Жалобы
+            </div>
+        </nav>
+    </aside>
+
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+    <main class="admin-main" id="admin-main">
+        <div class="topbar">
+            <div class="title" id="page-title">📊 ТЕРМИНАЛ УПРАВЛЕНИЯ</div>
+            <div class="user-info">👑 Администратор • <span class="gold">Тестовый режим</span></div>
+        </div>
+
+        <!-- ===== КОНТЕЙНЕР ДЛЯ СТРАНИЦ ===== -->
+        <div id="page-container">
+            <div class="loading-terminal">ЗАГРУЗКА ТЕРМИНАЛА...</div>
+        </div>
+    </main>
+
+    <script>
+        let currentPage = 'dashboard';
+
+        // ===== ЗАГРУЗКА СТРАНИЦ =====
+        function loadPage(page) {
+            currentPage = page;
+            const container = document.getElementById('page-container');
+
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+
+            const titles = {
+                dashboard: '📊 ТЕРМИНАЛ УПРАВЛЕНИЯ',
+                bans: '⚖️ СИСТЕМА НАКАЗАНИЙ',
+                hwid: '🛡️ БЛОКИРОВКА HWID',
+                staff: '👥 УПРАВЛЕНИЕ ПЕРСОНАЛОМ',
+                finance: '💰 ФИНАНСЫ',
+                reports: '📋 ЖАЛОБЫ ИГРОКОВ'
+            };
+            document.getElementById('page-title').textContent = titles[page] || 'АДМИН-ПАНЕЛЬ';
+
+            container.innerHTML = '<div class="loading-terminal">ЗАГРУЗКА...</div>';
+
+            setTimeout(() => {
+                switch (page) {
+                    case 'dashboard':
+                        renderDashboard(container);
+                        break;
+                    case 'bans':
+                        renderBans(container);
+                        break;
+                    case 'hwid':
+                        renderHWID(container);
+                        break;
+                    case 'staff':
+                        renderStaff(container);
+                        break;
+                    case 'finance':
+                        renderFinance(container);
+                        break;
+                    case 'reports':
+                        renderReports(container);
+                        break;
+                    default:
+                        renderDefault(container, page);
+                }
+            }, 300);
+        }
+
+        // ===== ДАШБОРД =====
+        function renderDashboard(container) {
+            container.innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-block">
+                            <div class="label">👥 Онлайн</div>
+                            <div class="value gold">${Math.floor(Math.random()*30+5)}</div>
+                        </div>
+                        <div class="stat-block">
+                            <div class="label">📈 Пик за сутки</div>
+                            <div class="value">${Math.floor(Math.random()*50+20)}</div>
+                        </div>
+                        <div class="stat-block">
+                            <div class="label">🚫 Активных банов</div>
+                            <div class="value danger" id="ban-count">${Math.floor(Math.random()*10+2)}</div>
+                        </div>
+                        <div class="stat-block">
+                            <div class="label">💻 CPU</div>
+                            <div class="value">${Math.floor(Math.random()*40+10)}%</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="card-title">📋 Последние события</div>
+                        <table class="admin-table">
+                            <thead><tr><th>Время</th><th>Событие</th><th>Игрок</th></tr></thead>
+                            <tbody>
+                                <tr><td>${new Date().toLocaleTimeString()}</td><td>🚫 Бан</td><td>test_player</td></tr>
+                                <tr><td>${new Date(Date.now()-3600000).toLocaleTimeString()}</td><td>📝 Регистрация</td><td>new_user</td></tr>
+                                <tr><td>${new Date(Date.now()-7200000).toLocaleTimeString()}</td><td>🛡️ HWID-бан</td><td>hacker_1337</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+        }
+
+        // ===== БАНЫ =====
+        function renderBans(container) {
+            container.innerHTML = `
+                    <div class="admin-card">
+                        <div class="card-title">🚫 ВЫДАТЬ БАН</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+                            <div>
+                                <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Ник игрока</label>
+                                <input class="admin-input" placeholder="Введите ник..." id="ban-nick">
+                            </div>
+                            <div>
+                                <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Причина</label>
+                                <select class="admin-select" id="ban-reason">
+                                    <option value="Читы">🎯 Читы</option>
+                                    <option value="Оскорбления">💬 Оскорбления</option>
+                                    <option value="Спам">📢 Спам</option>
+                                    <option value="Гриферство">🔨 Гриферство</option>
+                                    <option value="Дюпы">🔄 Дюпы</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Срок</label>
+                                <select class="admin-select" id="ban-duration">
+                                    <option value="permanent">🔒 Навсегда</option>
+                                    <option value="1d">📅 1 день</option>
+                                    <option value="3d">📅 3 дня</option>
+                                    <option value="7d">📅 7 дней</option>
+                                    <option value="14d">📅 14 дней</option>
+                                    <option value="30d">📅 30 дней</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top:16px;display:flex;gap:12px;">
+                            <button class="admin-btn danger" onclick="executeBan()">🚫 ВЫДАТЬ БАН</button>
+                            <button class="admin-btn" onclick="document.getElementById('ban-nick').value=''">◻ ОЧИСТИТЬ</button>
+                            <span style="margin-left:auto;font-size:0.7em;color:#1a6a1a;">⚡ Режим: ТЕСТОВЫЙ</span>
+                        </div>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="card-title">🔓 СНЯТЬ БАН</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div>
+                                <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Ник игрока</label>
+                                <input class="admin-input" placeholder="Введите ник..." id="unban-nick">
+                            </div>
+                            <div style="display:flex;align-items:flex-end;">
+                                <button class="admin-btn success" onclick="executeUnban()" style="width:100%;">🔓 СНЯТЬ БАН</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="card-title">📋 АКТИВНЫЕ БАНЫ</div>
+                        <table class="admin-table" id="bans-table">
+                            <thead><tr><th>Игрок</th><th>Причина</th><th>Срок</th><th>Дата выдачи</th><th>Статус</th></tr></thead>
+                            <tbody id="bans-tbody">
+                                <tr>
+                                    <td>test_player</td>
+                                    <td>Читы</td>
+                                    <td>7 дней</td>
+                                    <td>${new Date().toLocaleDateString()}</td>
+                                    <td style="color:#8b0000;">🔒 Активен</td>
+                                </tr>
+                                <tr>
+                                    <td>spammer_99</td>
+                                    <td>Спам</td>
+                                    <td>1 день</td>
+                                    <td>${new Date(Date.now()-86400000).toLocaleDateString()}</td>
+                                    <td style="color:#8b0000;">🔒 Активен</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+        }
+
+        // ===== HWID =====
+        function renderHWID(container) {
+            container.innerHTML = `
+                    <div class="admin-card">
+                        <div class="card-title">🛡️ БЛОКИРОВКА HWID</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                            <div>
+                                <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Ник игрока</label>
+                                <input class="admin-input" placeholder="Введите ник..." id="hwid-nick">
+                            </div>
+                            <div>
+                                <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Причина</label>
+                                <select class="admin-select" id="hwid-reason">
+                                    <option value="Читы">🎯 Читы</option>
+                                    <option value="Дюпы">🔄 Дюпы</option>
+                                    <option value="DDoS">💥 DDoS-атака</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hwid-warning">⚠️ Блокировка HWID — компьютер игрока будет заблокирован навсегда!</div>
+                        <div style="margin-top:16px;display:flex;gap:12px;">
+                            <button class="admin-btn danger" onclick="executeHWIDBan()">🛡️ ЗАБЛОКИРОВАТЬ HWID</button>
+                            <button class="admin-btn" onclick="document.getElementById('hwid-nick').value=''">◻ ОЧИСТИТЬ</button>
+                        </div>
+                    </div>
+                `;
+        }
+
+        // ===== ПЕРСОНАЛ =====
+        function renderStaff(container) {
+            container.innerHTML = `
+                    <div class="admin-card">
+                        <div class="card-title">👥 УПРАВЛЕНИЕ ПЕРСОНАЛОМ</div>
+                        <table class="admin-table">
+                            <thead><tr><th>Имя</th><th>Роль</th><th>Права</th><th>Статус</th></tr></thead>
+                            <tbody>
+                                <tr><td>Grif_Mo</td><td style="color:#b8860b;">👑 Владелец</td><td>Полный доступ</td><td style="color:#1a6a1a;">🟢 Онлайн</td></tr>
+                                <tr><td>pley1657</td><td style="color:#1a6a1a;">🛡️ Модератор</td><td>Баны, Муты</td><td style="color:#1a6a1a;">🟢 Онлайн</td></tr>
+                                <tr><td>helper_01</td><td style="color:#b8860b;">🤝 Хелпер</td><td>Только чат</td><td style="color:#8b0000;">🔴 Офлайн</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-title">➕ ДОБАВИТЬ СОТРУДНИКА</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+                            <input class="admin-input" placeholder="Telegram ID">
+                            <select class="admin-select"><option>Модератор</option><option>Хелпер</option></select>
+                            <button class="admin-btn gold">👥 ДОБАВИТЬ</button>
+                        </div>
+                    </div>
+                `;
+        }
+
+        // ===== ФИНАНСЫ =====
+        function renderFinance(container) {
+            container.innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-block"><div class="label">💰 Баланс</div><div class="value gold">$1,247.50</div></div>
+                        <div class="stat-block"><div class="label">📊 Транзакций</div><div class="value">156</div></div>
+                        <div class="stat-block"><div class="label">📈 Прибыль</div><div class="value success">+12.4%</div></div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-title">📋 ТРАНЗАКЦИИ</div>
+                        <table class="admin-table">
+                            <thead><tr><th>ID</th><th>Игрок</th><th>Сумма</th><th>Статус</th></tr></thead>
+                            <tbody>
+                                <tr><td>#1284</td><td>pley1657</td><td style="color:#1a6a1a;">$25.00</td><td style="color:#1a6a1a;">✅ Успешно</td></tr>
+                                <tr><td>#1283</td><td>test_user</td><td style="color:#1a6a1a;">$10.00</td><td style="color:#1a6a1a;">✅ Успешно</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+        }
+
+        // ===== ЖАЛОБЫ =====
+        function renderReports(container) {
+            container.innerHTML = `
+                    <div class="admin-card">
+                        <div class="card-title">📋 ВХОДЯЩИЕ ЖАЛОБЫ <span style="color:#8b0000;">● 3 новых</span></div>
+                        <table class="admin-table">
+                            <thead><tr><th>ID</th><th>Игрок</th><th>Нарушитель</th><th>Причина</th><th>Статус</th></tr></thead>
+                            <tbody>
+                                <tr><td>#R-001</td><td>new_player</td><td>hacker_1337</td><td>Читы</td><td style="color:#0066cc;">🔵 Новая</td></tr>
+                                <tr><td>#R-002</td><td>pley1657</td><td>spammer_99</td><td>Спам</td><td style="color:#b8860b;">🟡 Изучается</td></tr>
+                                <tr><td>#R-003</td><td>test_user</td><td>griefer_01</td><td>Гриферство</td><td style="color:#0066cc;">🔵 Новая</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+        }
+
+        // ===== ФУНКЦИИ ДЛЯ БАНОВ =====
+        function executeBan() {
+            const nick = document.getElementById('ban-nick')?.value || 'test_player';
+            const reason = document.getElementById('ban-reason')?.value || 'Нарушение';
+            const duration = document.getElementById('ban-duration')?.value || 'permanent';
+            const durationText = duration === 'permanent' ? 'Навсегда' : duration;
+
+            if (confirm(`⚠️ Выдать бан для ${nick}?\nПричина: ${reason}\nСрок: ${durationText}`)) {
+                showNotification(`✅ ${nick} забанен на ${durationText}`, 'success');
+
+                // Добавляем в таблицу
+                const tbody = document.getElementById('bans-tbody');
+                if (tbody) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${nick}</td>
+                            <td>${reason}</td>
+                            <td>${durationText}</td>
+                            <td>${new Date().toLocaleDateString()}</td>
+                            <td style="color:#8b0000;">🔒 Активен</td>
+                        `;
+                    tbody.prepend(row);
+                }
+
+                if (document.getElementById('ban-nick')) {
+                    document.getElementById('ban-nick').value = '';
+                }
+            }
+        }
+
+        function executeUnban() {
+            const nick = document.getElementById('unban-nick')?.value;
+            if (!nick) {
+                alert('❌ Введите ник игрока');
+                return;
+            }
+            if (confirm(`🔓 Снять бан с ${nick}?`)) {
+                showNotification(`✅ Бан снят с ${nick}`, 'success');
+                document.getElementById('unban-nick').value = '';
+            }
+        }
+
+        function executeHWIDBan() {
+            const nick = document.getElementById('hwid-nick')?.value || 'test_player';
+            const reason = document.getElementById('hwid-reason')?.value || 'Нарушение';
+
+            if (confirm(`🛡️ Заблокировать HWID для ${nick}?\nПричина: ${reason}`)) {
+                showNotification(`✅ HWID ${nick} заблокирован!`, 'success');
+                document.getElementById('hwid-nick').value = '';
+            }
+        }
+
+        // ===== УВЕДОМЛЕНИЯ =====
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('admin-notifications') || createNotificationContainer();
+            const el = document.createElement('div');
+            el.className = `admin-notif ${type}`;
+            el.textContent = message;
+            el.style.cssText = `
+                    background: var(--admin-card);
+                    border: 1px solid ${type === 'success' ? '#1a6a1a' : type === 'danger' ? '#6b0000' : 'var(--admin-border)'};
+                    color: var(--admin-text-light);
+                    padding: 12px 20px;
+                    margin-bottom: 8px;
+                    font-size: 0.85em;
+                    letter-spacing: 0.05em;
+                `;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 4000);
+        }
+
+        function createNotificationContainer() {
+            const container = document.createElement('div');
+            container.id = 'admin-notifications';
+            container.style.cssText = `
+                    position: fixed;
+                    top: 80px;
+                    right: 20px;
+                    z-index: 99999;
+                    max-width: 340px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                    pointer-events: none;
+                `;
+            document.body.appendChild(container);
+            return container;
+        }
+
+        function renderDefault(container, page) {
+            container.innerHTML =
+                `<div class="admin-card"><div class="card-title">⚠️ СТРАНИЦА В РАЗРАБОТКЕ</div><div style="padding:30px;text-align:center;color:var(--admin-text);opacity:0.3;">${page}</div></div>`;
+        }
+
+        // ===== НАВИГАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.dataset.page;
+                    if (page) loadPage(page);
+                });
             });
+            loadPage('dashboard');
         });
-        loadPage('dashboard');
-    });
 
-    console.log('✅ Админ-панель загружена (ТЕСТОВЫЙ РЕЖИМ)');
-</script>
+        console.log('✅ Админ-панель загружена (ТЕСТОВЫЙ РЕЖИМ)');
+    </script>
 
 </body>
 </html>
