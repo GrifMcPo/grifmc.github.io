@@ -1,0 +1,63 @@
+<div class="admin-card">
+    <div class="card-title">📚 БАЗА ЗНАНИЙ — ПРЕДМЕТЫ</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <input class="admin-input" id="item-search" placeholder="Поиск по ID или названию..." style="flex:1;" oninput="searchItems(this.value)">
+        <button class="admin-btn" onclick="searchItems(document.getElementById('item-search').value)">🔍</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;" id="items-grid">
+        ${[
+            {id: 'minecraft:diamond_sword', name: 'Алмазный меч', icon: '🗡️'},
+            {id: 'minecraft:diamond_pickaxe', name: 'Алмазная кирка', icon: '⛏️'},
+            {id: 'minecraft:diamond_helmet', name: 'Алмазный шлем', icon: '🪖'},
+            {id: 'minecraft:diamond_chestplate', name: 'Алмазный нагрудник', icon: '🛡️'},
+            {id: 'minecraft:diamond_leggings', name: 'Алмазные поножи', icon: '👖'},
+            {id: 'minecraft:diamond_boots', name: 'Алмазные ботинки', icon: '👢'},
+            {id: 'minecraft:totem_of_undying', name: 'Тотем бессмертия', icon: '🧿'},
+            {id: 'minecraft:elytra', name: 'Элитры', icon: '🪶'},
+            {id: 'minecraft:netherite_ingot', name: 'Незеритовый слиток', icon: '🔩'},
+            {id: 'minecraft:enchanted_golden_apple', name: 'Зачарованное золотое яблоко', icon: '🍎'},
+        ].map(item => `
+            <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;text-align:center;cursor:pointer;" onclick="alert('ID: ${item.id}')">
+                <div style="font-size:2em;">${item.icon}</div>
+                <div style="font-size:0.7em;color:var(--admin-text-light);">${item.name}</div>
+                <div style="font-size:0.5em;color:var(--admin-text);opacity:0.3;margin-top:4px;">${item.id}</div>
+            </div>
+        `).join('')}
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">🔄 РЕЗЕРВНОЕ КОПИРОВАНИЕ</div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <span style="color:var(--admin-text);">📦 Скачать конфигурацию сайта</span>
+        <button class="admin-btn gold" onclick="alert('Скачивание конфигурации начато')">📥 СКАЧАТЬ</button>
+        <span style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">Версия: 3.0.1 | Коммит: a7f3d9e</span>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">📋 ЖУРНАЛ ДЕПЛОЯ</div>
+    <table class="admin-table">
+        <thead><tr><th>Дата</th><th>Версия</th><th>Автор</th><th>Изменения</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>22.07.2026 15:30</td>
+                <td style="color:#1a6a1a;">v3.0.1</td>
+                <td>Grif_Mo</td>
+                <td>Добавлена админ-панель</td>
+            </tr>
+            <tr>
+                <td>20.07.2026 12:15</td>
+                <td style="color:#1a6a1a;">v3.0.0</td>
+                <td>Grif_Mo</td>
+                <td>Полный редизайн сайта</td>
+            </tr>
+            <tr>
+                <td>15.07.2026 09:45</td>
+                <td style="color:#b8860b;">v2.5.0</td>
+                <td>pley1657</td>
+                <td>Добавлена система регистрации</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
