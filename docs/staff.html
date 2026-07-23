@@ -1,0 +1,57 @@
+<div class="admin-card">
+    <div class="card-title">👥 УПРАВЛЕНИЕ ПЕРСОНАЛОМ</div>
+    <table class="admin-table">
+        <thead><tr><th>Имя</th><th>Роль</th><th>Права</th><th>Последняя активность</th><th>Статус</th><th>Действия</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Grif_Mo</td>
+                <td style="color:#b8860b;">👑 Владелец</td>
+                <td>Полный доступ</td>
+                <td>15:32:21</td>
+                <td style="color:#1a6a1a;">🟢 Онлайн</td>
+                <td><button class="admin-btn admin-btn-sm">✏️</button></td>
+            </tr>
+            <tr>
+                <td>pley1657</td>
+                <td style="color:#1a6a1a;">🛡️ Модератор</td>
+                <td>Баны, Муты, Телепорт</td>
+                <td>14:15:03</td>
+                <td style="color:#1a6a1a;">🟢 Онлайн</td>
+                <td><button class="admin-btn admin-btn-sm danger" onclick="deactivateStaff()">🔒</button></td>
+            </tr>
+            <tr>
+                <td>helper_01</td>
+                <td style="color:#b8860b;">🤝 Хелпер</td>
+                <td>Только чат</td>
+                <td>12:30:45</td>
+                <td style="color:#8b0000;">🔴 Офлайн</td>
+                <td><button class="admin-btn admin-btn-sm danger" onclick="deactivateStaff()">🔒</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">➕ ДОБАВИТЬ СОТРУДНИКА</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+        <input class="admin-input" placeholder="Telegram ID">
+        <select class="admin-select">
+            <option>Хелпер</option>
+            <option>Модератор</option>
+            <option>Главный инженер</option>
+        </select>
+        <button class="admin-btn gold">👥 ДОБАВИТЬ</button>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">📋 ЛОГ ДЕЙСТВИЙ ПЕРСОНАЛА</div>
+    <table class="admin-table">
+        <thead><tr><th>Время</th><th>Сотрудник</th><th>Действие</th><th>Цель</th></tr></thead>
+        <tbody>
+            <tr><td>15:32:21</td><td>pley1657</td><td>🚫 Бан</td><td>hacker_1337</td></tr>
+            <tr><td>14:15:03</td><td>Grif_Mo</td><td>🛡️ HWID-бан</td><td>cheater_99</td></tr>
+            <tr><td>13:48:12</td><td>pley1657</td><td>💬 Мут</td><td>spammer_01</td></tr>
+        </tbody>
+    </table>
+</div>
