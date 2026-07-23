@@ -1,0 +1,57 @@
+<div class="admin-card">
+    <div class="card-title">🔗 УПРАВЛЕНИЕ ИНТЕГРАЦИЯМИ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                <span style="font-size:1.5em;">🟣</span>
+                <div style="font-weight:700;color:var(--admin-text-light);">Discord</div>
+                <span style="margin-left:auto;font-size:0.7em;color:#1a6a1a;">✅ Подключен</span>
+            </div>
+            <div style="font-size:0.8em;color:var(--admin-text);opacity:0.5;">Webhook URL: https://discord.com/api/webhooks/...</div>
+            <div style="margin-top:8px;display:flex;gap:8px;">
+                <button class="admin-btn" onclick="alert('Тест webhook отправлен')">🧪 Тест</button>
+                <button class="admin-btn danger" onclick="alert('Discord отключён')">🔌 Отключить</button>
+            </div>
+        </div>
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                <span style="font-size:1.5em;">💬</span>
+                <div style="font-weight:700;color:var(--admin-text-light);">Telegram Bot</div>
+                <span style="margin-left:auto;font-size:0.7em;color:#1a6a1a;">✅ Активен</span>
+            </div>
+            <div style="font-size:0.8em;color:var(--admin-text);opacity:0.5;">Токен: bot123456:ABC...</div>
+            <div style="margin-top:8px;display:flex;gap:8px;">
+                <button class="admin-btn" onclick="alert('Тестовое сообщение отправлено')">🧪 Тест</button>
+                <button class="admin-btn danger" onclick="alert('Бот отключён')">🔌 Отключить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">🔄 СИНХРОНИЗАЦИЯ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--admin-border);">
+                <span style="font-weight:600;">VIP-статус → Префиксы</span>
+                <span style="margin-left:auto;font-size:0.7em;color:#1a6a1a;">✅ Синхрон.</span>
+                <button class="admin-btn admin-btn-sm" onclick="alert('Синхронизация запущена')">🔄</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--admin-border);">
+                <span style="font-weight:600;">Скины → Кэш аватаров</span>
+                <span style="margin-left:auto;font-size:0.7em;color:#b8860b;">⏳ Обновить</span>
+                <button class="admin-btn admin-btn-sm gold" onclick="alert('Кэш скинов обновлён')">🔄</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;">
+                <span style="font-weight:600;">Discord тикеты → Панель</span>
+                <span style="margin-left:auto;font-size:0.7em;color:#b8860b;">⏳ Ожидает</span>
+                <button class="admin-btn admin-btn-sm" onclick="alert('Тикеты загружены')">📥</button>
+            </div>
+        </div>
+        <div style="background:var(--admin-card);border:1px solid var(--admin-border);padding:12px;">
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">🔄 Последняя синхронизация</div>
+            <div style="font-weight:600;color:var(--admin-text-light);">22.07.2026 15:30:12</div>
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">✅ Все системы синхронизированы</div>
+        </div>
+    </div>
+</div>
