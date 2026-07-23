@@ -1,0 +1,86 @@
+<div class="admin-card">
+    <div class="card-title">🏗️ РЕДАКТОР КАРТОЧЕК ГЛАВНОЙ</div>
+    <div style="margin-bottom:16px;padding:12px;border:1px dashed var(--admin-border);">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+            <button class="admin-btn" onclick="alert('Карточка перемещена вверх')">⬆️ Вверх</button>
+            <button class="admin-btn" onclick="alert('Карточка перемещена вниз')">⬇️ Вниз</button>
+            <button class="admin-btn danger" onclick="alert('Карточка скрыта')">👁️ Скрыть</button>
+            <span style="margin-left:auto;font-size:0.7em;color:var(--admin-text);opacity:0.3;">Drag & Drop для перетаскивания</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="card-grid">
+            <div class="draggable-card" draggable="true" style="background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;cursor:grab;">
+                <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">📊 Статистика</div>
+                <div style="font-weight:700;color:var(--admin-text-light);">Онлайн</div>
+                <div style="font-size:0.7em;color:var(--admin-text);opacity:0.5;">Видимость: ✅</div>
+            </div>
+            <div class="draggable-card" draggable="true" style="background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;cursor:grab;">
+                <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">📝 Контент</div>
+                <div style="font-weight:700;color:var(--admin-text-light);">Новости</div>
+                <div style="font-size:0.7em;color:var(--admin-text);opacity:0.5;">Видимость: ✅</div>
+            </div>
+            <div class="draggable-card" draggable="true" style="background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;cursor:grab;">
+                <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">🏆 Рейтинг</div>
+                <div style="font-weight:700;color:var(--admin-text-light);">Топ игроков</div>
+                <div style="font-size:0.7em;color:var(--admin-text);opacity:0.5;">Видимость: ✅</div>
+            </div>
+            <div class="draggable-card" draggable="true" style="background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;cursor:grab;">
+                <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">🛒 Магазин</div>
+                <div style="font-weight:700;color:var(--admin-text-light);">Донат</div>
+                <div style="font-size:0.7em;color:var(--admin-text);opacity:0.5;">Видимость: ❌</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">✍️ РЕДАКТОР НОВОСТЕЙ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Заголовок</label>
+            <input class="admin-input" id="news-title" placeholder="Заголовок новости..." value="Сервер запущен!">
+        </div>
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Категория</label>
+            <select class="admin-select" id="news-category">
+                <option value="update">🆕 Обновление</option>
+                <option value="event">⚡ Ивент</option>
+                <option value="important">🛡️ Важно</option>
+            </select>
+        </div>
+    </div>
+    <div style="margin-top:12px;">
+        <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Текст новости</label>
+        <textarea class="admin-textarea" id="news-body" rows="4">Добро пожаловать на наш сервер! Забирай стартовый набор командой /kit start и присоединяйся к сообществу.</textarea>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:12px;align-items:center;">
+        <button class="admin-btn gold" onclick="publishNews()">📢 ОПУБЛИКОВАТЬ</button>
+        <button class="admin-btn" onclick="document.getElementById('news-title').value='';document.getElementById('news-body').value='';">◻ ОЧИСТИТЬ</button>
+        <label style="font-size:0.7em;color:var(--admin-text);opacity:0.3;display:flex;align-items:center;gap:8px;margin-left:auto;">
+            <input type="checkbox"> 📌 Закрепить
+        </label>
+        <label style="font-size:0.7em;color:var(--admin-text);opacity:0.3;display:flex;align-items:center;gap:8px;">
+            <input type="checkbox"> 🔔 Push-уведомление
+        </label>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="card-title">📋 ОТЛОЖЕННЫЕ ПУБЛИКАЦИИ</div>
+    <table class="admin-table">
+        <thead><tr><th>Заголовок</th><th>Дата публикации</th><th>Статус</th><th>Действия</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Турнир чемпионов</td>
+                <td>24.07.2026 20:00</td>
+                <td style="color:#b8860b;">⏳ Ожидает</td>
+                <td><button class="admin-btn admin-btn-sm danger" onclick="alert('Отложенная публикация удалена')">🗑️</button></td>
+            </tr>
+            <tr>
+                <td>Вайп мира</td>
+                <td>01.08.2026 00:00</td>
+                <td style="color:#b8860b;">⏳ Ожидает</td>
+                <td><button class="admin-btn admin-btn-sm danger" onclick="alert('Отложенная публикация удалена')">🗑️</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
