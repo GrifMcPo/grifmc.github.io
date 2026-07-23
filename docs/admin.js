@@ -1,5 +1,6 @@
 // ========================================
-// admin.js — ПОЛНАЯ ЛОГИКА АДМИН-ПАНЕЛИ (С ЗАГРУЗКОЙ СТРАНИЦ)
+// admin.js — ПОЛНАЯ ЛОГИКА АДМИН-ПАНЕЛИ
+// (ВСЕ ФАЙЛЫ В КОРНЕ)
 // ========================================
 
 const ADMIN_PASSWORD = 'grifmcBOT';
@@ -23,7 +24,7 @@ function checkAdminPassword() {
     }
 }
 
-// ===== ЗАГРУЗКА СТРАНИЦ (ЧЕРЕЗ FETCH) =====
+// ===== ЗАГРУЗКА СТРАНИЦ (ИЗ КОРНЯ) =====
 function loadPage(page) {
     currentPage = page;
     const container = document.getElementById('page-container');
@@ -56,8 +57,8 @@ function loadPage(page) {
     // Показываем загрузку
     container.innerHTML = '<div class="loading-terminal">ЗАГРУЗКА ТЕРМИНАЛА</div>';
 
-    // Загружаем HTML-файл из папки admin-pages
-    fetch(`admin-pages/${page}.html`)
+    // 🔥 ЗАГРУЖАЕМ ИЗ КОРНЯ (НЕ ИЗ ПАПКИ admin-pages)
+    fetch(`${page}.html`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Страница не найдена');
@@ -66,7 +67,7 @@ function loadPage(page) {
         })
         .then(html => {
             container.innerHTML = html;
-            // Вызываем инициализацию скриптов на странице, если они есть
+            // Инициализируем скрипты на странице, если есть
             if (window.initPage && typeof window.initPage === 'function') {
                 window.initPage();
             }
@@ -79,11 +80,266 @@ function loadPage(page) {
                     <div class="card-title">⚠️ ОШИБКА ЗАГРУЗКИ</div>
                     <div style="padding:40px 20px;text-align:center;color:var(--admin-text);opacity:0.5;">
                         Не удалось загрузить страницу "${page}"<br>
-                        <span style="font-size:0.7em;">Убедитесь, что файл admin-pages/${page}.html существует</span>
+                        <span style="font-size:0.7em;">Файл ${page}.html не найден в корневой папке</span>
                     </div>
                 </div>
             `;
         });
+}
+
+// ===== ФУНКЦИИ ДЛЯ СТРАНИЦ =====
+
+// ===== HWID =====
+function confirmHWIDBan() {
+    const reason = document.getElementById('hwid-reason')?.value || 'Нарушение';
+    const comment = document.getElementById('hwid-comment')?.value || 'Без комментария';
+    const duration = document.getElementById('hwid-duration')?.value || 'permanent';
+    const durationText = duration === 'permanent' ? 'НАВСЕГДА' : duration;
+
+    if (confirm(`⚠️ ВЫ УВЕРЕНЫ?\n\nБлокировка HWID для pley1657\nПричина: ${reason}\nСрок: ${durationText}\nКомментарий: ${comment}`)) {
+        showNotification('✅ HWID УСПЕШНО ЗАБЛОКИРОВАН!', 'success');
+        addAdminLog(`HWID-бан: pley1657 (${reason})`);
+        if (document.getElementById('hwid-comment')) {
+            document.getElementById('hwid-comment').value = '';
+        }
+        // Обновляем таблицу
+        const rows = document.querySelector('.hwid-section table tbody');
+        if (rows) {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>pley1657</td>
+                <td style="font-family:monospace;font-size:0.8em;">7F3A-9B2C-4D8E-1F5A-6B3C</td>
+                <td>${reason}</td>
+                <td style="color:#8b0000;">🔒 ${durationText}</td>
+                <td>${duration === 'permanent' ? '♾️ Бессрочно' : '0д 0ч'}</td>
+                <td><button class="admin-btn admin-btn-sm danger" onclick="unbanHWID()">🔓 Снять</button></td>
+            `;
+            rows.prepend(newRow);
+        }
+    }
+}
+
+function unbanHWID() {
+    if (confirm('⚠️ Снять блокировку HWID?')) {
+        showNotification('✅ HWID РАЗБЛОКИРОВАН', 'success');
+        addAdminLog('HWID-анбан');
+    }
+}
+
+function searchHWID(query) {
+    const results = document.getElementById('hwid-results');
+    if (!results) return;
+    if (!query || query.length < 2) {
+        results.innerHTML = '';
+        return;
+    }
+    results.innerHTML = `
+        <div style="padding:8px 12px;border:1px solid var(--admin-border);margin-bottom:4px;cursor:pointer;" onclick="selectHWID('pley1657')">
+            ⛏️ pley1657 — HWID: 7F3A-9B2C-4D8E-1F5A-6B3C
+        </div>
+        <div style="padding:8px 12px;border:1px solid var(--admin-border);margin-bottom:4px;cursor:pointer;" onclick="selectHWID('test_hacker')">
+            ⛏️ test_hacker — HWID: 1A2B-3C4D-5E6F-7G8H-9I0J
+        </div>
+    `;
+}
+
+function selectHWID(nick) {
+    const search = document.getElementById('hwid-search');
+    if (search) search.value = nick;
+    const results = document.getElementById('hwid-results');
+    if (results) results.innerHTML = '';
+    showNotification(`👤 Выбран игрок: ${nick}`, 'info');
+}
+
+// ===== БАНЫ =====
+function executeBan() {
+    const nick = document.getElementById('ban-nick')?.value || 'pley1657';
+    const reason = document.getElementById('ban-reason')?.value || 'Нарушение';
+    const duration = document.getElementById('ban-duration')?.value || 'permanent';
+    const durationText = duration === 'permanent' ? 'Навсегда' : duration;
+    
+    if (confirm(`⚠️ Выдать бан для ${nick}?\nПричина: ${reason}\nСрок: ${durationText}`)) {
+        showNotification(`✅ ${nick} забанен на ${durationText}`, 'success');
+        addAdminLog(`Бан: ${nick} (${reason})`);
+        if (document.getElementById('ban-nick')) {
+            document.getElementById('ban-nick').value = '';
+        }
+    }
+}
+
+function executeIPBan() {
+    const ip = document.getElementById('ip-ban-input')?.value || '192.168.1.1';
+    if (confirm(`🌐 Заблокировать IP: ${ip}?`)) {
+        showNotification(`✅ IP ${ip} заблокирован`, 'success');
+        addAdminLog(`IP-бан: ${ip}`);
+        if (document.getElementById('ip-ban-input')) {
+            document.getElementById('ip-ban-input').value = '';
+        }
+    }
+}
+
+function unbanPlayer() {
+    if (confirm('🔓 Снять бан?')) {
+        showNotification('✅ Бан снят', 'success');
+        addAdminLog('Анбан');
+    }
+}
+
+// ===== ПЕРСОНАЛ =====
+function deactivateStaff() {
+    if (confirm('⚠️ Деактивировать права сотрудника?')) {
+        showNotification('✅ Права отозваны', 'success');
+        addAdminLog('Деактивация прав сотрудника');
+    }
+}
+
+// ===== АНОНСЫ =====
+function sendAnnouncement() {
+    const text = document.getElementById('announce-text')?.value?.trim();
+    if (!text) {
+        alert('❌ Введите текст анонса');
+        return;
+    }
+    const type = document.getElementById('announce-type')?.value || 'chat';
+    const target = document.getElementById('announce-target')?.value || 'all';
+    
+    const typeNames = {
+        chat: '💬 Тихое',
+        sound: '🔊 Громкое',
+        title: '📺 На весь экран'
+    };
+    const targetNames = {
+        all: '🌍 Все игроки',
+        vip: '⭐ VIP',
+        staff: '👑 Персонал',
+        world: '🌎 Конкретный мир'
+    };
+    
+    if (confirm(`📢 Отправить анонс?\n\nТекст: "${text}"\nТип: ${typeNames[type] || type}\nТаргетинг: ${targetNames[target] || target}`)) {
+        alert('✅ Анонс отправлен успешно!');
+        addAdminLog(`Анонс: ${text}`);
+        if (document.getElementById('announce-text')) {
+            document.getElementById('announce-text').value = '';
+        }
+    }
+}
+
+// ===== СОБЫТИЯ =====
+function addEvent() {
+    const name = document.getElementById('event-name')?.value?.trim();
+    const time = document.getElementById('event-time')?.value;
+    const type = document.getElementById('event-type')?.value || 'tournament';
+    
+    if (!name || !time) {
+        alert('❌ Заполните все поля');
+        return;
+    }
+    
+    const typeNames = {
+        tournament: '🎯 Турнир',
+        wipe: '🔄 Вайп',
+        holiday: '🎉 Праздник',
+        maintenance: '🔧 Техработы'
+    };
+    
+    const colors = {
+        tournament: '#b8860b',
+        wipe: '#8b0000',
+        holiday: '#1a6a1a',
+        maintenance: '#b8860b'
+    };
+    
+    const list = document.getElementById('events-list');
+    if (list) {
+        const eventDiv = document.createElement('div');
+        eventDiv.style.cssText = `background:var(--admin-card);border:1px solid var(--admin-border);padding:16px;border-left:3px solid ${colors[type] || '#b8860b'};`;
+        eventDiv.innerHTML = `
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.3;">${new Date(time).toLocaleString()}</div>
+            <div style="font-weight:700;color:var(--admin-text-light);">${typeNames[type] || type} ${name}</div>
+            <div style="font-size:0.7em;color:var(--admin-text);opacity:0.5;">⏳ Добавлено только что</div>
+        `;
+        list.prepend(eventDiv);
+    }
+    
+    alert('✅ Событие добавлено в календарь!');
+    addAdminLog(`Событие: ${name}`);
+    if (document.getElementById('event-name')) {
+        document.getElementById('event-name').value = '';
+    }
+}
+
+// ===== НОВОСТИ =====
+function publishNews() {
+    const title = document.getElementById('news-title')?.value;
+    const body = document.getElementById('news-body')?.value;
+    if (!title || !body) {
+        alert('❌ Заполните заголовок и текст новости');
+        return;
+    }
+    alert('✅ Новость успешно опубликована!');
+    addAdminLog(`Новость: ${title}`);
+}
+
+// ===== КОНСОЛЬ =====
+function executeCommand() {
+    const input = document.getElementById('console-input');
+    const output = document.getElementById('console-output');
+    if (!input || !output) return;
+    
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    
+    const responses = {
+        'help': 'Доступные команды: help, status, reload, list, backup, clear',
+        'status': 'Статус сервера: ✅ Работает | Онлайн: 27 игроков | TPS: 19.8',
+        'reload': '🔄 Перезагрузка плагинов... ✅ Готово!',
+        'list': 'Активные плагины: Essentials, WorldGuard, LuckPerms, TAB',
+        'backup': '💾 Создание бэкапа... ✅ Бэкап сохранён в /backups/backup-20260722-2230.tar.gz',
+        'clear': '🗑️ Консоль очищена'
+    };
+    
+    const response = responses[cmd] || `❌ Неизвестная команда: ${cmd}`;
+    
+    const newLine = document.createElement('div');
+    newLine.style.cssText = 'color:#666;';
+    newLine.innerHTML = `$ ${cmd}`;
+    output.appendChild(newLine);
+    
+    const respLine = document.createElement('div');
+    respLine.style.cssText = 'color:#aaa;padding-left:8px;';
+    respLine.textContent = response;
+    output.appendChild(respLine);
+    
+    input.value = '';
+    output.scrollTop = output.scrollHeight;
+    
+    if (cmd === 'clear') {
+        setTimeout(() => {
+            output.innerHTML = `<div style="color:#666;">$ GRIFMC-SERVER:~ administrator$ <span style="color:#aaa;">Консоль очищена</span></div>`;
+            addAdminLog('Консоль очищена');
+        }, 100);
+    }
+    
+    addAdminLog(`Консоль: ${cmd}`);
+}
+
+function confirmSoftReload() {
+    if (confirm('⚠️ ПЕРВОЕ ПОДТВЕРЖДЕНИЕ: Вы уверены, что хотите перезагрузить все плагины?')) {
+        if (confirm('⚠️ ВТОРОЕ ПОДТВЕРЖДЕНИЕ: Перезагрузка плагинов займёт 5-10 секунд. Продолжить?')) {
+            alert('🔄 Перезагрузка плагинов запущена...\n\n✅ Плагины успешно перезагружены!');
+            addAdminLog('Мягкая перезагрузка плагинов');
+        }
+    }
+}
+
+function searchItems(query) {
+    const grid = document.getElementById('items-grid');
+    if (!grid) return;
+    const items = grid.querySelectorAll('div[style*="background:var(--admin-card);"]');
+    items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+    });
 }
 
 // ===== УВЕДОМЛЕНИЯ =====
@@ -159,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ===== ГЛОБАЛЬНЫЕ СТИЛИ =====
+// ===== СТИЛИ ДЛЯ НОТИФИКАЦИЙ =====
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -187,11 +443,13 @@ document.head.appendChild(style);
 window.emergencyMessage = function(text) {
     const bar = document.getElementById('emergency-bar');
     if (!text) {
-        bar.style.display = 'none';
+        if (bar) bar.style.display = 'none';
         return;
     }
-    bar.innerHTML = `⚠️ ${text.toUpperCase()} <button class="emergency-close" onclick="emergencyMessage()">✕</button>`;
-    bar.style.display = 'block';
+    if (bar) {
+        bar.innerHTML = `⚠️ ${text.toUpperCase()} <button class="emergency-close" onclick="emergencyMessage()">✕</button>`;
+        bar.style.display = 'block';
+    }
     addAdminLog(`Экстренное оповещение: ${text}`);
 };
 
