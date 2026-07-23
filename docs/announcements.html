@@ -1,0 +1,21 @@
+<div class="admin-card">
+    <div class="card-title">📢 ГЛОБАЛЬНЫЙ АНОНС</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:12px;">
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Текст анонса</label>
+            <input class="admin-input" id="announce-text" placeholder="Введите сообщение для всех игроков...">
+        </div>
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Тип уведомления</label>
+            <select class="admin-select" id="announce-type">
+                <option value="chat">💬 Тихое (чат)</option>
+                <option value="sound">🔊 Громкое (звук)</option>
+                <option value="title">📺 На весь экран</option>
+            </select>
+        </div>
+        <div>
+            <label style="font-size:0.7em;text-transform:uppercase;color:var(--admin-text);opacity:0.4;">Таргетинг</label>
+            <select class="admin-select" id="announce-target">
+                <option value="all">🌍 Все игроки</option>
+                <option value="vip">⭐ VIP</option>
+                <option value="staff">
